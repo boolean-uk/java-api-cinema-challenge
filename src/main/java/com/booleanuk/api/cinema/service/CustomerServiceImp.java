@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @Service
 public class CustomerServiceImp implements CustomerService {
@@ -25,15 +26,20 @@ public class CustomerServiceImp implements CustomerService {
 
     @Override
     public Customer createCustomer(Customer customer) {
+        LocalDateTime createdAt = LocalDateTime.now();
+        customer.setCreatedAt(createdAt);
+        customer.setUpdatedAt(createdAt);
         return customerRepository.save(customer);
     }
 
     @Override
     public Customer updateCustomer(Long id, Customer customer) {
-        customerRepository.findById(id)
+        Customer foundCustomer = customerRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No customer matches the provided id"));
 
         customer.setId(id);
+        customer.setCreatedAt(foundCustomer.getCreatedAt());
+        customer.setUpdatedAt(LocalDateTime.now());
         return customerRepository.save(customer);
     }
 
