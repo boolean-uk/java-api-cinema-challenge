@@ -10,6 +10,7 @@ updated_at TIMESTAMP
 
 CREATE TABLE IF NOT EXISTS screening(
 id SERIAL PRIMARY KEY,
+movie_id INTEGER REFERENCES movie(id),
 screen_number INTEGER NOT NULL,
 starts_at TIMESTAMP,
 capacity INTEGER,

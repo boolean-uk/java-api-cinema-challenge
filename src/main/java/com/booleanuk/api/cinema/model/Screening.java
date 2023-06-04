@@ -23,4 +23,7 @@ public class Screening {
     private LocalDateTime createdAt;
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
+    @ManyToOne
+    @JoinColumn(name="movie_id",referencedColumnName = "id")
+    private Movie movie;
 }

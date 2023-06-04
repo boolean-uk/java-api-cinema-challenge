@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Data
 public class Movie {
@@ -19,4 +21,6 @@ public class Movie {
     private LocalDateTime createdAt;
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "movie")
+    private List<Screening> screenings;
 }
