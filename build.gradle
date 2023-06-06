@@ -14,10 +14,20 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	runtimeOnly 'org.postgresql:postgresql'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.postgresql:postgresql:42.6.0'
+	implementation 'javax.validation:validation-api:2.0.1.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	compileOnly 'org.projectlombok:lombok:1.18.28'
+	annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+	testCompileOnly 'org.projectlombok:lombok:1.18.28'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	implementation 'org.apache.commons:commons-lang3:3.0'
+
 }
 
 tasks.named('test') {
