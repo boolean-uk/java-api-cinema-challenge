@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 @Data
 public class ScreeningDto {
-    private int screenNumber;
-    private int capacity;
+    private Integer screenNumber;
+    private Integer capacity;
     private String startsAt;
 
     public Screening toScreening(Movie movie) {

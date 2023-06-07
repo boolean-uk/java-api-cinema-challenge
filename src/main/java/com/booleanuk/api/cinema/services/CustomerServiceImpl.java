@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.services;
 
+import com.booleanuk.api.cinema.Dtos.CustomerDto;
+import com.booleanuk.api.cinema.Dtos.TicketDto;
 import com.booleanuk.api.cinema.entities.Customer;
 import com.booleanuk.api.cinema.entities.Screening;
 import com.booleanuk.api.cinema.entities.Ticket;
@@ -32,8 +34,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer createCustomer(Customer customer) {
-        return customerRepo.save(customer);
+    public Customer createCustomer(CustomerDto customer) {
+        if (Validation.checkIfNullExists(customer)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Could not create the Customer,please check all required fields are correct.");
+        }
+        if (!Validation.isEmail(customer.getEmail())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You have to provide email in valid format");
+        }
+        return customerRepo.save(customer.toCustomer());
     }
 
     @Override
@@ -47,8 +55,12 @@ public class CustomerServiceImpl implements CustomerService {
         if (requestCustomer.getName() != null) {
             customerFromDb.setName(requestCustomer.getName());
         }
-        if (requestCustomer.getEmail() != null && Validation.isEmail(requestCustomer.getEmail())) {
-            customerFromDb.setEmail(requestCustomer.getEmail());
+        if (requestCustomer.getEmail() != null  ) {
+            if (Validation.isEmail(requestCustomer.getEmail())){
+                customerFromDb.setEmail(requestCustomer.getEmail());
+            }else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You have to provide email in valid format");
+            }
         }
         if (requestCustomer.getPhone() != null) {
             customerFromDb.setPhone(requestCustomer.getPhone());
@@ -64,12 +76,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Ticket bookATicket(int customerId, int screeningId, Ticket ticket) {
+    public Ticket bookATicket(int customerId, int screeningId, TicketDto ticket) {
+        if (Validation.checkIfNullExists(ticket)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Could not create the Ticket,please check all required fields are correct.");
+        }
         Customer customerFromDb = findCustomerById(customerId);
         Screening screeningFromDb = findScreeningById(screeningId);
-        ticket.setCustomer(customerFromDb);
-        ticket.setScreening(screeningFromDb);
-        return ticketRepo.save(ticket);
+        return ticketRepo.save(ticket.toTicket(customerFromDb,screeningFromDb));
     }
 
     @Override
