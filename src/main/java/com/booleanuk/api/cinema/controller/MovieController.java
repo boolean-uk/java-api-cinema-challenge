@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.dto.GenericResponseDTO;
+import com.booleanuk.api.cinema.GenericResponse;
 import com.booleanuk.api.cinema.dto.MovieViewDTO;
 import com.booleanuk.api.cinema.dto.ScreeningViewDTO;
 import com.booleanuk.api.cinema.model.Movie;
@@ -31,25 +31,25 @@ public class MovieController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GenericResponseDTO<MovieViewDTO> create(@RequestBody Movie movie){
+    public GenericResponse<MovieViewDTO> create(@RequestBody Movie movie){
         return movieService.create(movie);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public GenericResponseDTO<List<MovieViewDTO>> getAll(){
+    public GenericResponse<List<MovieViewDTO>> getAll(){
         return movieService.getAll();
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public GenericResponseDTO<MovieViewDTO> update(@PathVariable int id, @RequestBody Movie movie){
+    public GenericResponse<MovieViewDTO> update(@PathVariable int id, @RequestBody Movie movie){
         return movieService.update(id, movie);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public GenericResponseDTO<MovieViewDTO> delete(@PathVariable int id) {
+    public GenericResponse<MovieViewDTO> delete(@PathVariable int id) {
         return movieService.delete(id);
     }
 
