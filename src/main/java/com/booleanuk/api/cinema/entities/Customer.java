@@ -36,7 +36,7 @@ public class Customer {
     private Instant updatedAt;
     // FK
     @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
-//    @JsonIgnore
+    @JsonIgnore
     private List<Ticket> tickets;
 
 }

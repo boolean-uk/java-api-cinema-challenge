@@ -1,32 +1,30 @@
 package com.booleanuk.api.cinema.services.customer;
 
-import com.booleanuk.api.cinema.Dtos.customers.CustomerDtoWithoutTickets;
 import com.booleanuk.api.cinema.entities.Customer;
+import com.booleanuk.api.cinema.entities.Screening;
+import com.booleanuk.api.cinema.entities.Ticket;
 import com.booleanuk.api.cinema.repositories.CustomerRepo;
+import com.booleanuk.api.cinema.repositories.ScreeningRepo;
+import com.booleanuk.api.cinema.repositories.TicketRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ICustomerService implements CustomerServiceInterface {
     @Autowired
     CustomerRepo customerRepo;
+    @Autowired
+    TicketRepo ticketRepo;
+    @Autowired
+    ScreeningRepo screeningRepo;
 
     @Override
-    public List<CustomerDtoWithoutTickets> generateList() {
-        List<Customer> customers = customerRepo.findAll();
-        List<CustomerDtoWithoutTickets> theList = new ArrayList<>();
-        for (Customer customer : customers) {
-            CustomerDtoWithoutTickets dto = new CustomerDtoWithoutTickets(
-                    customer.getId(), customer.getName(), customer.getEmail(), customer.getPhone(), customer.getCreatedAt(), customer.getUpdatedAt()
-            );
-            theList.add(dto);
-        }
-        return theList;
+    public List<Customer> getAllCustomers() {
+        return customerRepo.findAll();
     }
 
     private Customer findCustomerById(int id) {
@@ -61,10 +59,19 @@ public class ICustomerService implements CustomerServiceInterface {
         return deletedCustomer;
     }
 
+
     @Override
-    public CustomerDtoWithoutTickets generateCustomerWithoutTickets(Customer customer) {
-        return new CustomerDtoWithoutTickets(
-                customer.getId(), customer.getName(), customer.getEmail(), customer.getPhone(), customer.getCreatedAt(), customer.getUpdatedAt()
-        );
+    public List<Ticket> findByCustomerIdAndScreeningId(int customerId, int screeningId) {
+        List<Ticket> tickets = ticketRepo.findByCustomerIdAndScreeningId(customerId, screeningId);
+        return tickets;
+    }
+
+    @Override
+    public Ticket createTicket(int customerId, int screeningId, Ticket ticket) {
+        Customer customer = customerRepo.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Customer with that id"));
+        Screening screening = screeningRepo.findById(screeningId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Screening with that id"));
+        ticket.setCustomer(customer);
+        ticket.setScreening(screening);
+        return ticketRepo.save(ticket);
     }
 }

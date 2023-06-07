@@ -8,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class CustomerResponseDto {
     private String status;
-    private CustomerDtoWithoutTickets data;
+    private Customer data;
 }

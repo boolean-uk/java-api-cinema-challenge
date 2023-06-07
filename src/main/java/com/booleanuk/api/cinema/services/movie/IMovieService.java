@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.services.movie;
 
 import com.booleanuk.api.cinema.Dtos.movies.MovieRequestDto;
+import com.booleanuk.api.cinema.Dtos.screenings.ScreeningDto;
 import com.booleanuk.api.cinema.Dtos.screenings.ScreeningNew;
 import com.booleanuk.api.cinema.entities.Movie;
 import com.booleanuk.api.cinema.entities.Screening;
@@ -32,8 +33,8 @@ public class IMovieService implements MovieServiceInterface {
         List<ScreeningNew> screenings = movieDto.getScreenings();
         if (screenings != null) {
             for (ScreeningNew screening : screenings) {
-                Screening sc = new Screening(0, MovieInstance, screening.getScreenNumber(), getInstant(screening), screening.getCapacity(), new ArrayList<>(), null, null);
-                screeningRepo.save(sc);
+                Screening temp = new Screening(0, MovieInstance, screening.getScreenNumber(), getInstant(screening), screening.getCapacity(), new ArrayList<>(), null, null);
+                screeningRepo.save(temp);
             }
         }
 //        System.out.println(screenings.size());
@@ -79,5 +80,42 @@ public class IMovieService implements MovieServiceInterface {
         Movie movieTodelete = findByIdOrElseThrow(id);
         movieRepo.delete(movieTodelete);
         return movieTodelete;
+    }
+
+    @Override
+    public List<ScreeningDto> getScreeningsForMovieId(int id) {
+        Movie movie = null;
+        movie = movieRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID."));
+
+        List<ScreeningDto> theList = new ArrayList<>();
+        for (int i = 0; i < movie.getScreenings().size(); i++) {
+            Screening screening = movie.getScreenings().get(i);
+            ScreeningDto dto = new ScreeningDto(screening.getId()
+                    , screening.getScreenNumber()
+                    , screening.getStartsAt()
+                    , screening.getCapacity()
+                    , screening.getCreatedAt()
+                    , screening.getUpdatedAt());
+            theList.add(dto);
+        }
+        return theList;
+    }
+
+    @Override
+    public ScreeningDto createScreeningForMovieId(int id, ScreeningNew screeningNew) {
+        Movie movie = null;
+        movie = movieRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID."));
+
+        Screening temp = new Screening(0, movie, screeningNew.getScreenNumber(), getInstant(screeningNew), screeningNew.getCapacity(), new ArrayList<>(), null, null);
+        Screening screeningFromDb = screeningRepo.save(temp);
+
+
+        ScreeningDto dto = new ScreeningDto(screeningFromDb.getId()
+                , screeningFromDb.getScreenNumber()
+                , screeningFromDb.getStartsAt()
+                , screeningFromDb.getCapacity()
+                , screeningFromDb.getCreatedAt()
+                , screeningFromDb.getUpdatedAt());
+        return dto;
     }
 }

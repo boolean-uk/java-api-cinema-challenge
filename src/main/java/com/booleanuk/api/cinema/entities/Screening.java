@@ -31,12 +31,13 @@ public class Screening {
     @Column
     private int screenNumber;
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Instant startsAt;
     @Column
     private int capacity;
 
     @OneToMany(mappedBy = "screening",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Ticket> tickets;
 
 
