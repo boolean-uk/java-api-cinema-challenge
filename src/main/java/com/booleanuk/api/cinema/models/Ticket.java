@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "tickets")
@@ -81,14 +82,14 @@ public class Ticket {
     //endregion
 
     public Ticket() {
-        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
-        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
     }
     public Ticket(int numSeats, Customer customer, Screening screening) {
         this.numSeats = numSeats;
         this.customer = customer;
         this.screening = screening;
-        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
-        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
     }
 }

@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controllers;
 
+import com.booleanuk.api.cinema.models.DTOs.CustomerNoRelationsDTO;
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.DTOs.MovieNoRelationsDTO;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,13 +89,19 @@ public class MovieController {
             hasChanged = true;
         }
 
-        if (hasChanged)
-            movieToUpdate.setUpdatedAt(ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString());
+        if (hasChanged) {
+            movieToUpdate.setUpdatedAt(ZonedDateTime
+                    .ofInstant(Instant.now(), ZoneId.of("CET"))
+                    .format(DateTimeFormatter.ISO_DATE_TIME)
+                    .toString());
+
+            this.movieRepository.save(movieToUpdate);
+        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new MovieSingleDTO("success", modelMapper
-                        .map(this.movieRepository.save(movieToUpdate), MovieNoRelationsDTO.class)
+                        .map(movieToUpdate, MovieNoRelationsDTO.class)
                 ));
     }
     //endregion

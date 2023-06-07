@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Entity
@@ -101,20 +102,20 @@ public class Screening {
     //endregion
 
     public Screening() {
-        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
-        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
     }
     public Screening(int id) {
         this.id = id;
-        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
-        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
     }
     public Screening(int screenNumber, String startsAt, int capacity, Movie movie) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
         this.movie = movie;
-        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
-        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).format(DateTimeFormatter.ISO_DATE_TIME).toString();
     }
 }

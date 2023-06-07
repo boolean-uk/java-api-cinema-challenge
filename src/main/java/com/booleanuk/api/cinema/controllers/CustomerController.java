@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,13 +74,19 @@ public class CustomerController {
             hasChanged = true;
         }
 
-        if (hasChanged)
-            customerToUpdate.setUpdatedAt(ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString());
+        if (hasChanged) {
+            customerToUpdate.setUpdatedAt(ZonedDateTime
+                    .ofInstant(Instant.now(), ZoneId.of("CET"))
+                    .format(DateTimeFormatter.ISO_DATE_TIME)
+                    .toString());
+
+            this.customerRepository.save(customerToUpdate);
+        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new CustomerSingleDTO("success", modelMapper
-                        .map(this.customerRepository.save(customerToUpdate), CustomerNoRelationsDTO.class)
+                        .map(customerToUpdate, CustomerNoRelationsDTO.class)
                 ));
     }
     //endregion
