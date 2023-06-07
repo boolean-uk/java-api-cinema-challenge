@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.Date;
 
 @Entity
-@Table(name = "cinema_entities")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Data
 @AllArgsConstructor

@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Movie extends CinemaEntity{
+
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "rating", nullable = false)

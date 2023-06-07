@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -32,4 +33,8 @@ public class Screening extends CinemaEntity{
     @JoinColumn(name="movie_id", nullable=false)
     @JsonIgnore
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Ticket> tickets;
 }

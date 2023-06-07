@@ -34,6 +34,9 @@ public class CustomerService {
 
     }
 
+    public Customer getById(int id){
+        return customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
+    }
     public GenericResponse<List<Customer>> getAll(){
         return new GenericResponse<List<Customer>>()
                 .from(customerRepository.findAll());
