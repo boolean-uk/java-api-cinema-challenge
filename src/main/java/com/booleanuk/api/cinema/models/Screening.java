@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table (name = "screenings")
@@ -28,6 +29,10 @@ public class Screening {
     private Timestamp createdAt;
     @UpdateTimestamp
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnore
+    private List<Ticket> tickets;
 
     // Constructors
     public Screening(){

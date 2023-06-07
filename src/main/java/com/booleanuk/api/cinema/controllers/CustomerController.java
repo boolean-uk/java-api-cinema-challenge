@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
+import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
+import com.booleanuk.api.cinema.repositories.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import java.util.List;
 public class CustomerController {
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @GetMapping
     public List<Customer> getAllCustomers(){
@@ -47,6 +51,12 @@ public class CustomerController {
         Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found"));
         this.customerRepository.delete(customerToDelete);
         return  ResponseEntity.ok(customerToDelete);
+    }
+
+    // Extra routes
+    @GetMapping("/{id}/tickets")
+    public List<Ticket> getTicketsByCustomerId(@PathVariable int id){
+        return this.ticketRepository.findByCustomerId(id);
     }
 
 }

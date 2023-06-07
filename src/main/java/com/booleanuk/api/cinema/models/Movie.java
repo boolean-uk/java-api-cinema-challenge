@@ -48,6 +48,14 @@ public class Movie {
         this.runtimeMins = runtimeMins;
     }
 
+    public Movie(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.screenings = screenings;
+    }
+
     // Getters & Setters
     public int getId() {
         return this.id;
