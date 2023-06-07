@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.Dtos;
+package com.booleanuk.api.cinema.Dtos.screenings;
 
 import lombok.Data;
 

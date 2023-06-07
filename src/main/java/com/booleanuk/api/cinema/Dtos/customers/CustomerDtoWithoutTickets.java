@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.Dtos;
+package com.booleanuk.api.cinema.Dtos.customers;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;

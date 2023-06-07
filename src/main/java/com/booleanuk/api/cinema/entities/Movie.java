@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,8 @@ public class Movie {
     @Column
     private int runtimeMins;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Screening> screenings;
 
     @Column

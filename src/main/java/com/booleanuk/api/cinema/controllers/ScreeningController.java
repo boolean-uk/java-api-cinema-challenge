@@ -1,18 +1,13 @@
 package com.booleanuk.api.cinema.controllers;
 
-import com.booleanuk.api.cinema.Dtos.ScreeningDto;
-import com.booleanuk.api.cinema.Dtos.ScreeningNew;
-import com.booleanuk.api.cinema.entities.Movie;
-import com.booleanuk.api.cinema.entities.Screening;
-import com.booleanuk.api.cinema.repositories.MovieRepo;
+import com.booleanuk.api.cinema.Dtos.screenings.ScreeningDto;
+import com.booleanuk.api.cinema.Dtos.screenings.ScreeningNew;
 import com.booleanuk.api.cinema.repositories.ScreeningRepo;
-import com.booleanuk.api.cinema.services.ScreeningServiceInterface;
+import com.booleanuk.api.cinema.services.screening.ScreeningServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,8 +16,7 @@ public class ScreeningController {
 
     @Autowired
     ScreeningServiceInterface screeningService;
-    @Autowired
-    ScreeningRepo screeningRepo;
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

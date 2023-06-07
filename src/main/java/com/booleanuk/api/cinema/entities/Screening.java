@@ -36,7 +36,7 @@ public class Screening {
     @Column
     private int capacity;
 
-    @OneToMany(mappedBy = "screening")
+    @OneToMany(mappedBy = "screening",cascade = CascadeType.ALL)
     private List<Ticket> tickets;
 
 

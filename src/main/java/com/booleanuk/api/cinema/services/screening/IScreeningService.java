@@ -1,7 +1,7 @@
-package com.booleanuk.api.cinema.services;
+package com.booleanuk.api.cinema.services.screening;
 
-import com.booleanuk.api.cinema.Dtos.ScreeningDto;
-import com.booleanuk.api.cinema.Dtos.ScreeningNew;
+import com.booleanuk.api.cinema.Dtos.screenings.ScreeningDto;
+import com.booleanuk.api.cinema.Dtos.screenings.ScreeningNew;
 import com.booleanuk.api.cinema.entities.Movie;
 import com.booleanuk.api.cinema.entities.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepo;
