@@ -58,5 +58,4 @@ public class CustomerController {
     public List<Ticket> getTicketsByCustomerId(@PathVariable int id){
         return this.ticketRepository.findByCustomerId(id);
     }
-
 }

@@ -1,6 +1,5 @@
 package com.booleanuk.api.cinema.controllers;
 
-import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;

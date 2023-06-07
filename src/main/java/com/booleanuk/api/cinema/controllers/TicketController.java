@@ -43,11 +43,6 @@ public class TicketController {
 
     @GetMapping
     public List<Ticket> getAll(@PathVariable("customerId") int customerId, @PathVariable("screeningId") int screeningId) {
-        Screening screening = null;
-        Customer customer = null;
-        screening = this.screeningRepository.findById(screeningId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with provided id found."));
-        customer = this.customerRepository.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with provided id found."));
-
         return this.ticketRepository.findByCustomerIdAndScreeningId(customerId, screeningId);
     }
 

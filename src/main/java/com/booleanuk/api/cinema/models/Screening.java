@@ -6,7 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table (name = "screenings")
@@ -24,7 +27,7 @@ public class Screening {
     @Column (name = "capacity")
     private int capacity;
     @Column (name = "starts_at")
-    private String startsAt;
+    private Timestamp startsAt;
     @CreationTimestamp
     private Timestamp createdAt;
     @UpdateTimestamp
@@ -42,7 +45,7 @@ public class Screening {
     public Screening( int screenNumber, int capacity, String startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
-        this.startsAt = startsAt;
+        setStartsAt(startsAt);
     }
 
     // Getters & Setters
@@ -76,12 +79,10 @@ public class Screening {
 
     public void setCapacity(int capacity) {this.capacity = capacity;}
 
-    public String getStartsAt() {
-        return this.startsAt;
-    }
+    public Timestamp getStartsAt() { return this.startsAt; }
 
-    public void setStartsAt(String startsAt) {
-        this.startsAt = startsAt;
+    public void setStartsAt(String startsAt){
+        this.startsAt =  Timestamp.valueOf(startsAt);
     }
 
     public Timestamp getCreatedAt() {

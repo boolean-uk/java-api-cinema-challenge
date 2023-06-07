@@ -29,7 +29,7 @@ public class Customer {
     private Instant updatedAt;
 
     @OneToMany(mappedBy = "customer")
-    @JsonIgnore
+//    @JsonIgnore
     private List<Ticket> tickets;
 
     // Constructors
