@@ -3,6 +3,10 @@ package com.booleanuk.api.cinema.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @Entity
 @Table(name = "tickets")
 public class Ticket {
@@ -76,10 +80,15 @@ public class Ticket {
     }
     //endregion
 
-    public Ticket() { }
+    public Ticket() {
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+    }
     public Ticket(int numSeats, Customer customer, Screening screening) {
         this.numSeats = numSeats;
         this.customer = customer;
         this.screening = screening;
+        this.createdAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
+        this.updatedAt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("CET")).toString();
     }
 }
