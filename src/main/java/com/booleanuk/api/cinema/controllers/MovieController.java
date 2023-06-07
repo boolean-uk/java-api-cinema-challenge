@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controllers;
 
+import com.booleanuk.api.cinema.Dtos.movies.MovieRequestDto;
 import com.booleanuk.api.cinema.Dtos.movies.MovieResponseDto;
 import com.booleanuk.api.cinema.Dtos.movies.MovieResponseSingleDto;
 import com.booleanuk.api.cinema.entities.Movie;
@@ -21,9 +22,13 @@ public class MovieController {
     public MovieResponseDto getAllMovies() {
         return new MovieResponseDto("success",movieService.getAllMovie());
     }
+//    @PostMapping
+//    public MovieResponseSingleDto createMovie(@RequestBody Movie movie) {
+//        return new MovieResponseSingleDto("success",movieService.createMovie(movie));
+//    }
     @PostMapping
-    public MovieResponseSingleDto createMovie(@RequestBody Movie movie) {
-        return new MovieResponseSingleDto("success",movieService.createMovie(movie));
+    public MovieResponseSingleDto createMovie(@RequestBody MovieRequestDto movieRequestDto) {
+        return new MovieResponseSingleDto("success",movieService.createMovie(movieRequestDto));
     }
     @PutMapping("/{id}")
     public MovieResponseSingleDto updateMovie(@PathVariable Integer id,@RequestBody Movie movie) {
