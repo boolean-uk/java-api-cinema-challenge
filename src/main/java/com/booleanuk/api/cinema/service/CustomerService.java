@@ -1,7 +1,6 @@
 package com.booleanuk.api.cinema.service;
 
 import com.booleanuk.api.cinema.GenericResponse;
-import com.booleanuk.api.cinema.dto.CustomerListViewDTO;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,6 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.GenericResponse;
 import com.booleanuk.api.cinema.dto.MovieViewDTO;
-import com.booleanuk.api.cinema.dto.ScreeningViewDTO;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;

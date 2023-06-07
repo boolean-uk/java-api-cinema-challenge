@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenericResponse<T> {
+    private static String SUCCESS_STATUS = "success";
     private String status;
     private T data;
 
     public GenericResponse<T> from(T cinemaEntity){
         return new GenericResponse<>(
-                WrapperUtils.STATUS.SUCCESS.status,
+                SUCCESS_STATUS,
                 cinemaEntity
         );
     }
