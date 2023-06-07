@@ -30,5 +30,6 @@ public class Screening extends CinemaEntity{
 
     @ManyToOne
     @JoinColumn(name="movie_id", nullable=false)
+    @JsonIgnore
     private Movie movie;
 }

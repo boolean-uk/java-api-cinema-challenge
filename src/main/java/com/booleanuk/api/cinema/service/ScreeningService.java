@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.service;
 
+import com.booleanuk.api.cinema.GenericResponse;
 import com.booleanuk.api.cinema.dto.ScreeningViewDTO;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
@@ -24,26 +25,21 @@ public class ScreeningService {
         this.movieRepository = movieRepository;
         this.screeningRepository = screeningRepository;
     }
-    public Screening create(int movieId, Screening screening){
+    public GenericResponse<Screening> create(int movieId, Screening screening){
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
 
         screening.setMovie(movie);
-        try {return screeningRepository.save(screening);}
+        try {return new GenericResponse<Screening>().from(screeningRepository.save(screening));}
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Could not create screening, please check all required fields are correct");
         }
     }
 
-    public List<ScreeningViewDTO> getAllForMovie(int movieId){
+    public GenericResponse<List<Screening>> getAllForMovie(int movieId){
         List<Screening> screenings = screeningRepository.findByMovieId(movieId);
-        List<ScreeningViewDTO> screeningViewDTOS = new ArrayList<>();
 
-        screenings.forEach(screening -> {
-            screeningViewDTOS.add(ScreeningViewDTO.fromScreening(screening));
-        });
-
-        return screeningViewDTOS;
+        return new GenericResponse<List<Screening>>().from(screenings);
     }
 }

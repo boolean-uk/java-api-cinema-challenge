@@ -55,13 +55,13 @@ public class MovieController {
 
     @PostMapping("/{id}/screenings")
     @ResponseStatus(HttpStatus.CREATED)
-    public Screening createScreening(@PathVariable int id, @RequestBody Screening screening){
+    public GenericResponse<Screening> createScreening(@PathVariable int id, @RequestBody Screening screening){
         return screeningService.create(id, screening);
     }
 
     @GetMapping("/{id}/screenings")
     @ResponseStatus(HttpStatus.OK)
-    public List<ScreeningViewDTO> getAllScreeningsForMovie(@PathVariable int id){
+    public GenericResponse<List<Screening>> getAllScreeningsForMovie(@PathVariable int id){
         return screeningService.getAllForMovie(id);
     }
 }
