@@ -40,5 +40,12 @@ public class CustomerController {
         return new ResponseEntity<Customer>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
+        Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Cannot delete this user, as the user id could not be found"));
+        this.customerRepository.delete(customerToDelete);
+        return ResponseEntity.ok(customerToDelete);
+    }
 
 }
