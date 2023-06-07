@@ -14,7 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScreeningViewDTO {
-    private static final String PATTERN_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
     private int id;
     private int screenNumber;
     private int capacity;
@@ -23,7 +22,6 @@ public class ScreeningViewDTO {
     private Date updatedAt;
 
     public static ScreeningViewDTO fromScreening(Screening screening){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT);
         return new ScreeningViewDTO(
                 screening.getId(),
                 screening.getScreenNumber(),

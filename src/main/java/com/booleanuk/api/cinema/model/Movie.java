@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -24,5 +25,17 @@ public class Movie extends CinemaEntity{
     private String description;
     @Column(name = "runtime_mins", nullable = false)
     private int runtimeMins;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private List<Screening> screenings = new ArrayList<>();
+
+    public static Movie withoutScreenings(Movie movie){
+        return new Movie(
+                movie.getTitle(),
+                movie.getRating(),
+                movie.getDescription(),
+                movie.getRuntimeMins(),
+                new ArrayList<>()
+        );
+    }
 
 }

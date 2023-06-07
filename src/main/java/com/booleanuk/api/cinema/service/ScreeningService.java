@@ -28,7 +28,7 @@ public class ScreeningService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
 
-        screening.setMovieId(movieId);
+        screening.setMovie(movie);
         try {return screeningRepository.save(screening);}
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

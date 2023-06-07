@@ -1,14 +1,16 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.dto.GenericResponseDTO;
+import com.booleanuk.api.cinema.dto.MovieViewDTO;
 import com.booleanuk.api.cinema.dto.ScreeningViewDTO;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.service.MovieService;
 import com.booleanuk.api.cinema.service.ScreeningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,55 +20,37 @@ public class MovieController {
 
     private final MovieRepository movieRepository;
     private final ScreeningService screeningService;
+    private final MovieService movieService;
 
     @Autowired
-    public MovieController(MovieRepository movieRepository, ScreeningService screeningService){
+    public MovieController(MovieRepository movieRepository, ScreeningService screeningService, MovieService movieService){
         this.movieRepository = movieRepository;
         this.screeningService = screeningService;
+        this.movieService = movieService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Movie create(@RequestBody Movie movie){
-
-        try {
-            return movieRepository.save(movie);
-        }
-        catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create movie, please check all required fields are correct");
-        }
+    public GenericResponseDTO<MovieViewDTO> create(@RequestBody Movie movie){
+        return movieService.create(movie);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Movie> getAll(){
-        return movieRepository.findAll();
+    public GenericResponseDTO<List<MovieViewDTO>> getAll(){
+        return movieService.getAll();
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Movie update(@PathVariable int id, @RequestBody Movie movie){
-        Movie movieToUpdate = movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
-
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-
-        try {return movieRepository.save(movieToUpdate);}
-        catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Could not update the movie's details, please check all required fields are correct");
-        }
+    public GenericResponseDTO<MovieViewDTO> update(@PathVariable int id, @RequestBody Movie movie){
+        return movieService.update(id, movie);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Movie delete(@PathVariable int id) {
-        Movie movieToDelete = movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
-        movieRepository.delete(movieToDelete);
-
-        return movieToDelete;
+    public GenericResponseDTO<MovieViewDTO> delete(@PathVariable int id) {
+        return movieService.delete(id);
     }
 
     @PostMapping("/{id}/screenings")

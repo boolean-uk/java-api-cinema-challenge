@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,11 +24,11 @@ public class Screening extends CinemaEntity{
     @Column(name = "capacity", nullable = false)
     private int capacity;
     @Column(name = "starts_at")
-    /*@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS")
-    private Date startsAt;*/
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS") //yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS")
     private Date startsAt;
 
-    @Column(name = "movie_id")
-    private int movieId;
+    @ManyToOne
+    @JoinColumn(name="movie_id", nullable=false)
+    private Movie movie;
 }
