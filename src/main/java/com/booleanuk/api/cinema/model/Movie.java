@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name="movies")
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +24,6 @@ public class Movie {
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
     @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties(value={"movie"})
     private List<Screening> screenings;
 }

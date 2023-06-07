@@ -42,3 +42,4 @@ out/
 *.properties
 report.html
 report.json
+src/main/resources/db/migration/

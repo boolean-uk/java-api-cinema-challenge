@@ -1,28 +1,30 @@
 package com.booleanuk.api.cinema.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
-@Table(name = "customers")
-public class Customer {
+@Table(name="tickets")
+public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany(mappedBy = "customer")
-    @JsonIgnoreProperties(value = {"customer"})
-    private List<Ticket> tickets;
-    private String name;
-    private String email;
-    private String phone;
+
+    @ManyToOne
+    @JoinColumn(name="customer_id", referencedColumnName = "id")
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name="screening_id", referencedColumnName = "id")
+    private Screening screening;
+
+    @Column(name="num_seats")
+    private int numSeats;
     @Column(name="created_at")
     private LocalDateTime createdAt;
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
-
 }
