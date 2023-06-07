@@ -47,7 +47,7 @@ public class CustomerService {
         if(customer.getName() != null)
             customerToUpdate.setName(customer.getName());
         if(customer.getEmail() != null)
-        customerToUpdate.setEmail(customer.getEmail());
+            customerToUpdate.setEmail(customer.getEmail());
         if(customer.getPhone() != null)
             customerToUpdate.setPhone(customer.getPhone());
 
