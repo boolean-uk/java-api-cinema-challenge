@@ -22,13 +22,6 @@ public class CustomerController {
     public List<Customer> getAllCustomer() {
         return customerService.getAllCustomers();
     }
-    @PatchMapping
-    public Customer afdscreateCustomer(@RequestBody Customer customer) {
-
-        return customer;
-    }
-
-
     @PostMapping
     public CustomerResponseDto createCustomer(@RequestBody Customer customer) {
         Customer customerFromDb = customerService.createCustomer(customer);
