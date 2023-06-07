@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -24,7 +23,9 @@ public class Screening extends CinemaEntity{
     @Column(name = "capacity", nullable = false)
     private int capacity;
     @Column(name = "starts_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS")
+    /*@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS")
+    private Date startsAt;*/
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD HH:MM:SS") //yyyy-MM-dd'T'HH:mm:ss.SSSXXX
     private Date startsAt;
 
     @Column(name = "movie_id")

@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "cinema_entities")
@@ -22,8 +23,8 @@ public abstract class CinemaEntity {
     private int id;
     @CreationTimestamp
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Date createdAt;
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Date updatedAt;
 }
