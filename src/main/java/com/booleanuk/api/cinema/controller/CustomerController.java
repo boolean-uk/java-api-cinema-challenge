@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/customers")
 public class CustomerController {
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     @GetMapping
     public List<Customer> getAllCustomers() {
@@ -30,12 +30,11 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Cannot update this user, as the user id could not be found"));
+                HttpStatus.NOT_FOUND, "Cannot update this customer, as the customer id could not be found"));
         
         if(customer.getName() != null) customerToUpdate.setName(customer.getName());
         if(customer.getEmail() != null) customerToUpdate.setEmail(customer.getEmail());
         if(customer.getPhone() != null) customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate.setUpdatedAt(LocalDateTime.now());
 
         return new ResponseEntity<Customer>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
@@ -43,7 +42,7 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Cannot delete this user, as the user id could not be found"));
+                HttpStatus.NOT_FOUND, "Cannot delete this customer, as the customer id could not be found"));
         this.customerRepository.delete(customerToDelete);
         return ResponseEntity.ok(customerToDelete);
     }

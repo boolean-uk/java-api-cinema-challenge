@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,7 +28,7 @@ public class Customer {
     @Column(name = "created_At")
     private LocalDateTime createdAt;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_At")
     private LocalDateTime updatedAt;
@@ -38,9 +39,9 @@ public class Customer {
 
     public Customer(String name, String email, String phone) {
         super();
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
+        this.setName(name);
+        this.setEmail(email);
+        this.setPhone(phone);
     }
 
     public int getId() {
