@@ -13,10 +13,10 @@ public class GenericResponse<T> {
     private T data;
 
 
-    public GenericResponse<T> from(T cinemaEntity){
+    public GenericResponse<T> from(T data){
         return new GenericResponse<>(
                 SUCCESS_STATUS,
-                cinemaEntity
+                data
         );
     }
 
