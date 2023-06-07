@@ -81,4 +81,9 @@ public class Screening {
     public String getUpdatedAt() {
         return updatedAt;
     }
+
+    public void setMoviePlaying(Movie moviePlaying) {
+        this.moviePlaying = moviePlaying;
+    }
+
 }

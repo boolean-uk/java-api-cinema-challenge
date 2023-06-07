@@ -14,6 +14,7 @@ import java.util.List;
 public class ScreeningController {
     @Autowired
     private ScreeningRepository repository;
+    //i made this in case i want to see all screenings for all movies
     @GetMapping
     public List<Screening> getAll(){
         return this.repository.findAll();

@@ -28,8 +28,11 @@ public class CustomerController {
     public record CustomerRequest(String name, String email,String phone){}
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody CustomerRequest customer){
+        if(customer.name == null || customer.email == null || customer.phone == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid body for Customer");
+        }
         Customer createdCustomer = new Customer(customer.name,customer.email, customer.phone);
-        return new ResponseEntity<>(createdCustomer,HttpStatus.OK);
+        return new ResponseEntity<>(createdCustomer,HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody CustomerRequest customer){

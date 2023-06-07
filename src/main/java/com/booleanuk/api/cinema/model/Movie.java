@@ -94,4 +94,7 @@ public class Movie {
     public void setRuntimeMins(int runtimeMins) {
         this.runtimeMins = runtimeMins;
     }
+    public void addScreening(Screening screening){
+        this.screenings.add(screening);
+    }
 }
