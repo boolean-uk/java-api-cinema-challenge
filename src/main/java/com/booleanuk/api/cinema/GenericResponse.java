@@ -12,6 +12,7 @@ public class GenericResponse<T> {
     private String status;
     private T data;
 
+
     public GenericResponse<T> from(T cinemaEntity){
         return new GenericResponse<>(
                 SUCCESS_STATUS,

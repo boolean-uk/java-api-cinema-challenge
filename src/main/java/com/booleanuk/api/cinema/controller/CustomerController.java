@@ -3,9 +3,7 @@ package com.booleanuk.api.cinema.controller;
 import com.booleanuk.api.cinema.GenericResponse;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Ticket;
-import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.service.CustomerService;
-import com.booleanuk.api.cinema.service.ScreeningService;
 import com.booleanuk.api.cinema.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +17,11 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
-    private final ScreeningService screeningService;
     private final TicketService ticketService;
 
     @Autowired
-    public CustomerController(CustomerService customerService, ScreeningService screeningService, TicketService ticketService){
+    public CustomerController(CustomerService customerService, TicketService ticketService){
         this.customerService = customerService;
-        this.screeningService = screeningService;
         this.ticketService = ticketService;
     }
 
