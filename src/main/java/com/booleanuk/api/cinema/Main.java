@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.core;
+package com.booleanuk.api.cinema;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

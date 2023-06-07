@@ -1,9 +1,8 @@
-package com.booleanuk.api.cinema.core.model;
+package com.booleanuk.api.cinema.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Entity
