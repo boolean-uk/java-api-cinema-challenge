@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.service;
 
+import com.booleanuk.api.cinema.GenericResponse;
 import com.booleanuk.api.cinema.dto.CustomerListViewDTO;
-import com.booleanuk.api.cinema.dto.CustomerViewDTO;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public CustomerViewDTO create(Customer customer){
+    public GenericResponse<Customer> create(Customer customer){
         Customer createdCustomer;
         try {
             createdCustomer = customerRepository.save(customer);
@@ -30,15 +30,16 @@ public class CustomerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create customer, please check all required fields are correct");
         }
 
-        return CustomerViewDTO.fromCustomer(createdCustomer);
+        return new GenericResponse<Customer>().from(createdCustomer);
 
     }
 
-    public CustomerListViewDTO getAll(){
-        return CustomerListViewDTO.fromCustomers(customerRepository.findAll());
+    public GenericResponse<List<Customer>> getAll(){
+        return new GenericResponse<List<Customer>>()
+                .from(customerRepository.findAll());
     }
 
-    public CustomerViewDTO update(int id, Customer customer){
+    public GenericResponse<Customer> update(int id, Customer customer){
         Customer customerToUpdate = customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
 
         if(customer.getName() != null)
@@ -48,17 +49,21 @@ public class CustomerService {
         if(customer.getPhone() != null)
             customerToUpdate.setPhone(customer.getPhone());
 
-        try {return CustomerViewDTO.fromCustomer(customerRepository.save(customerToUpdate));}
+        try {
+            return new GenericResponse<Customer>()
+                    .from(customerRepository.save(customerToUpdate));
+        }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Could not update the customer's details, please check all required fields are correct");
         }
     }
 
-    public CustomerViewDTO delete(int id){
+    public GenericResponse<Customer> delete(int id){
         Customer customerToDelete = customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
         customerRepository.delete(customerToDelete);
 
-        return CustomerViewDTO.fromCustomer(customerToDelete);
+        return new GenericResponse<Customer>()
+                .from(customerToDelete);
     }
 }
