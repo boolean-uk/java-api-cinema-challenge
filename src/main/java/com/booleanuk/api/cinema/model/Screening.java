@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.booleanuk.api.cinema.StaticMethods;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,6 +19,10 @@ public class Screening {
     private String createdAt;
     @Column(name = "updated_at")
     private String updatedAt;
+    @ManyToOne
+    @JoinColumn(name = "movie_playing")
+    @JsonIgnoreProperties("screenings")
+    private Movie moviePlaying;
     public Screening(){
 
     }
@@ -28,6 +33,10 @@ public class Screening {
         this.startsAt = startsAt;
         this.createdAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
         this.updatedAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
+    }
+
+    public Movie getMoviePlaying() {
+        return moviePlaying;
     }
 
     public void setId(int id) {
