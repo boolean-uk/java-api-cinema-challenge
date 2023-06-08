@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.ApiResponse;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -24,15 +25,14 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping("{id}/screenings")
-    public ResponseEntity<List<Screening>> getAllScreenings(@PathVariable int id){
+    public ResponseEntity<ApiResponse<List<Screening>>> getAllScreenings(@PathVariable int id){
         Movie movieToSearch = this.movieRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Movie not found"));
         List<Screening> screenings = screeningRepository.findByMovieId(movieToSearch.getId());
 
-        return new ResponseEntity<>(screenings, HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("success",screenings), HttpStatus.OK);
     }
     @PostMapping("{id}/screenings")
-
-    public ResponseEntity<Screening> createScreeningForMovie(@PathVariable int id, @RequestBody Screening screening) {
+    public ResponseEntity<ApiResponse<Screening>> createScreeningForMovie(@PathVariable int id, @RequestBody Screening screening) {
         // Retrieve the movie by its ID
         Optional<Movie> optionalMovie = movieRepository.findById(id);
 
@@ -42,7 +42,7 @@ public class ScreeningController {
             screening.setCreatedAt(LocalDateTime.now());
             screening.setUpdatedAt(LocalDateTime.now());
             Screening savedScreening = screeningRepository.save(screening);
-            return new ResponseEntity<>(savedScreening, HttpStatus.CREATED);
+            return new ResponseEntity<>(new ApiResponse<>("success",savedScreening), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.ApiResponse;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +21,22 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers(){
-        return this.customerRepository.findAll();
+    public ApiResponse<List<Customer>> getAllCustomers(){
+        return new ApiResponse<>("success",this.customerRepository.findAll());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable int id){
+    public ResponseEntity<ApiResponse<Customer>> getCustomerById(@PathVariable int id){
         Customer customer = this.customerRepository.findById(id).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found!"));
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(new ApiResponse<>("success", customer));
     }
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<ApiResponse<Customer>> createCustomer(@RequestBody Customer customer) {
         customer.setCreatedAt(LocalDateTime.now());
         Customer savedCustomer = customerRepository.save(customer);
-        return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>("success",savedCustomer), HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customerDetails) {
+    public ResponseEntity<ApiResponse<Customer>> updateCustomer(@PathVariable int id, @RequestBody Customer customerDetails) {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         return optionalCustomer.map(customer -> {
             customer.setName(customerDetails.getName());
@@ -43,21 +44,19 @@ public class CustomerController {
             customer.setPhone(customerDetails.getPhone());
             customer.setUpdatedAt(LocalDateTime.now());
             Customer updatedCustomer = customerRepository.save(customer);
-            return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>("success",updatedCustomer), HttpStatus.OK);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Customer>> deleteCustomer(@PathVariable int id) {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isPresent()) {
             customerRepository.delete(optionalCustomer.get());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return  ResponseEntity.ok(new ApiResponse<>("success",optionalCustomer.get()));
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-//    @PostMapping
-//    public ResponseEntity<Customer>
 
 }
