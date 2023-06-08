@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,14 +29,18 @@ public class Movie {
     private int runTimeMins;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
+
+
 
     public Movie(){
         super();
@@ -45,8 +51,6 @@ public class Movie {
         this.rating = rating;
         this.description = description;
         this.runTimeMins = runTimeMins;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public int getId() {

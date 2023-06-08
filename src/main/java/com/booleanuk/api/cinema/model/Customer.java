@@ -1,8 +1,12 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -21,10 +25,16 @@ public class Customer {
     @Column(name = "phone")
     private String phone;
 
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties("customer")
+    private List<Ticket> tickets;
+
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     public Customer(){
@@ -35,8 +45,6 @@ public class Customer {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
 
@@ -81,10 +89,18 @@ public class Customer {
     }
 
     public LocalDateTime getUpdatedAt() {
-        return LocalDateTime.now();
+        return this.updatedAt;
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }
