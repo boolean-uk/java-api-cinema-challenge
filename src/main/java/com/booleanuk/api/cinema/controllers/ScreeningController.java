@@ -25,9 +25,8 @@ public class ScreeningController {
     @GetMapping
     public ResponseEntity<CustomResponse<List<Screening>>> getAll(@PathVariable(name = "id") int id) {
         return new ResponseEntity<>(
-                new CustomResponse<List<Screening>>(
-                        movieRepo.findById(id)
-                                .map(Movie::getScreenings)
+                new CustomResponse<>(
+                        repo.findByMovieId(id)
                                 .orElseThrow(() ->
                                         new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,

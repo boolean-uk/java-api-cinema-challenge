@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,13 +27,15 @@ public class Ticket {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id")
-    @JsonIgnoreProperties({"tickets"})
-    private Movie movie;
+    @JoinColumn(name = "screening_id")
+//    @JsonIgnoreProperties({"tickets"})
+    @JsonIgnore
+    private Screening screening;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnoreProperties({"tickets"})
+    @JsonIgnore
+//    @JsonIgnoreProperties({"tickets"})
     private Customer customer;
 
     public int getId() {
@@ -67,12 +70,12 @@ public class Ticket {
         this.updatedAt = updatedAt;
     }
 
-    public Movie getMovie() {
-        return movie;
+    public Screening getScreening() {
+        return screening;
     }
 
-    public void setMovie(Movie movie) {
-        this.movie = movie;
+    public void setScreening(Screening screening) {
+        this.screening = screening;
     }
 
     public Customer getCustomer() {

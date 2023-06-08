@@ -1,8 +1,9 @@
 package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.CustomResponse;
+import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
-import com.booleanuk.api.cinema.models.Screening;
+import com.booleanuk.api.cinema.repositories.CustomerRepository;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,33 +13,29 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/movies")
-public class MovieController {
+@RequestMapping("/customers")
+public class CustomerController {
     @Autowired
-    private MovieRepository repo;
-
-    @Autowired
-    private ScreeningRepository screeningRepo;
+    private CustomerRepository repo;
 
     @GetMapping
-    public ResponseEntity<CustomResponse<List<Movie>>> getAll() {
+    public ResponseEntity<CustomResponse<List<Customer>>> getAll() {
         return new ResponseEntity<>(
-                new CustomResponse<List<Movie>>(repo.findAll()),
+                new CustomResponse<>(repo.findAll()),
                 HttpStatus.OK
         );
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<CustomResponse<Movie>> getOne(@PathVariable(name = "id") int id) {
+    public ResponseEntity<CustomResponse<Customer>> getOne(@PathVariable(name = "id") int id) {
         return new ResponseEntity<>(
-                new CustomResponse<Movie>(
+                new CustomResponse<>(
                         repo.findById(id).orElseThrow(() ->
                             new ResponseStatusException(
                                     HttpStatus.NOT_FOUND,
-                                    "No movies with that id were found"
+                                    "No customers with that id were found"
                             )
                         )
                 ),
@@ -47,34 +44,26 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<CustomResponse<Movie>> createOne(@RequestBody Movie movie) {
-        Movie savedMovie = repo.save(movie);
-
-        movie.getScreenings().forEach(s -> {
-            s.setMovie(savedMovie);
-            screeningRepo.save(s);
-        });
-
+    public ResponseEntity<CustomResponse<Customer>> createOne(@RequestBody Customer customer) {
         return new ResponseEntity<>(
-                new CustomResponse<>(savedMovie),
+                new CustomResponse<>(repo.save(customer)),
                 HttpStatus.CREATED
         );
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<CustomResponse<Movie>> updateOne(@PathVariable(name = "id") int id, @RequestBody Movie movie) {
-        Movie toUpdate = repo.findById(id)
+    public ResponseEntity<CustomResponse<Customer>> updateOne(@PathVariable(name = "id") int id, @RequestBody Customer customer) {
+        Customer toUpdate = repo.findById(id)
                             .orElseThrow(() ->
                                     new ResponseStatusException(
                                             HttpStatus.NOT_FOUND,
-                                            "No movies with that id were found"
+                                            "No customers with that id were found"
                                     )
                             );
 
-        toUpdate.setTitle(movie.getTitle());
-        toUpdate.setDescription(movie.getDescription());
-        toUpdate.setRating(movie.getRating());
-        toUpdate.setRuntimeMins(movie.getRuntimeMins());
+        toUpdate.setName(customer.getName());
+        toUpdate.setEmail(customer.getEmail());
+        toUpdate.setPhone(customer.getPhone());
 
         return new ResponseEntity<>(
                 new CustomResponse<>(repo.save(toUpdate)),
@@ -83,16 +72,15 @@ public class MovieController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<CustomResponse<Movie>> deleteOne(@PathVariable(name = "id") int id) {
-        Movie deleted = repo.findById(id)
+    public ResponseEntity<CustomResponse<Customer>> deleteOne(@PathVariable(name = "id") int id) {
+        Customer deleted = repo.findById(id)
                             .orElseThrow(() ->
                                     new ResponseStatusException(
                                             HttpStatus.NOT_FOUND,
-                                            "No movies with that id were found"
+                                            "No customers with that id were found"
                                     )
                             );
 
-        deleted.getScreenings().forEach(s -> screeningRepo.delete(s));
         repo.deleteById(id);
 
         return new ResponseEntity<>(

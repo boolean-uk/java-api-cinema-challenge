@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,7 +36,8 @@ public class Screening {
 
     @ManyToOne
     @JoinColumn(name = "movie_id")
-    @JsonIgnoreProperties({"screenings"})
+//    @JsonIgnoreProperties({"screenings"})
+    @JsonIgnore
     private Movie movie;
 
     public int getId() {
