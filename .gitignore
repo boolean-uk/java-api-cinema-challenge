@@ -36,3 +36,10 @@ out/
 
 ### VS Code ###
 .vscode/
+### MacOS ###
+.DS_Store
+### Personal Settings ###
+src/main/resources/application.yml
+application.properties
+report.html
+report.json
