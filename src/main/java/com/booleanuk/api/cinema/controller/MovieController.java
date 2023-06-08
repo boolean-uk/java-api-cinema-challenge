@@ -2,19 +2,12 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.repository.MovieRepository;
-import jdk.jfr.ContentType;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
@@ -31,7 +24,6 @@ public class MovieController {
         return ResponseEntity.ok(this.movieRepository.findAll());
     }
     //TODO: remove this and its tests. Not specified in specs. OR Better, add to specs. Ask Dave
-    // also ask about post-put. Is it ok not to return the object?
     @GetMapping("/{id}")
     public ResponseEntity<Movie> findMovieById(@PathVariable long id) {
         Optional<Movie> movieOptional = this.movieRepository.findById(id);
@@ -39,10 +31,34 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         Movie savedMovie = this.movieRepository.save(movie);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedMovie.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(savedMovie);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Movie> updateMovie(@PathVariable long id, @RequestBody Movie movie) {
+        Optional<Movie> movieOptional = this.movieRepository.findById(id);
+        if (movieOptional.isEmpty()) return ResponseEntity.notFound().build();
+
+        Movie movieToUpdate = movieOptional.get();
+        movieToUpdate.setTitle(movie.getTitle());
+        movieToUpdate.setRating(movie.getRating());
+        movieToUpdate.setDescription(movie.getDescription());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.movieRepository.save(movieToUpdate));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Movie> deleteMovie(@PathVariable long id) {
+        if(this.movieRepository.existsById(id)) {
+            Optional<Movie> movie = this.movieRepository.findById(id);
+            this.movieRepository.deleteById(id);
+            return ResponseEntity.ok(movie.get());
+        }
+        return ResponseEntity.notFound().build();
     }
 }
