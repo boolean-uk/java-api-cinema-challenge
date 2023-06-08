@@ -32,7 +32,7 @@ public class CustomerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid body for Customer");
         }
         Customer createdCustomer = new Customer(customer.name,customer.email, customer.phone);
-        return new ResponseEntity<>(createdCustomer,HttpStatus.CREATED);
+        return new ResponseEntity<>(this.repository.save(createdCustomer),HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody CustomerRequest customer){

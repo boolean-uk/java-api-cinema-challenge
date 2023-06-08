@@ -4,6 +4,9 @@ import com.booleanuk.api.cinema.StaticMethods;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 
+import java.time.*;
+
+
 @Entity
 @Table(name = "customers")
 public class Customer {
@@ -32,6 +35,10 @@ public class Customer {
     }
 
     public void setUpdatedAt() {
+        //when this method is called, the updatedAt value changes
+        this.updatedAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
+    }
+    public void setCreatedAt() {
         //when this method is called, the updatedAt value changes
         this.updatedAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
     }
