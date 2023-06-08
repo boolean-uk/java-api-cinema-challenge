@@ -28,25 +28,29 @@ public class CustomerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GenericResponse<Customer> create(@RequestBody Customer customer){
-        return customerService.create(customer);
+        return new GenericResponse<Customer>()
+                .from(customerService.create(customer));
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GenericResponse<List<Customer>> getAll(){
-        return customerService.getAll();
+        return new GenericResponse<List<Customer>>()
+                .from(customerService.getAll());
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public GenericResponse<Customer> update(@PathVariable int id, @RequestBody Customer customer){
-        return customerService.update(id, customer);
+        return new GenericResponse<Customer>()
+                .from(customerService.update(id, customer));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public GenericResponse<Customer> delete(@PathVariable int id) {
-        return customerService.delete(id);
+        return new GenericResponse<Customer>()
+                .from(customerService.delete(id));
     }
 
     @PostMapping("/{customerId}/screenings/{screeningId}")
@@ -55,7 +59,8 @@ public class CustomerController {
             @PathVariable(name = "customerId") int customerId, @PathVariable(name = "screeningId") int screeningId,
             @RequestBody Ticket ticket) {
 
-        return ticketService.create(customerId, screeningId, ticket);
+        return new GenericResponse<Ticket>()
+                .from(ticketService.create(customerId, screeningId, ticket));
     }
 
     @GetMapping("/{customerId}/screenings/{screeningId}")
@@ -64,6 +69,7 @@ public class CustomerController {
             @PathVariable(name = "customerId") int customerId,
             @PathVariable(name = "screeningId") int screeningId){
 
-        return ticketService.getAllForCustomerAndScreening(customerId, screeningId);
+        return new GenericResponse<List<Ticket>>()
+                .from(ticketService.getAllForCustomerAndScreening(customerId, screeningId));
     }
 }

@@ -20,28 +20,23 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public GenericResponse<Customer> create(Customer customer){
-        Customer createdCustomer;
+    public Customer create(Customer customer){
         try {
-            createdCustomer = customerRepository.save(customer);
+            return customerRepository.save(customer);
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create customer, please check all required fields are correct");
         }
-
-        return new GenericResponse<Customer>().from(createdCustomer);
-
     }
 
     public Customer getById(int id){
         return customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
     }
-    public GenericResponse<List<Customer>> getAll(){
-        return new GenericResponse<List<Customer>>()
-                .from(customerRepository.findAll());
+    public List<Customer> getAll(){
+        return customerRepository.findAll();
     }
 
-    public GenericResponse<Customer> update(int id, Customer customer){
+    public Customer update(int id, Customer customer){
         Customer customerToUpdate = customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
 
         if(customer.getName() != null)
@@ -52,8 +47,7 @@ public class CustomerService {
             customerToUpdate.setPhone(customer.getPhone());
 
         try {
-            return new GenericResponse<Customer>()
-                    .from(customerRepository.save(customerToUpdate));
+            return customerRepository.save(customerToUpdate);
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -61,11 +55,10 @@ public class CustomerService {
         }
     }
 
-    public GenericResponse<Customer> delete(int id){
+    public Customer delete(int id){
         Customer customerToDelete = customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
         customerRepository.delete(customerToDelete);
 
-        return new GenericResponse<Customer>()
-                .from(customerToDelete);
+        return customerToDelete;
     }
 }

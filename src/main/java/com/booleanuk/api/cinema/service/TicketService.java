@@ -25,7 +25,7 @@ public class TicketService {
         this.screeningService = screeningService;
     }
 
-    public GenericResponse<Ticket> create(int customerId, int screeningId, Ticket ticket){
+    public Ticket create(int customerId, int screeningId, Ticket ticket){
 
         Customer customer = customerService.getById(customerId);
         Screening screening = screeningService.getById(screeningId);
@@ -33,19 +33,15 @@ public class TicketService {
         ticket.setCustomer(customer);
         ticket.setScreening(screening);
         try {
-            return new GenericResponse<Ticket>()
-                    .from(ticketRepository.save(ticket));
+            return ticketRepository.save(ticket);
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create ticket, please check all required fields are correct");
         }
     }
 
-    public GenericResponse<List<Ticket>> getAllForCustomerAndScreening(int customerId, int screeningId){
-        List<Ticket> tickets = ticketRepository.findByCustomerIdAndScreeningId(customerId, screeningId);
-
-        return new GenericResponse<List<Ticket>>()
-                .from(tickets);
+    public List<Ticket> getAllForCustomerAndScreening(int customerId, int screeningId){
+        return ticketRepository.findByCustomerIdAndScreeningId(customerId, screeningId);
     }
 
 }

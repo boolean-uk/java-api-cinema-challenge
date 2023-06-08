@@ -24,7 +24,7 @@ public class MovieService {
         this.screeningService = screeningService;
     }
 
-    public GenericResponse<MovieViewDTO> create(Movie movie){
+    public MovieViewDTO create(Movie movie){
         Movie createdMovie;
         Movie movieWithoutScreenings = Movie.withoutScreenings(movie);
 
@@ -39,19 +39,19 @@ public class MovieService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create movie, please check all required fields are correct");
         }
 
-        return new GenericResponse<MovieViewDTO>().from(MovieViewDTO.from(createdMovie));
+        return MovieViewDTO.from(createdMovie);
     }
 
-    public GenericResponse<List<MovieViewDTO>> getAll(){
+    public List<MovieViewDTO> getAll(){
         List<Movie> movies = movieRepository.findAll();
         List<MovieViewDTO> movieViewDTOS = new ArrayList<>();
 
         movies.forEach(movie -> movieViewDTOS.add(MovieViewDTO.from(movie)));
 
-        return new GenericResponse<List<MovieViewDTO>>().from(movieViewDTOS);
+        return movieViewDTOS;
     }
 
-    public GenericResponse<MovieViewDTO> update(int id, Movie movie){
+    public MovieViewDTO update(int id, Movie movie){
         Movie movieToUpdate = movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
 
         if(movie.getTitle() != null)
@@ -64,7 +64,7 @@ public class MovieService {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
 
         try {
-            return new GenericResponse<MovieViewDTO>().from(MovieViewDTO.from(movieRepository.save(movieToUpdate)));
+            return MovieViewDTO.from(movieRepository.save(movieToUpdate));
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -72,10 +72,10 @@ public class MovieService {
         }
     }
 
-    public GenericResponse<MovieViewDTO> delete(int id){
+    public MovieViewDTO delete(int id){
         Movie movieToDelete = movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
         movieRepository.delete(movieToDelete);
 
-        return new GenericResponse<MovieViewDTO>().from(MovieViewDTO.from(movieToDelete));
+        return MovieViewDTO.from(movieToDelete);
     }
 }
