@@ -4,6 +4,6 @@ import java.util.List;
 
 public record ScreeningsResponse(
         String status,
-        List<ScreeningData> data
+        List<ScreeningDto> data
 ) {
 }

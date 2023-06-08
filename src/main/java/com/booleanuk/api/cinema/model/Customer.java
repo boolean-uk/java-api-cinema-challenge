@@ -14,7 +14,7 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = {"customer"})
     private List<Ticket> tickets;
     private String name;

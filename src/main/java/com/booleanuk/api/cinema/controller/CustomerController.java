@@ -1,10 +1,8 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.dto.CustomerData;
-import com.booleanuk.api.cinema.model.dto.CustomerRequest;
-import com.booleanuk.api.cinema.model.dto.CustomerResponse;
-import com.booleanuk.api.cinema.model.dto.CustomersResponse;
+import com.booleanuk.api.cinema.model.Ticket;
+import com.booleanuk.api.cinema.model.dto.*;
 import com.booleanuk.api.cinema.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("customers")
@@ -24,8 +21,8 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<CustomersResponse> getAll()
     {
-        List<CustomerData> data = customerService.getCustomers().stream().map(c ->{
-          return new CustomerData (c.getId(),c.getName(), c.getEmail(), c.getPhone(),c.getCreatedAt(),c.getUpdatedAt());
+        List<CustomerDto> data = customerService.getCustomers().stream().map(c ->{
+          return new CustomerDto(c.getId(),c.getName(), c.getEmail(), c.getPhone(),c.getCreatedAt(),c.getUpdatedAt());
         }).toList();
 
         return new ResponseEntity<>(new CustomersResponse("Success",data),HttpStatus.OK);
@@ -45,7 +42,7 @@ public class CustomerController {
         customer.setPhone(customerRequest.phone());
 
         Customer updatedCustomer = customerService.updateCustomer(id,customer);
-        CustomerData data = new CustomerData(
+        CustomerDto data = new CustomerDto(
                 updatedCustomer.getId(),
                 updatedCustomer.getName(),
                 updatedCustomer.getEmail(),
@@ -65,7 +62,7 @@ public class CustomerController {
         customer.setPhone(customerRequest.phone());
 
         Customer createdCustomer = customerService.createCustomer(customer);
-        CustomerData data = new CustomerData(
+        CustomerDto data = new CustomerDto(
                 createdCustomer.getId(),
                 createdCustomer.getName(),
                 createdCustomer.getEmail(),
@@ -79,7 +76,7 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> delete(@PathVariable(name="id") long id){
 
         Customer deletedCustomer = customerService.deleteCustomer(id);
-        CustomerData data = new CustomerData(
+        CustomerDto data = new CustomerDto(
                 deletedCustomer.getId(),
                 deletedCustomer.getName(),
                 deletedCustomer.getEmail(),
@@ -89,4 +86,27 @@ public class CustomerController {
 
         return new ResponseEntity<>(new CustomerResponse("Success",data),HttpStatus.OK);
     }
+
+    @GetMapping("/{customerId}/screenings/{screeningId}")
+    public ResponseEntity<TicketsResponse> getAllCustomerScreeningTickets(@PathVariable long customerId,@PathVariable long screeningId){
+        List<TicketDto> data = customerService.getCustomerScreeningTickets(customerId,screeningId).stream()
+                .map(t->{
+                    return new TicketDto(t.getId(),t.getNumSeats(),t.getCreatedAt(),t.getUpdatedAt());
+                }).toList();
+        return new ResponseEntity<>(new TicketsResponse("Success",data),HttpStatus.OK);
+    }
+    @PostMapping("/{customerId}/screenings/{screeningId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<TicketResponse> createCustomerTicket(@PathVariable long customerId,@PathVariable long screeningId,@RequestBody @Valid TicketRequest ticketRequest){
+
+        Ticket createdTicket = customerService.createCustomerTicket(customerId,screeningId, ticketRequest.numSeats());
+        TicketDto data = new TicketDto(
+                createdTicket.getId(),
+                createdTicket.getNumSeats(),
+                createdTicket.getCreatedAt(),
+                createdTicket.getUpdatedAt());
+
+        return new ResponseEntity<>(new TicketResponse("Success",data),HttpStatus.CREATED);
+    }
+
 }

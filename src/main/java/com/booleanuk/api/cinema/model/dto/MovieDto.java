@@ -2,7 +2,7 @@ package com.booleanuk.api.cinema.model.dto;
 
 import java.time.LocalDateTime;
 
-public record MovieData(
+public record MovieDto(
         long id,
         String title,
         String rating,

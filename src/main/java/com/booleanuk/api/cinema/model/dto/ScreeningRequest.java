@@ -10,9 +10,11 @@ import java.time.LocalDateTime;
 
 public record ScreeningRequest(
         @NotNull (message = "Should not be null!")
+        @NotBlank (message = "Should not be empty!")
         @Min(1)
         Integer screenNumber,
         @NotNull (message = "Should not be null!")
+        @NotBlank (message = "Should not be empty!")
         @Min(1)
         Integer capacity,
         @NotNull (message = "Should not be null!")

@@ -4,6 +4,6 @@ import java.util.List;
 
 public record MoviesResponse (
         String status,
-        List<MovieData> data
+        List<MovieDto> data
 ){
 }

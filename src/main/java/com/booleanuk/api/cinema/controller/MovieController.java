@@ -22,9 +22,9 @@ public class MovieController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<MoviesResponse> getAll(){
-        List<MovieData> data =  movieService.getMovies().stream()
+        List<MovieDto> data =  movieService.getMovies().stream()
                 .map(m-> {
-                    return new MovieData(
+                    return new MovieDto(
                             m.getId(),
                             m.getTitle(),
                             m.getRating(),
@@ -53,7 +53,7 @@ public class MovieController {
 
         Movie updateMovie = movieService.updateMovie(id,movie);
 
-        MovieData data = new MovieData(
+        MovieDto data = new MovieDto(
                 updateMovie.getId(),
                 updateMovie.getTitle(),
                 updateMovie.getRating(),
@@ -98,7 +98,7 @@ public class MovieController {
             movie.setScreenings(screenings);
         }
         Movie createdMovie =movieService.createMovie(movie);
-        MovieData data = new MovieData(
+        MovieDto data = new MovieDto(
                 createdMovie.getId(),
                 createdMovie.getTitle(),
                 createdMovie.getRating(),
@@ -112,7 +112,7 @@ public class MovieController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<MovieResponse> delete(@PathVariable(name="id") long id){
         Movie movie = movieService.deleteMovie(id);
-        MovieData data = new MovieData(
+        MovieDto data = new MovieDto(
                 movie.getId(),
                 movie.getTitle(),
                 movie.getRating(),
@@ -126,9 +126,9 @@ public class MovieController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ScreeningsResponse> getAllMovieScreenings(@PathVariable long id){
 
-        List<ScreeningData> data =  movieService.getScreenings(id).stream()
+        List<ScreeningDto> data =  movieService.getScreenings(id).stream()
                 .map(s-> {
-                    return new ScreeningData(
+                    return new ScreeningDto(
                             s.getId(),
                             s.getScreenNumber(),
                             s.getCapacity(),
@@ -157,7 +157,7 @@ public class MovieController {
         screening.setUpdatedAt(LocalDateTime.now());
 
         Screening createdScreening = movieService.createScreening(id,screening);
-        ScreeningData data = new ScreeningData(
+        ScreeningDto data = new ScreeningDto(
                 createdScreening.getId(),
                 createdScreening.getScreenNumber(),
                 createdScreening.getCapacity(),

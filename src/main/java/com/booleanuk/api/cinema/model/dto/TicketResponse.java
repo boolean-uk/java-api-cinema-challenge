@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model.dto;
 
-public record CustomerResponse (
+public record TicketResponse(
         String status,
-        CustomerDto data){
+        TicketDto data
+) {
 }
