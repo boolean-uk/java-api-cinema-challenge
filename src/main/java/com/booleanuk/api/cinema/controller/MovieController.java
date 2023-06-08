@@ -122,4 +122,49 @@ public class MovieController {
                 movie.getUpdatedAt());
         return new ResponseEntity<>(new MovieResponse("Success",data),HttpStatus.OK);
     }
+    @GetMapping("/{id}/screenings")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ScreeningsResponse> getAllMovieScreenings(@PathVariable long id){
+
+        List<ScreeningData> data =  movieService.getScreenings(id).stream()
+                .map(s-> {
+                    return new ScreeningData(
+                            s.getId(),
+                            s.getScreenNumber(),
+                            s.getCapacity(),
+                            s.getStartsAt(),
+                            s.getCreatedAt(),
+                            s.getUpdatedAt());
+                }).toList();
+
+        return new ResponseEntity<>(new ScreeningsResponse("Success",data),HttpStatus.OK);
+    }
+    @PostMapping("/{id}/screenings")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ScreeningResponse> createMovieScreening(@PathVariable int id,@Valid @RequestBody ScreeningRequest screeningRequest){
+
+        Screening screening = new Screening();
+        screening.setScreenNumber(screeningRequest.screenNumber());
+        screening.setCapacity(screeningRequest.capacity());
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dateTime = LocalDateTime.parse(screeningRequest.startsAt(), formatter);
+            screening.setStartsAt(dateTime);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "startsAt format is invalid");
+        }
+        screening.setCreatedAt(LocalDateTime.now());
+        screening.setUpdatedAt(LocalDateTime.now());
+
+        Screening createdScreening = movieService.createScreening(id,screening);
+        ScreeningData data = new ScreeningData(
+                createdScreening.getId(),
+                createdScreening.getScreenNumber(),
+                createdScreening.getCapacity(),
+                createdScreening.getStartsAt(),
+                createdScreening.getCreatedAt(),
+                createdScreening.getUpdatedAt());
+
+        return new ResponseEntity<>(new ScreeningResponse("Success",data),HttpStatus.CREATED);
+    }
 }

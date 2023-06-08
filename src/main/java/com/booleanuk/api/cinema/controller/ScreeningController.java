@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping("movies")
+@RequestMapping("screenings")
 public class ScreeningController {
     @Autowired
     private ScreeningService screeningService;
@@ -28,7 +28,7 @@ public class ScreeningController {
 //    public Screening update(@PathVariable(name="id") long id,@RequestBody Screening screening){
 //        return screeningService.updateScreening(id,screening);
 //    }
-    @PostMapping("/{id}/screenings")
+    @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public Screening create(@PathVariable(name = "id") long id,@RequestBody Screening screening){
         return screeningService.createScreening(id,screening);

@@ -18,7 +18,7 @@ public class ScreeningServiceImp implements ScreeningService{
     @Autowired
     private MovieRepository movieRepository;
     @Override
-    public List<Screening> getScreenings(Long id)
+    public List<Screening> getScreenings(long id)
     {
         movieRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
@@ -27,13 +27,13 @@ public class ScreeningServiceImp implements ScreeningService{
     }
 
     @Override
-    public Screening getScreening(Long id) {
+    public Screening getScreening(long id) {
         return screeningRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Not found"));
     }
 
     @Override
-    public Screening createScreening(Long id, Screening screening) {
+    public Screening createScreening(long id, Screening screening) {
 
         try{
 
@@ -51,7 +51,7 @@ public class ScreeningServiceImp implements ScreeningService{
     }
 
     @Override
-    public Screening updateScreening(Long id, Screening screening) {
+    public Screening updateScreening(long id, Screening screening) {
         Screening foundScreening = screeningRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No screening matches the provided id"));
 
@@ -62,7 +62,7 @@ public class ScreeningServiceImp implements ScreeningService{
     }
 
     @Override
-    public Screening deleteScreening(Long id) {
+    public Screening deleteScreening(long id) {
         Screening toBeDeleted = screeningRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No screening matches the provided id"));
 

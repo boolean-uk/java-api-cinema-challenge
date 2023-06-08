@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.service;
 
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,15 @@ import java.util.List;
 public class MovieServiceImp implements MovieService {
     @Autowired
     private MovieRepository moviesRepository;
+    @Autowired
+    private ScreeningRepository screeningRepository;
     @Override
     public List<Movie> getMovies() {
         return moviesRepository.findAll();
     }
 
     @Override
-    public Movie getMovie(Long id) {
+    public Movie getMovie(long id) {
         return moviesRepository
                 .findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
@@ -35,7 +39,7 @@ public class MovieServiceImp implements MovieService {
     }
 
     @Override
-    public Movie updateMovie(Long id, Movie movie) {
+    public Movie updateMovie(long id, Movie movie) {
         Movie foundMovie = moviesRepository
                 .findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
@@ -47,12 +51,32 @@ public class MovieServiceImp implements MovieService {
     }
 
     @Override
-    public Movie deleteMovie(Long id) {
+    public Movie deleteMovie(long id) {
         Movie toDelete = moviesRepository
                 .findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
 
         moviesRepository.delete(toDelete);
         return toDelete;
+    }
+
+    @Override
+    public Screening createScreening(long id, Screening screening) {
+        Movie foundMovie = moviesRepository
+                .findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
+
+        screening.setMovie(foundMovie);
+
+        return screeningRepository.save(screening);
+    }
+
+    @Override
+    public List<Screening> getScreenings(long id) {
+        Movie foundMovie = moviesRepository
+                .findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"No movie matches the provided id"));
+
+        return foundMovie.getScreenings();
     }
 }
