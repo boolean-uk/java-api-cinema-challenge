@@ -33,7 +33,7 @@ public class Screening {
     @ManyToOne
     @JoinColumn(name = "movie_id")
 //    @JsonIgnoreProperties(value = {"movies"})
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnoreProperties(value = {"id", "rating"})
     private Movie movie;
 
     // created constructors

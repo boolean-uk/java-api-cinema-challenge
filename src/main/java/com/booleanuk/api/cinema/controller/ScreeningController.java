@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,9 +30,11 @@ public class ScreeningController {
         Movie tempMovie = this.movieRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't create screening as movie id not found"));
         screening.setMovie(tempMovie);
+        LocalDateTime createdAt = LocalDateTime.now();
+        screening.setCreatedAt(createdAt);
+        screening.setUpdatedAt(createdAt);
         return new ResponseEntity<Screening>(this.screeningRepository.save(screening), HttpStatus.CREATED);
     }
-
 
     @GetMapping ("movies/{id}/screenings")
     public List<Screening> getAll(@PathVariable int id) {
