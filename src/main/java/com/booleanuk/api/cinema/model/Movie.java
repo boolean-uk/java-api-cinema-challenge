@@ -23,7 +23,7 @@ public class Movie {
     private LocalDateTime createdAt;
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value={"movie"})
     private List<Screening> screenings;
 }
