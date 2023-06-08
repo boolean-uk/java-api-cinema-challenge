@@ -4,6 +4,8 @@ import com.booleanuk.api.cinema.StaticMethods;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "screenings")
 public class Screening {
@@ -23,6 +25,9 @@ public class Screening {
     @JoinColumn(name = "movie_playing")
     @JsonIgnoreProperties("screenings")
     private Movie moviePlaying;
+    @OneToMany
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
     public Screening(){
 
     }
@@ -37,6 +42,10 @@ public class Screening {
 
     public Movie getMoviePlaying() {
         return moviePlaying;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
     public void setId(int id) {

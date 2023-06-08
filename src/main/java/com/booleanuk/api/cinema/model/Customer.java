@@ -1,10 +1,12 @@
 package com.booleanuk.api.cinema.model;
 
 import com.booleanuk.api.cinema.StaticMethods;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 
 import java.time.*;
+import java.util.List;
 
 
 @Entity
@@ -21,6 +23,9 @@ public class Customer {
     private String createdAt;
     @Column(name = "updated_at")
     private String updatedAt;
+    @OneToMany
+    @JsonIgnoreProperties("customer")
+    private List<Ticket> tickets;
     public Customer(){
 
     }
@@ -41,6 +46,10 @@ public class Customer {
     public void setCreatedAt() {
         //when this method is called, the updatedAt value changes
         this.updatedAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
     public String getCreatedAt() {

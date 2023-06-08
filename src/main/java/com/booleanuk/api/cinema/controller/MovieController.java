@@ -88,6 +88,11 @@ public class MovieController {
     @GetMapping("/{id}/screenings")
     public List<Screening> getScreenings(@PathVariable (name = "id") int id){
         //may need work
-        return this.screeningRepository.findAll().stream().filter((movie -> movie.getMoviePlaying().getId() == id)).toList();
+        List<Screening> screenings = this.screeningRepository.findAll().stream().filter((movie -> movie.getMoviePlaying().getId() == id)).toList();
+        if(screenings.size()>0){
+            return screenings;
+        }else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"That movie has no available screenings yet");
+        }
     }
 }
