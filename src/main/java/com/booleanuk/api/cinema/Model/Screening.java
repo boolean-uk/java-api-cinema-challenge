@@ -1,11 +1,13 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -36,7 +38,13 @@ public class Screening {
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnoreProperties("screening")
+    @JsonIgnore
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties({"screenings", "movie"})
+    @JsonIgnore
+    private List<Ticket> tickets;
 
 
     public Screening() {
@@ -103,6 +111,17 @@ public class Screening {
         movie.getScreenings().add(this);
     }
 
+    public Movie getMovie() {
+        return movie;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
 
     @Override
     public boolean equals(Object o) {

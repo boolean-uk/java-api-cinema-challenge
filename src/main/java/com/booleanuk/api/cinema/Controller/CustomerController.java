@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Controller;
 
+import com.booleanuk.api.cinema.ApiResponse.ApiResponse;
 import com.booleanuk.api.cinema.Model.Customer;
 import com.booleanuk.api.cinema.Repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,36 +19,39 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return this.customerRepository.findAll();
+    public ApiResponse<List<Customer>> getAllCustomers() {
+        List<Customer> customers = this.customerRepository.findAll();
+        return new ApiResponse<>("success", customers);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        return new ResponseEntity<Customer>(this.customerRepository.save(customer), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Customer>> createCustomer(@RequestBody Customer customer) {
+        return new ResponseEntity<>(new ApiResponse<>("success", this.customerRepository.save(customer)), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Customer>> getCustomerById(@PathVariable int id) {
         Customer customer = null;
         customer = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
-        return ResponseEntity.ok(customer);
+        ApiResponse<Customer> response = new ApiResponse<>("success", customer);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<ApiResponse<Customer>> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
 
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
-        return new ResponseEntity<Customer>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>("success", this.customerRepository.save(customerToUpdate)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Customer>> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers matching that id were found"));
         this.customerRepository.delete(customerToDelete);
-        return ResponseEntity.ok(customerToDelete);
+        ApiResponse<Customer> response = new ApiResponse<>("success", customerToDelete);
+        return ResponseEntity.ok(response);
     }
 }

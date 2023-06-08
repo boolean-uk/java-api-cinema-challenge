@@ -1,10 +1,10 @@
 package com.booleanuk.api.cinema.Controller;
 
+import com.booleanuk.api.cinema.ApiResponse.ApiResponse;
 import com.booleanuk.api.cinema.Model.Movie;
 import com.booleanuk.api.cinema.Model.Screening;
 import com.booleanuk.api.cinema.Repository.MovieRepository;
 import com.booleanuk.api.cinema.Repository.ScreeningRepository;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,36 +25,38 @@ public class MovieController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping
-    public List<Movie> getAllMovies() {
-        return this.movieRepository.findAll();
+    public ApiResponse<List<Movie>> getAllMovies() {
+        List<Movie> movies = this.movieRepository.findAll();
+        return new ApiResponse<>("success", movies);
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        return new ResponseEntity<Movie>(this.movieRepository.save(movie), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Movie>> createMovie(@RequestBody Movie movie) {
+        return new ResponseEntity<>(new ApiResponse<>("success", this.movieRepository.save(movie)), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Movie>> getMovieById(@PathVariable int id) {
         Movie movie = null;
         movie = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
-        return ResponseEntity.ok(movie);
+        ApiResponse<Movie> response = new ApiResponse<>("success", movie);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+    public ResponseEntity<ApiResponse<Movie>> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         Movie movieToUpdate = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
 
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-        return new ResponseEntity<Movie>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>("success", this.movieRepository.save(movieToUpdate)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Movie>> deleteMovie(@PathVariable int id) {
         Movie movieToDelete = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
 
         //Saving the screenings in a list
@@ -68,6 +70,7 @@ public class MovieController {
         //Delete movie entity
         this.movieRepository.delete(movieToDelete);
 
-        return ResponseEntity.ok(movieToDelete);
+        ApiResponse<Movie> response = new ApiResponse<>("success", movieToDelete);
+        return ResponseEntity.ok(response);
     }
 }

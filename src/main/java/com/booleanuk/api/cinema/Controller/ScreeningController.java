@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Controller;
 
+import com.booleanuk.api.cinema.ApiResponse.ApiResponse;
 import com.booleanuk.api.cinema.Model.Movie;
 import com.booleanuk.api.cinema.Model.Screening;
 import com.booleanuk.api.cinema.Repository.MovieRepository;
@@ -22,15 +23,17 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping("/movies/{movieId}/screenings")
-    public List<Screening> getAllScreenings(@PathVariable int movieId) {
-        return this.screeningRepository.findByMovieId(movieId);
+    public ApiResponse<List<Screening>> getAllScreenings(@PathVariable int movieId) {
+        Movie movie = this.movieRepository.findById(movieId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
+        List<Screening> screenings = movie.getScreenings();
+        return new ApiResponse<>("success", screenings);
     }
 
     @PostMapping("/movies/{movieId}/screenings")
-    public ResponseEntity<Screening> createScreening(@PathVariable int movieId,@RequestBody Screening screening) {
+    public ResponseEntity<ApiResponse<Screening>> createScreening(@PathVariable int movieId,@RequestBody Screening screening) {
         Movie movie = this.movieRepository.findById(movieId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies matching that id were found"));
         screening.setMovie(movie);
-        return new ResponseEntity<Screening>(this.screeningRepository.save(screening), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>("success", this.screeningRepository.save(screening)), HttpStatus.CREATED);
     }
 
 //    @PutMapping("/movies/{movieId}/screenings/{screeningId}")
