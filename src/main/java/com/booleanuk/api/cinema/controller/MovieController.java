@@ -19,7 +19,7 @@ public class MovieController {
     private MovieRepository movieRepository;
     @Autowired
     private ScreeningRepository screeningRepository;
-    public record MovieRequest(String title, String rating, String description, int runtimeMins /*, int screening_id*/){}
+    public record MovieRequest(String title, String rating, String description, int runtimeMins , int[] screenings_id){}
     public record ScreeningRequest(int screenNumber, int capacity, String startsAt){}
     @GetMapping
     public List<Movie> getAll(){
@@ -33,14 +33,18 @@ public class MovieController {
     }
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody MovieRequest movie){
-//        Screening screening = this.screeningRepository.findById(movie.screening_id)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"No screening with given id exists"));
+        //when creating a movie, we can add the screenings id in an array beforehand
         if(movie.title == null || movie.rating == null || movie.description == null || movie.runtimeMins == 0){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Movie body is invalid");
         }
         Movie temp = new Movie(movie.title, movie.rating, movie.description, movie.runtimeMins);
-//        temp.addScreening(screening);
-        //creating movies without screenings first.
+        if(movie.screenings_id != null) {
+            for (int i = 0; i < movie.screenings_id.length; i++) {
+                Screening screening = this.screeningRepository.findById(movie.screenings_id[i])
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No screening with given id exists"));
+                temp.addScreening(screening);
+            }
+        }
         return new ResponseEntity<>(this.movieRepository.save(temp),HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
@@ -48,15 +52,15 @@ public class MovieController {
         Movie updatedMovie = this.movieRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Movie with that id not found"));
 
-        if(movie.title != null || !movie.title.isEmpty()){
+        if(movie.title != null){
             updatedMovie.setTitle(movie.title);
             updatedMovie.setUpdatedAt();
         }
-        if(movie.rating != null || !movie.rating.isEmpty()){
+        if(movie.rating != null){
             updatedMovie.setRating(movie.rating);
             updatedMovie.setUpdatedAt();
         }
-        if(movie.description != null || !movie.description.isEmpty()){
+        if(movie.description != null){
             updatedMovie.setDescription(movie.description);
             updatedMovie.setUpdatedAt();
         }
@@ -83,6 +87,7 @@ public class MovieController {
         }
         Screening added = new Screening(screening.screenNumber,screening.capacity,screening.startsAt);
         added.setMoviePlaying(screened);
+        screened.addScreening(added);
         return new ResponseEntity<>(this.screeningRepository.save(added),HttpStatus.CREATED);
     }
     @GetMapping("/{id}/screenings")

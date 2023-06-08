@@ -25,7 +25,7 @@ public class Screening {
     @JoinColumn(name = "movie_playing")
     @JsonIgnoreProperties("screenings")
     private Movie moviePlaying;
-    @OneToMany
+    @OneToMany(mappedBy = "screening")
     @JsonIgnoreProperties("screening")
     private List<Ticket> tickets;
     public Screening(){

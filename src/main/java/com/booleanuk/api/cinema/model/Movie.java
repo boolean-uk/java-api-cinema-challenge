@@ -21,7 +21,7 @@ public class Movie {
     private String createdAt;
     @Column(name = "updated_at")
     private String updatedAt;
-    @OneToMany(mappedBy = "moviePlaying")
+    @OneToMany(mappedBy = "moviePlaying", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("moviePlaying")
     private List<Screening> screenings;
     public Movie() {

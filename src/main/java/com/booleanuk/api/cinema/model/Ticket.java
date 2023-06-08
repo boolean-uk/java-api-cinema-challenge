@@ -17,11 +17,11 @@ public class Ticket {
     @Column(name = "updated_at")
     private String updatedAt;
     @ManyToOne
-    @JoinColumn(name = "tickets")
+    @JoinColumn(insertable=false, updatable=false, name = "tickets")
     @JsonIgnoreProperties("tickets")
     private Customer customer;
     @ManyToOne
-    @JoinColumn(name = "tickets")
+    @JoinColumn(insertable=false, updatable=false, name = "tickets")
     @JsonIgnoreProperties("tickets")
     private Screening screening;
     public Ticket() {
@@ -29,6 +29,8 @@ public class Ticket {
 
     public Ticket(int numOfSeats) {
         this.numOfSeats = numOfSeats;
+        this.setCreatedAt();
+        this.setUpdatedAt();
     }
 
     public void setId(int id) {
@@ -47,8 +49,8 @@ public class Ticket {
         return screening;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt() {
+        this.createdAt = StaticMethods.convertEpochTimeToDateTime(System.currentTimeMillis());
     }
 
     public void setUpdatedAt() {
@@ -69,5 +71,13 @@ public class Ticket {
 
     public String getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public void setScreening(Screening screening) {
+        this.screening = screening;
     }
 }

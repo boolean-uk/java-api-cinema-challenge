@@ -23,7 +23,7 @@ public class Customer {
     private String createdAt;
     @Column(name = "updated_at")
     private String updatedAt;
-    @OneToMany
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("customer")
     private List<Ticket> tickets;
     public Customer(){

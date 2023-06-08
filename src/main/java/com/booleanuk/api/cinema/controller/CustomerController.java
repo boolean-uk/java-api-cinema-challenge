@@ -58,11 +58,12 @@ public class CustomerController {
             updatedCustomer.setEmail(customer.email);
             updatedCustomer.setUpdatedAt();
         }
-        return new ResponseEntity<>(updatedCustomer,HttpStatus.OK);
+        return new ResponseEntity<>(this.customerRepository.save(updatedCustomer),HttpStatus.OK);
     }
     @DeleteMapping("{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id){
-        Customer toDelete = getCustomer(id);
+        Customer toDelete = this.customerRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found"));
         this.customerRepository.delete(toDelete);
         return new ResponseEntity<>(toDelete,HttpStatus.OK);
     }
@@ -87,6 +88,10 @@ public class CustomerController {
         Ticket added = new Ticket(screeningRequest.numOfSeats);
         customer.getTickets().add(added);
         screening.getTickets().add(added);
+        added.setCustomer(customer);
+        added.setScreening(screening);
+        this.screeningRepository.save(screening);
+        this.customerRepository.save(customer);
         return new ResponseEntity<>(this.ticketRepository.save(added),HttpStatus.OK);
     }
 

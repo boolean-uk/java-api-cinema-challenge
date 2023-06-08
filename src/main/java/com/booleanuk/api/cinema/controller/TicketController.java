@@ -18,6 +18,7 @@ public class TicketController {
     private TicketRepository repository;
 
     //in case i want to see all tickets
+    //does not work as expected but i don't mind since it isn't required
     @GetMapping
     public List<Ticket> getAll(){
         return this.repository.findAll();
