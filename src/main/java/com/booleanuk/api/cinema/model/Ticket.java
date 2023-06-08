@@ -17,11 +17,11 @@ public class Ticket {
     @Column(name = "updated_at")
     private String updatedAt;
     @ManyToOne
-    @JoinColumn(insertable=false, updatable=false, name = "tickets")
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
     @JsonIgnoreProperties("tickets")
     private Customer customer;
     @ManyToOne
-    @JoinColumn(insertable=false, updatable=false, name = "tickets")
+    @JoinColumn(name = "screening_id", referencedColumnName = "id")
     @JsonIgnoreProperties("tickets")
     private Screening screening;
     public Ticket() {
