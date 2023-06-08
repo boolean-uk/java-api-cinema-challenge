@@ -39,7 +39,7 @@ out/
 ### MacOS ###
 .DS_Store
 ### Personal Settings ###
-*.properties
+application.properties
 report.html
 report.json
 src/main/resources/db/migration/
