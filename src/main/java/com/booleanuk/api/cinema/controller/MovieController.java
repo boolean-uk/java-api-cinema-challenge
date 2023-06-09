@@ -1,13 +1,16 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,6 +19,9 @@ public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
     @GetMapping
     public List<Movie> getAllMovies() {
         return this.movieRepository.findAll();
@@ -23,6 +29,16 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+        this.movieRepository.save(movie);
+        List<Screening> screenings = movie.getScreenings();
+        List<Screening> updatedScreenings = new ArrayList<>();
+        if (screenings != null) {
+            for (Screening screening : screenings) {
+                Screening newScreening = new Screening(screening.getScreenNumber(), screening.getCapacity(), screening.getStartsAt(), movie);
+                updatedScreenings.add(screeningRepository.save(newScreening));
+            }
+            movie.setScreenings(updatedScreenings);
+        }
         return new ResponseEntity<Movie>(this.movieRepository.save(movie), HttpStatus.CREATED);
     }
 

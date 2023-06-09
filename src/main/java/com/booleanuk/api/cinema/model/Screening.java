@@ -1,11 +1,12 @@
 package com.booleanuk.api.cinema.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 
 @Entity
@@ -15,11 +16,6 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private
     int id;
-
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIgnore
-    private Movie movie;
 
     @Column(name = "screen_number")
     private
@@ -43,15 +39,33 @@ public class Screening {
     @Column(name = "updated_At")
     private Timestamp updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
+    @JsonIgnoreProperties("screenings")
+    private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
+
     public Screening() {
         super();
     }
 
-    public Screening(Integer screenNumber, Integer capacity, String startsAt) {
+    public Screening(Integer screenNumber, Integer capacity, Timestamp startsAt, Movie movie) {
         super();
         this.setScreenNumber(screenNumber);
         this.setCapacity(capacity);
         this.setStartsAt(startsAt);
+        this.movie = movie;
+    }
+
+    public Screening(Integer screenNumber, Integer capacity, String startsAt, Movie movie) {
+        super();
+        this.setScreenNumber(screenNumber);
+        this.setCapacity(capacity);
+        this.setStartsAt(startsAt);
+        this.movie = movie;
     }
 
     public int getId() {
@@ -90,6 +104,10 @@ public class Screening {
         return startsAt;
     }
 
+    public void setStartsAt(Timestamp startsAt) {
+        this.startsAt = startsAt;
+    }
+
     public void setStartsAt(String startsAt) {
         this.startsAt = Timestamp.valueOf(startsAt);
     }
@@ -108,5 +126,13 @@ public class Screening {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }

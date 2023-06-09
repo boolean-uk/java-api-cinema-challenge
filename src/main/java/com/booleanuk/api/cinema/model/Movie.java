@@ -1,10 +1,12 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 
 @Entity
@@ -13,25 +15,19 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private
-    int id;
+    private int id;
 
     @Column(name = "title")
-    private
-    String title;
+    private String title;
 
     @Column(name = "rating")
-    private
-    String rating;
+    private String rating;
 
     @Column(name = "description")
-    private
-    String description;
+    private String description;
 
     @Column(name = "runtime_mins")
-    private
-    Integer runtimeMins;
-
+    private Integer runtimeMins;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,6 +38,10 @@ public class Movie {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_At")
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties("movie")
+    private List<Screening> screenings;
 
     public Movie() {
         super();
@@ -55,12 +55,29 @@ public class Movie {
         this.setRuntimeMins(runtimeMins);
     }
 
+    public Movie(String title, String rating, String description, Integer runtimeMins, List<Screening> screenings) {
+        super();
+        this.setTitle(title);
+        this.setRating(rating);
+        this.setDescription(description);
+        this.setRuntimeMins(runtimeMins);
+        this.setScreenings(screenings);
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Screening> getScreenings() {
+        return screenings;
+    }
+
+    public void setScreenings(List<Screening> screenings) {
+        this.screenings = screenings;
     }
 
     public String getTitle() {
