@@ -32,20 +32,22 @@ public class MovieController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ApiResponse<List<Movie>> getAllMovies(){
-        return new ApiResponse<>("success",this.movieRepository.findAll());
+    public ApiResponse<List<Movie>> getAllMovies() {
+        return new ApiResponse<>("success", this.movieRepository.findAll());
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable int id){
-        Movie movie = this.movieRepository.findById(id).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"Movie not found!"));
+    public ResponseEntity<Movie> getMovieById(@PathVariable int id) {
+        Movie movie = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found!"));
         return ResponseEntity.ok(movie);
     }
+
     @PostMapping
     public ResponseEntity<ApiResponse<Movie>> createMovie(@RequestBody Movie movie) {
-        movie.setCreatedAt(LocalDateTime.now());
         Movie savedMovie = movieRepository.save(movie);
-        return new ResponseEntity<>(new ApiResponse<>("success",savedMovie), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>("success", savedMovie), HttpStatus.CREATED);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Movie>> updateMovie(@PathVariable int id, @RequestBody Movie movieDetails) {
         Optional<Movie> optionalMovie = movieRepository.findById(id);
@@ -55,11 +57,12 @@ public class MovieController {
             movie.setRating(movieDetails.getRating());
             movie.setRuntimeMins(movieDetails.getRuntimeMins());
 
-            movie.setUpdatedAt(LocalDateTime.now());
             Movie updatedMovie = movieRepository.save(movie);
-            return new ResponseEntity<>(new ApiResponse<>("success",updatedMovie), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>("success", updatedMovie), HttpStatus.OK);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Movie>> deleteMovie(@PathVariable int id) {
         Movie movie = movieRepository.findById(id).orElse(null);
@@ -67,24 +70,8 @@ public class MovieController {
             return ResponseEntity.notFound().build();
         }
 
-
-        // Delete associated screenings before deleting movie
-        List<Screening> screenings = screeningRepository.findByMovieId(id);
-        for (Screening screening : screenings) {
-
-            // Delete associated tickets before deleting screening
-            List<Ticket> tickets = ticketRepository.findTicketsByScreeningId(screening.getId());
-            System.out.println(tickets.size());
-            ticketRepository.deleteAll(tickets);
-//            for (Ticket ticket : tickets) {
-//                ticketRepository.delete(ticket);
-//            }
-            screeningRepository.delete(screening);
-        }
-
-        // Delete the movie
         movieRepository.delete(movie);
 
-        return ResponseEntity.ok(new ApiResponse<>("success",movie)); //noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>("success", movie));
     }
 }

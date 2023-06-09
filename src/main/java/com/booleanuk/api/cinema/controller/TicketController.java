@@ -56,7 +56,6 @@ public class TicketController {
         for(Ticket similarTicket:sameScreeningTickets){
             remainingCapacity += similarTicket.getNumSeats();
         }
-        System.out.println(remainingCapacity);
 
         if((screening.getCapacity()-remainingCapacity-ticket.getNumSeats())<0){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Screening Not enough capacity!");
@@ -65,7 +64,6 @@ public class TicketController {
         ticketToCreate.setCustomer(customer);
         ticketToCreate.setScreening(screening);
         ticketToCreate.setNumSeats(ticket.getNumSeats());
-        ticketToCreate.setCreatedAt(LocalDateTime.now());
         Ticket savedTicket = this.ticketRepository.save(ticketToCreate);
         return new ResponseEntity<>(new ApiResponse<>("success",savedTicket), HttpStatus.CREATED);
 

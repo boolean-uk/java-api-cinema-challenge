@@ -3,13 +3,12 @@ package com.booleanuk.api.cinema.controller;
 import com.booleanuk.api.cinema.ApiResponse;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +18,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @GetMapping
     public ApiResponse<List<Customer>> getAllCustomers(){
@@ -31,7 +33,6 @@ public class CustomerController {
     }
     @PostMapping
     public ResponseEntity<ApiResponse<Customer>> createCustomer(@RequestBody Customer customer) {
-        customer.setCreatedAt(LocalDateTime.now());
         Customer savedCustomer = customerRepository.save(customer);
         return new ResponseEntity<>(new ApiResponse<>("success",savedCustomer), HttpStatus.CREATED);
     }
@@ -42,7 +43,6 @@ public class CustomerController {
             customer.setName(customerDetails.getName());
             customer.setEmail(customerDetails.getEmail());
             customer.setPhone(customerDetails.getPhone());
-            customer.setUpdatedAt(LocalDateTime.now());
             Customer updatedCustomer = customerRepository.save(customer);
             return new ResponseEntity<>(new ApiResponse<>("success",updatedCustomer), HttpStatus.OK);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));

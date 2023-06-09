@@ -39,8 +39,6 @@ public class ScreeningController {
         if (optionalMovie.isPresent()) {
             Movie movie = optionalMovie.get();
             screening.setMovie(movie);
-            screening.setCreatedAt(LocalDateTime.now());
-            screening.setUpdatedAt(LocalDateTime.now());
             Screening savedScreening = screeningRepository.save(screening);
             return new ResponseEntity<>(new ApiResponse<>("success",savedScreening), HttpStatus.CREATED);
         } else {

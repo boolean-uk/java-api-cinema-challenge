@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket,Integer> {
     List<Ticket> findTicketsByCustomerIdAndScreeningId(int customerId, int screeningId);
-
     List<Ticket> findTicketsByScreeningId(int screeningId);
-
-    void deleteAll(Iterable<? extends Ticket> entities);
 
 }
