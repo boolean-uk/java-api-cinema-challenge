@@ -34,7 +34,7 @@ public class Customer {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     @JsonIgnore
     private List<Ticket> tickets;
 

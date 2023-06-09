@@ -16,12 +16,12 @@ public class Ticket {
     @GeneratedValue( strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     @JoinColumn(name = "screening_id", nullable = false)
     @JsonIgnore
     private Screening screening;
 
-    @ManyToOne
+    @ManyToOne(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore
     private Customer customer;

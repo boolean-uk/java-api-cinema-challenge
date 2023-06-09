@@ -37,7 +37,7 @@ public class Movie {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     @JsonIgnore
     private List<Screening> screenings;
 

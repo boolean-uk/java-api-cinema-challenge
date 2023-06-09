@@ -9,10 +9,8 @@ import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import com.booleanuk.api.cinema.repositories.TicketRepository;
 import com.booleanuk.api.cinema.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
