@@ -8,7 +8,7 @@ import java.util.TimeZone;
 //@Configuration
 public class TimeZoneConfig {
 
-    //@Bean
+    @Bean
     public void setDefaultTimeZone() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }

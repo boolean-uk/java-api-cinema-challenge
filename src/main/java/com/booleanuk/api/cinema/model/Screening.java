@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
-import com.booleanuk.api.cinema.formatter.CustomDateSerializer;
 import com.booleanuk.api.cinema.formatter.CustomDateDeserializer;
+import com.booleanuk.api.cinema.formatter.CustomDateSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
