@@ -8,4 +8,5 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByCustomerIdAndScreeningId(int customerId, int screeningId);
     List<Ticket> findByCustomerId(int customerId);
+    List<Ticket> findByScreeningId(int screeningId);
 }
