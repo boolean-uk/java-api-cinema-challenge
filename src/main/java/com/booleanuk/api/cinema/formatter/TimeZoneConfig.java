@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.TimeZone;
 
-//@Configuration
+@Configuration
 public class TimeZoneConfig {
 
     @Bean
