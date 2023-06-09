@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -26,12 +27,10 @@ public class Movie {
     private int runtimeMins;
     @CreationTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Column(name = "created_at")
-    private Instant createdAt;
+    private Timestamp createdAt;
     @UpdateTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Column (name = "updated_at")
-    private Instant updatedAt;
+    private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnore
@@ -58,7 +57,7 @@ public class Movie {
         this.screenings = screenings;
     }
 
-    public Movie(String title, String rating, String description, int runtimeMins, Instant createdAt, Instant updatedAt) {
+    public Movie(String title, String rating, String description, int runtimeMins, Timestamp createdAt, Timestamp updatedAt) {
         this.title = title;
         this.rating = rating;
         this.description = description;
@@ -108,19 +107,19 @@ public class Movie {
         this.runtimeMins = runtimeMins;
     }
 
-    public Instant getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return this.createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return this.updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
