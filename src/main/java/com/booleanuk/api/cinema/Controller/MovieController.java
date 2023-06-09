@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -32,7 +34,18 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Movie>> createMovie(@RequestBody Movie movie) {
-        return new ResponseEntity<>(new ApiResponse<>("success", this.movieRepository.save(movie)), HttpStatus.CREATED);
+        Movie savedMovie = this.movieRepository.save(movie);
+
+        if (movie.getScreenings()  != null ) {
+            List<Screening> screenings = new ArrayList<>(movie.getScreenings());
+
+            for (Screening screening : screenings) {
+                screening.setMovie(savedMovie);
+                this.screeningRepository.save(screening);
+            }
+            savedMovie.setScreenings(screenings);
+        }
+        return new ResponseEntity<>(new ApiResponse<>("success", savedMovie), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
