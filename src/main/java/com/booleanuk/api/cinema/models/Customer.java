@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -17,15 +16,20 @@ public class Customer {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "email")
     private String email;
+
     @Column (name = "phone")
     private String phone;
+
     @CreationTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
+
     @UpdateTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;
@@ -55,7 +59,6 @@ public class Customer {
     }
 
     // Getters & Setters
-
     public int getId() {
         return this.id;
     }

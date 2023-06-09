@@ -28,9 +28,11 @@ public class Ticket {
 
     @Column (name = "num_seats")
     private int numSeats;
+
     @CreationTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
+
     @UpdateTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;

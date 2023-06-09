@@ -16,19 +16,25 @@ public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnore
     private Movie movie;
+
     @Column(name = "screen_number")
     private int screenNumber;
+
     @Column (name = "capacity")
     private int capacity;
+
     @Column (name = "starts_at")
     private Timestamp startsAt;
+
     @CreationTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
+
     @UpdateTimestamp
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;
@@ -109,6 +115,4 @@ public class Screening {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-
 }
