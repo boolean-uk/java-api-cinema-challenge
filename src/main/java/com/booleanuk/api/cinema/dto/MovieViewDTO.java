@@ -4,6 +4,8 @@ import com.booleanuk.api.cinema.model.Movie;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 @Data

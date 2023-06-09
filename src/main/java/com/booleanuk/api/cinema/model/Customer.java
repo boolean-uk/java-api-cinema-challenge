@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.model;
 
+import com.booleanuk.api.cinema.formatter.EmailDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +23,7 @@ public class Customer extends CinemaEntity{
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "email", nullable = false)
+    @JsonDeserialize(using = EmailDeserializer.class)
     private String email;
     @Column(name = "phone", nullable = false)
     private String phone;

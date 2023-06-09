@@ -16,11 +16,12 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class CustomDateSerializer extends JsonSerializer<Date> {
-    private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     @Override
     public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        String dateString = FORMATTER.format(value);
+        String dateString = dateFormat.format(value);
         gen.writeString(dateString);
+
     }
 }
+
