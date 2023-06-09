@@ -6,10 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 @Entity
 @Table (name = "screenings")
@@ -46,6 +43,15 @@ public class Screening {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         setStartsAt(startsAt);
+    }
+
+    public Screening(Movie movie, int screenNumber, int capacity, Timestamp startsAt, Timestamp createdAt, Timestamp updatedAt) {
+        this.movie = movie;
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     // Getters & Setters

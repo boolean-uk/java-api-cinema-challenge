@@ -40,4 +40,7 @@ out/
 ### Ignore application.yml file ###
 src/main/resources/application.yml
 
+## Ignore report.html & report.json file ###
+report.html
+report.json
 

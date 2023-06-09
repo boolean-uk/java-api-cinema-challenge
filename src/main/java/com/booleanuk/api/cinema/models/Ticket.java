@@ -41,6 +41,12 @@ public class Ticket {
         this.numSeats = numSeats;
     }
 
+    public Ticket(Screening screening, Customer customer, int numSeats) {
+        this.screening = screening;
+        this.customer = customer;
+        this.numSeats = numSeats;
+    }
+
     // Getters & Setters
     public int getId() {
         return this.id;

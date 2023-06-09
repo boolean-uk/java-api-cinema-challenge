@@ -44,6 +44,14 @@ public class Customer {
         this.phone = phone;
     }
 
+    public Customer(String name, String email, String phone, Instant createdAt, Instant updatedAt, List<Ticket> tickets) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     // Getters & Setters
 
     public int getId() {
