@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 public class Screening extends TimestampedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
+    private long id;
+    @NotNull
     @JsonProperty(index = 2)
     private long screenNumber;
     @NotNull
