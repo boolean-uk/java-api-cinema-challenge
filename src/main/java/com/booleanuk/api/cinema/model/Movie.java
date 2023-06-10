@@ -1,39 +1,36 @@
 package com.booleanuk.api.cinema.model;
 
-import com.booleanuk.api.cinema.helper.LocalDateConverter;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class Movie {
+public class Movie extends TimestampedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(index = 1)
     private long id;
+    @NotNull
+    @JsonProperty(index = 2)
     private String title;
+    @NotNull
+    @JsonProperty(index = 3)
     private String rating;
+    @NotNull
+    @JsonProperty(index = 4)
     private String description;
-    private int runtimeMins;
-    @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-    private LocalDateTime createdAt;
-    @UpdateTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-    private LocalDateTime updatedAt;
+    @NotNull
+    @JsonProperty(index = 5)
+    private Integer runtimeMins;
 
-    public Movie() {}
+    @OneToMany(mappedBy = "movie")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //@JsonIgnore
+    List<Screening> screenings; //TODO: can I remove this entirely?
 
-    public Movie(String title, String rating, String description, int runtimeMins) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMins = runtimeMins;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    public Movie() {
     }
 
     public long getId() {
@@ -70,34 +67,5 @@ public class Movie {
 
     public void setRuntimeMins(int runtimeMins) {
         this.runtimeMins = runtimeMins;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Movie movie = (Movie) o;
-        return id == movie.id && runtimeMins == movie.runtimeMins && Objects.equals(title, movie.title) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(createdAt, movie.createdAt) && Objects.equals(updatedAt, movie.updatedAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, rating, description, runtimeMins, createdAt, updatedAt);
     }
 }
