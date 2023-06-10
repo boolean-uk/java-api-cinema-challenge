@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Screening extends TimestampedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
+    @JsonProperty(index = 1)
     private long id;
     @NotNull
     @JsonProperty(index = 2)
@@ -28,10 +28,10 @@ public class Screening extends TimestampedEntity {
     @JsonIgnore
     private Movie movie;
 
-    @JsonProperty(value = "id", index = 1)
-    public Long getMovieId() {
-        return movie.getId();
-    }
+//    @JsonProperty(value = "id", index = 1)
+//    public Long getMovieId() {
+//        return movie.getId();
+//    }
 
     public void setMovie(Movie movie) {
         this.movie = movie;
