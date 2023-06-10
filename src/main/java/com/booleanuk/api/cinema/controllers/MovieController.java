@@ -72,19 +72,19 @@ public class MovieController {
                 ));
 
         boolean hasChanged = false;
-        if(!movieToUpdate.getTitle().equals(movie.getTitle())) {
+        if(movie.getTitle() != null && !movieToUpdate.getTitle().equals(movie.getTitle())) {
             movieToUpdate.setTitle(movie.getTitle());
             hasChanged = true;
         }
-        if(!movieToUpdate.getRating().equals(movie.getRating())) {
+        if(movie.getRating() != null && !movieToUpdate.getRating().equals(movie.getRating())) {
             movieToUpdate.setRating(movie.getRating());
             hasChanged = true;
         }
-        if(!movieToUpdate.getDescription().equals(movie.getDescription())) {
+        if(movie.getDescription() != null && !movieToUpdate.getDescription().equals(movie.getDescription())) {
             movieToUpdate.setDescription(movie.getDescription());
             hasChanged = true;
         }
-        if(!(movieToUpdate.getRuntimeMins() == movie.getRuntimeMins())) {
+        if(movie.getRuntimeMins() != -1 && !(movieToUpdate.getRuntimeMins() == movie.getRuntimeMins())) {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
             hasChanged = true;
         }

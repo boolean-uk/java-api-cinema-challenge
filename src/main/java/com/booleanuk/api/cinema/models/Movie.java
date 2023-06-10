@@ -23,7 +23,7 @@ public class Movie {
     @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "runtime_mins")
-    private int runtimeMins;
+    private int runtimeMins = -1;
     @Column(name = "created_at", nullable = false)
     private String createdAt;
     @Column(name = "updated_at", nullable = false)

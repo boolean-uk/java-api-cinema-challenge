@@ -61,15 +61,15 @@ public class CustomerController {
                 ));
 
         boolean hasChanged = false;
-        if(!customerToUpdate.getName().equals(customer.getName())) {
+        if(customer.getName() != null && !customerToUpdate.getName().equals(customer.getName())) {
             customerToUpdate.setName(customer.getName());
             hasChanged = true;
         }
-        if(!customerToUpdate.getName().equals(customer.getName())) {
+        if(customer.getEmail() != null && !customerToUpdate.getEmail().equals(customer.getEmail())) {
             customerToUpdate.setEmail(customer.getEmail());
             hasChanged = true;
         }
-        if(!customerToUpdate.getName().equals(customer.getName())) {
+        if(customer.getPhone() != null && !customerToUpdate.getPhone().equals(customer.getPhone())) {
             customerToUpdate.setPhone(customer.getPhone());
             hasChanged = true;
         }
