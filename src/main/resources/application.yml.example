@@ -25,6 +25,6 @@ spring:
           schema-generation:
             create-source: metadata
             scripts:
-              action: create
+              action: update
               create-target: src/main/resources/db/migration/V1_0_0__ddl_jpa_creation.sql
     show-sql: true

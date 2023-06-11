@@ -28,7 +28,7 @@ public class Movie extends TimestampedEntity {
 
     @OneToMany(mappedBy = "movie")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //@JsonIgnore
-    List<Screening> screenings; //TODO: can I remove this entirely?
+    List<Screening> screenings;
 
     public Movie() {
     }

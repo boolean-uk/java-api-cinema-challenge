@@ -10,7 +10,6 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("customers")
 public class CustomerController {
     private final CustomerRepository customerRepository;
 
@@ -18,12 +17,12 @@ public class CustomerController {
         this.customerRepository = customerRepository;
     }
 
-    @GetMapping
+    @GetMapping("customers")
     public ResponseEntity<Iterable<Customer>> findAll() {
         return ResponseEntity.ok(this.customerRepository.findAll());
     }
 
-    @PostMapping
+    @PostMapping("customers")
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         Customer savedCustomer = this.customerRepository.save(customer);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -31,7 +30,7 @@ public class CustomerController {
         return ResponseEntity.created(location).body(savedCustomer);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("customers/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable long id, @RequestBody Customer customer) {
         Optional<Customer> customerOptional = this.customerRepository.findById(id);
         if (customerOptional.isEmpty()) return ResponseEntity.notFound().build();
@@ -47,7 +46,7 @@ public class CustomerController {
         return ResponseEntity.created(location).body(this.customerRepository.save(customerToUpdate));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("customers/{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable long id) {
         Optional<Customer> customerOptional = this.customerRepository.findById(id);
         if (customerOptional.isEmpty()) return ResponseEntity.notFound().build();

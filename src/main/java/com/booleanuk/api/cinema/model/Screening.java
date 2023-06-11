@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Screening extends TimestampedEntity {
@@ -27,6 +28,10 @@ public class Screening extends TimestampedEntity {
     @JoinColumn(name = "movie_id")
     @JsonIgnore
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnore
+    List<Ticket> tickets;
 
 //    @JsonProperty(value = "id", index = 1)
 //    public Long getMovieId() {
