@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 public class Customer extends TimestampedEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @JsonProperty(index = 1)
     private long id;
     @NotNull

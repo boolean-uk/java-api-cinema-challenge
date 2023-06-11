@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Ticket extends TimestampedEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @JsonProperty(index = 1)
     private long id;
 

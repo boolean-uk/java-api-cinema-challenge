@@ -10,7 +10,7 @@ import java.util.Objects;
 @Entity
 public class Movie extends TimestampedEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @JsonProperty(index = 1)
     private long id;
     @NotNull
