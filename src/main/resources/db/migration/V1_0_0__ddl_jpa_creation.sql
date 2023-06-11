@@ -55,3 +55,11 @@
        add constraint FKslsbfjfvsw5v43w11jm31x0c6 
        foreign key (screening_id) 
        references screening;
+
+    create table hibernate_sequences (
+       sequence_name varchar(255) not null,
+        next_val bigint,
+        primary key (sequence_name)
+    );
+
+    insert into hibernate_sequences(sequence_name, next_val) values ('default',0);

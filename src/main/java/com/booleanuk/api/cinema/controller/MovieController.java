@@ -42,10 +42,10 @@ public class MovieController {
         if (movieOptional.isEmpty()) return ResponseEntity.notFound().build();
 
         Movie movieToUpdate = movieOptional.get();
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        if (movie.getTitle() != null) movieToUpdate.setTitle(movie.getTitle());
+        if (movie.getRating() != null) movieToUpdate.setRating(movie.getRating());
+        if (movie.getDescription() != null) movieToUpdate.setDescription(movie.getDescription());
+        if (movie.getRuntimeMins() != 0) movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(this.movieRepository.save(movieToUpdate));
     }

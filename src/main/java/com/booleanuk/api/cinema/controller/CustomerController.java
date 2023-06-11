@@ -37,9 +37,9 @@ public class CustomerController {
 
         Customer customerToUpdate = customerOptional.get();
 
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customerToUpdate.getPhone());
+        if (customer.getName() != null) customerToUpdate.setName(customer.getName());
+        if (customer.getEmail() != null) customerToUpdate.setEmail(customer.getEmail());
+        if (customer.getPhone() != null) customerToUpdate.setPhone(customerToUpdate.getPhone());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(customerToUpdate.getId()).toUri();
 
