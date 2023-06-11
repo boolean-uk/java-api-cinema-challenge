@@ -15,9 +15,16 @@ spring:
     max-idle: 3
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+      jakarta:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: update
+              create-target: src/main/resources/db/migration/V1_0_0__ddl_jpa_creation.sql
     show-sql: true
