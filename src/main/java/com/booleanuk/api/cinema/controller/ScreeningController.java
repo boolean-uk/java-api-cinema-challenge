@@ -37,8 +37,8 @@ public class ScreeningController {
     }
 
     @GetMapping ("movies/{id}/screenings")
-    public List<Screening> getAll(@PathVariable int id) {
-        List<Screening> screenings = this.screeningRepository.getScreeningByMovieId(id);
+    public List<Screening> getAll(@PathVariable int movie_id) {
+        List<Screening> screenings = this.screeningRepository.getScreeningByMovieId(movie_id);
         return screenings;
     }
 

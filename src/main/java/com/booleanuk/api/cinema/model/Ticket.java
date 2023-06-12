@@ -38,11 +38,11 @@ public class Ticket {
     @JsonIgnoreProperties(value = {"capacity"})
     private Screening screening;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-//    @JsonIgnoreProperties(value = {"movies"})
-    @JsonIgnoreProperties(value = {"rating","description"})
-    private Movie movie;
+//    @ManyToOne
+//    @JoinColumn(name = "movie_id")
+////    @JsonIgnoreProperties(value = {"movies"})
+//    @JsonIgnoreProperties(value = {"rating","description"})
+//    private Movie movie;
 
     // constructors
     public Ticket() {
