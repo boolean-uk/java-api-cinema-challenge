@@ -15,7 +15,7 @@ It's time to use everything you've learned up to this point! Your task is to bui
 4. Navigate to the `src/main/resources/` dirctory and rename the `application.yml.example` file to `application.yml`
     - Create a new PostgreSQL database for this exercise, a cloud database such as ElephantSQL is fine
     - Replace the `DATABASE_URL`, `DATABASE_USERNAME` and `DATABASE_PASSWORD` sections in the .yml file with your real database information. An example of what the file should look like is below
-5. Your task is to develop the API that [satisfies this API spec](https://boolean-uk.github.io/java-api-cinema-challenge/). Create your source code in the `com.booleanuk.api.cinema` package
+5. Your task is to develop the API that [satisfies this API spec](https://boolean-uk.github.io/java-api-cinema-challenge/). Create your source code in the `com.booleanuk.api.Cinema` package
 
 Pay close attention to the details of each endpoint. How you choose to implement the solution is up to you, there are no wrong answers, but the inputs and outputs must match the provided API documentation exactly.
 
