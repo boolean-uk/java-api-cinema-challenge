@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Entity
 @Table(name = "screenings")
@@ -36,6 +38,11 @@ public class Screening {
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnoreProperties("screening")
     private Movie movie;
+
+    @OneToMany
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
+
     public Screening(){
         super();
     }
@@ -101,5 +108,13 @@ public class Screening {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }
