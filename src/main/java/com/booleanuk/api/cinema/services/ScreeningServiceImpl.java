@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class ScreeningServiceImpl implements ScreeningService {
         if (movieOptional.isPresent()) {
             Screening screening = modelMapper.map(screeningDTO, Screening.class);
             screening.setMovie(movieOptional.get());
+            screening.setCreatedAt(LocalDateTime.now());
             Screening savedScreening = screeningRepository.save(screening);
             return modelMapper.map(savedScreening, ScreeningResponseDTO.class);
         } else {
@@ -70,6 +72,11 @@ public class ScreeningServiceImpl implements ScreeningService {
         Optional<Screening> screeningOptional = screeningRepository.findById(screeningId);
         if (screeningOptional.isPresent()) {
             Screening existingScreening = screeningOptional.get();
+
+            if (hasUpdates(existingScreening, screeningDTO)) {
+                existingScreening.setUpdatedAt(LocalDateTime.now());
+            }
+
             modelMapper.map(screeningDTO, existingScreening);
             Screening updatedScreening = screeningRepository.save(existingScreening);
             return modelMapper.map(updatedScreening, ScreeningResponseDTO.class);
@@ -85,5 +92,13 @@ public class ScreeningServiceImpl implements ScreeningService {
         } else {
             throw new ResourceNotFoundException("Screening not found with id: " + screeningId);
         }
+    }
+// TODO: Create a helpers class..
+    private boolean hasUpdates(Screening existingScreening, UpdateScreeningRequestDTO screeningDTO) {
+        boolean hasUpdates = existingScreening.getScreenNumber() != screeningDTO.getScreenNumber() ||
+                existingScreening.getCapacity() != screeningDTO.getCapacity() ||
+                !existingScreening.getStartsAt().equals(screeningDTO.getStartsAt());
+
+        return hasUpdates;
     }
 }

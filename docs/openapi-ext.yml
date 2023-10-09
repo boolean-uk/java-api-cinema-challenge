@@ -1,3 +1,4 @@
+#TODO: ADD ADDITIONAL ENDPOINTS TO SPECS
 openapi: 3.1.0
 info:
   title: Java API Cinema Challenge - Extension Criteria

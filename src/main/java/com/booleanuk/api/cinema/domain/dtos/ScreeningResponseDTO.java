@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.domain.dtos;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+@Data
 public class ScreeningResponseDTO {
     private Long id;
     private Integer screenNumber;

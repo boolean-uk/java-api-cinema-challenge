@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieResponseDTO createMovie(CreateMovieRequestDTO movieDTO) {
         Movie movie = modelMapper.map(movieDTO, Movie.class);
+        movie.setCreatedAt(LocalDateTime.now());
         Movie savedMovie = movieRepository.save(movie);
         return modelMapper.map(savedMovie, MovieResponseDTO.class);
     }
@@ -55,6 +57,11 @@ public class MovieServiceImpl implements MovieService {
         Optional<Movie> movieOptional = movieRepository.findById(movieId);
         if (movieOptional.isPresent()) {
             Movie existingMovie = movieOptional.get();
+
+            if (hasUpdates(existingMovie, movieDTO)) {
+                existingMovie.setUpdatedAt(LocalDateTime.now());
+            }
+
             modelMapper.map(movieDTO, existingMovie);
             Movie updatedMovie = movieRepository.save(existingMovie);
             return modelMapper.map(updatedMovie, MovieResponseDTO.class);
@@ -70,5 +77,13 @@ public class MovieServiceImpl implements MovieService {
         } else {
             throw new ResourceNotFoundException("Movie not found with id: " + movieId);
         }
+    }
+    private boolean hasUpdates(Movie existingMovie, UpdateMovieRequestDTO movieDTO) {
+        boolean hasUpdates = !existingMovie.getTitle().equals(movieDTO.getTitle()) ||
+                !existingMovie.getRating().equals(movieDTO.getRating()) ||
+                !existingMovie.getDescription().equals(movieDTO.getDescription()) ||
+                existingMovie.getRuntimeMins() != movieDTO.getRuntimeMins();
+
+        return hasUpdates;
     }
 }

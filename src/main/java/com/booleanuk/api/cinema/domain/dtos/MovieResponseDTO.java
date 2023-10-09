@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.domain.dtos;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+@Data
 public class MovieResponseDTO {
     private Long id;
     private String title;

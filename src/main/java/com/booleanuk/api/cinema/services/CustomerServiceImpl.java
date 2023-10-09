@@ -8,8 +8,11 @@ import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,12 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
         this.modelMapper = modelMapper;
     }
 
-    @Override
-    public CustomerResponseDTO createCustomer(CreateCustomerRequestDTO customerDTO) {
-        Customer customer = modelMapper.map(customerDTO, Customer.class);
-        Customer savedCustomer = customerRepository.save(customer);
-        return modelMapper.map(savedCustomer, CustomerResponseDTO.class);
-    }
+
 
     @Override
     public List<CustomerResponseDTO> getAllCustomers() {
@@ -49,18 +47,29 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResourceNotFoundException("Customer not found with id: " + customerId);
         }
     }
-
     @Override
-    public CustomerResponseDTO updateCustomer(Long customerId, UpdateCustomerRequestDTO customerDTO) {
-        Optional<Customer> customerOptional = customerRepository.findById(customerId);
-        if (customerOptional.isPresent()) {
-            Customer existingCustomer = customerOptional.get();
-            modelMapper.map(customerDTO, existingCustomer);
-            Customer updatedCustomer = customerRepository.save(existingCustomer);
-            return modelMapper.map(updatedCustomer, CustomerResponseDTO.class);
-        } else {
-            throw new ResourceNotFoundException("Customer not found with id: " + customerId);
+    public CustomerResponseDTO createCustomer(CreateCustomerRequestDTO customerDTO) {
+        Customer customer = modelMapper.map(customerDTO, Customer.class);
+        customer.setCreatedAt(LocalDateTime.now());
+        Customer savedCustomer = customerRepository.save(customer);
+        return modelMapper.map(savedCustomer, CustomerResponseDTO.class);
+    }
+    @Override
+    public CustomerResponseDTO updateCustomer(Long id, UpdateCustomerRequestDTO updateCustomerDTO) {
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found."));
+        if (hasUpdates(existingCustomer, updateCustomerDTO)) {
+            existingCustomer.setUpdatedAt(LocalDateTime.now());
         }
+        existingCustomer.setName(updateCustomerDTO.getName());
+        existingCustomer.setEmail(updateCustomerDTO.getEmail());
+        existingCustomer.setPhone(updateCustomerDTO.getPhone());
+
+        Customer updatedCustomer = customerRepository.save(existingCustomer);
+
+        CustomerResponseDTO customerDTO = modelMapper.map(updatedCustomer, CustomerResponseDTO.class);
+
+        return customerDTO;
     }
 
     @Override
@@ -70,5 +79,15 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             throw new ResourceNotFoundException("Customer not found with id: " + customerId);
         }
+    }
+
+
+    // Helper method to check if there are updates in the DTO
+    private boolean hasUpdates(Customer existingCustomer, UpdateCustomerRequestDTO updateCustomerDTO) {
+        boolean hasUpdates = !existingCustomer.getName().equals(updateCustomerDTO.getName()) ||
+                !existingCustomer.getEmail().equals(updateCustomerDTO.getEmail()) ||
+                !existingCustomer.getPhone().equals(updateCustomerDTO.getPhone());
+
+        return hasUpdates;
     }
 }
