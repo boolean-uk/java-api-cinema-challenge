@@ -2,8 +2,8 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
-import com.booleanuk.api.cinema.utility.CustomerListResponse;
-import com.booleanuk.api.cinema.utility.CustomerResponse;
+import com.booleanuk.api.cinema.utility.Responses.CustomerListResponse;
+import com.booleanuk.api.cinema.utility.Responses.CustomerResponse;
 import com.booleanuk.api.cinema.utility.DataResponse;
 import com.booleanuk.api.cinema.utility.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ public class CustomerController {
             customerToUpdate = this.customers.save(customerToUpdate);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.set("Could not update customer, please check all fields are correct.");
+            error.set("Could not update the specified customer, please check all fields are correct.");
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
         CustomerResponse response = new CustomerResponse();
