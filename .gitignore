@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application.yml
+flyway.conf
 
 ### STS ###
 .apt_generated

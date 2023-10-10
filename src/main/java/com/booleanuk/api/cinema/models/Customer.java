@@ -1,11 +1,13 @@
 package com.booleanuk.api.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
@@ -24,6 +26,9 @@ public class Customer {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties({"customer"})
+    private List<Ticket> ticketList;
 
     public Customer(String name, String email, String phone) {
         this.name = name;
@@ -77,5 +82,9 @@ public class Customer {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
     }
 }

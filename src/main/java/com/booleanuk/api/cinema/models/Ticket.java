@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import org.springframework.cglib.core.Local;
@@ -22,9 +23,11 @@ public class Ticket {
     private LocalDateTime updatedAt;
     @ManyToOne
     @JoinColumn(name = "customerId")
+    @JsonIgnoreProperties({"ticketList"})
     private Customer customer;
     @ManyToOne
     @JoinColumn(name = "screeningId")
+    @JsonIgnoreProperties({"ticketList"})
     private Screening screening;
 
     public Ticket(int numSeats, Customer customer, Screening screening) {

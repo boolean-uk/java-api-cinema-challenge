@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
@@ -28,6 +29,9 @@ public class Screening {
     @JoinColumn(name = "movieId")
     @JsonIgnoreProperties({"screeningList"})
     private Movie movie;
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties({"screening"})
+    private List<Ticket> ticketList;
 
     public Screening(int screenNumber, LocalDateTime startsAt, int capacity, Movie movie) {
         this.screenNumber = screenNumber;
@@ -90,5 +94,9 @@ public class Screening {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
     }
 }
