@@ -1,13 +1,15 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.response.CustomerListResponse;
+import com.booleanuk.api.cinema.response.CustomerResponse;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping("customers")
@@ -17,48 +19,74 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<CustomerListResponse> getAllCustomers() {
+        CustomerListResponse customerListResponse = new CustomerListResponse();
+        customerListResponse.set(this.customerRepository.findAll());
+        return ResponseEntity.ok(customerListResponse);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response<?>> createCustomer(@RequestBody Customer customer) {
+        CustomerResponse customerResponse = new CustomerResponse();
+
         if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some fields are invalid");
+            ErrorResponse error = new ErrorResponse();
+            error.set("Some fields are invalid");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+
+        } else {
+            Date today = new Date();
+            customer.setCreatedAt(today);
+            customer.setUpdatedAt(today);
+
+            customerResponse.set(this.customerRepository.save(customer));
         }
-
-        Date today = new Date();
-        customer.setCreatedAt(today);
-        customer.setUpdatedAt(today);
-
-        return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
+        return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<Response<?>> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+        CustomerResponse customerResponse = new CustomerResponse();
+
         if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some fields are invalid");
+            ErrorResponse error = new ErrorResponse();
+            error.set("Some fields are invalid");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+
         } else {
-            Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found to update"));
+            Customer customerToUpdate = this.customerRepository.findById(id).orElse(null);
 
-            customerToUpdate.setName(customer.getName());
-            customerToUpdate.setEmail(customer.getEmail());
-            customerToUpdate.setPhone(customer.getPhone());
+            if (customerToUpdate == null) {
+                ErrorResponse error = new ErrorResponse();
+                error.set("Not found to update");
+                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
 
-            Date today = new Date();
-            customerToUpdate.setUpdatedAt(today);
+            } else {
+                customerToUpdate.setName(customer.getName());
+                customerToUpdate.setEmail(customer.getEmail());
+                customerToUpdate.setPhone(customer.getPhone());
 
-            return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+                Date today = new Date();
+                customerToUpdate.setUpdatedAt(today);
+                customerResponse.set(this.customerRepository.save(customerToUpdate));
+            }
+            return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
-        Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found to delete"));
-        this.customerRepository.delete(customerToDelete);
+    public ResponseEntity<Response<?>> deleteCustomer(@PathVariable int id) {
+        CustomerResponse customerResponse = new CustomerResponse();
+        Customer customerToDelete = this.customerRepository.findById(id).orElse(null);
 
-        return ResponseEntity.ok(customerToDelete);
+        if (customerToDelete == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Not found to delete");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        this.customerRepository.delete(customerToDelete);
+        customerResponse.set(customerToDelete);
+
+        return ResponseEntity.ok(customerResponse);
     }
 }
