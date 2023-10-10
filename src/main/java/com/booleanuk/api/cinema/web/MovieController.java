@@ -1,9 +1,6 @@
 package com.booleanuk.api.cinema.web;
 
-import com.booleanuk.api.cinema.domain.dtos.CreateMovieRequestDTO;
-import com.booleanuk.api.cinema.domain.dtos.CustomerResponseDTO;
-import com.booleanuk.api.cinema.domain.dtos.MovieResponseDTO;
-import com.booleanuk.api.cinema.domain.dtos.UpdateMovieRequestDTO;
+import com.booleanuk.api.cinema.domain.dtos.*;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.responses.CustomerResponse;
 import com.booleanuk.api.cinema.responses.ErrorResponse;
@@ -77,6 +74,24 @@ public class MovieController {
         return new ResponseEntity<>(movieResponse, HttpStatus.CREATED);
     }
 
+    @PostMapping("/with-screenings")
+    // TODO: remove the extra mapping maybe?
+    //  - by using just this method for creation with or without screenings.
+    public ResponseEntity<Response<?>> createMovieWithScreenings(@Valid @RequestBody CreateMovieWithScreeningsRequestDTO requestDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
+            ErrorResponse error = new ErrorResponse();
+            error.set(errorMessages);
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        MovieResponseDTO movieResponseDTO = movieService.createMovieWithScreenings(requestDTO);
+        MovieResponse movieResponse = new MovieResponse();
+        movieResponse.set(movieResponseDTO);
+        return new ResponseEntity<>(movieResponse, HttpStatus.CREATED);
+    }
+
+
     @PutMapping("/{id}")
     public ResponseEntity<Response<?>> updateMovie(@PathVariable Long id, @Valid @RequestBody UpdateMovieRequestDTO movieDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -97,7 +112,7 @@ public class MovieController {
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
     }
-
+// TODO: fix Cascade.
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<?>> deleteMovie(@PathVariable Long id) {
@@ -106,7 +121,7 @@ public class MovieController {
             return getResponseEntity(deletedMovie);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.CUSTOMER_NOT_FOUND_MESSAGE);
+            error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
 

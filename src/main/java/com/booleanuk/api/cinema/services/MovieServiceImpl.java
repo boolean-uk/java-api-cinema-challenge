@@ -1,8 +1,6 @@
 package com.booleanuk.api.cinema.services;
 
-import com.booleanuk.api.cinema.domain.dtos.CreateMovieRequestDTO;
-import com.booleanuk.api.cinema.domain.dtos.MovieResponseDTO;
-import com.booleanuk.api.cinema.domain.dtos.UpdateMovieRequestDTO;
+import com.booleanuk.api.cinema.domain.dtos.*;
 import com.booleanuk.api.cinema.domain.entities.Movie;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
@@ -18,11 +16,13 @@ import java.util.stream.Collectors;
 @Service
 public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
+    private final ScreeningService screeningService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public MovieServiceImpl(MovieRepository movieRepository, ModelMapper modelMapper) {
+    public MovieServiceImpl(MovieRepository movieRepository, ScreeningService screeningService, ModelMapper modelMapper) {
         this.movieRepository = movieRepository;
+        this.screeningService = screeningService;
         this.modelMapper = modelMapper;
     }
 
@@ -79,6 +79,21 @@ public class MovieServiceImpl implements MovieService {
 
         return modelMapper.map(movie, MovieResponseDTO.class);
     }
+
+    public MovieResponseDTO createMovieWithScreenings(CreateMovieWithScreeningsRequestDTO requestDTO) {
+        CreateMovieRequestDTO movieDTO = requestDTO.getMovie();
+        List<CreateScreeningRequestDTO> screenings = requestDTO.getScreenings();
+
+        MovieResponseDTO createdMovie = createMovie(movieDTO);
+
+        if (screenings != null && !screenings.isEmpty()) {
+            for (CreateScreeningRequestDTO screeningDTO : screenings) {
+                screeningService.createScreening(createdMovie.getId(), screeningDTO);
+            }
+        }
+        return createdMovie;
+    }
+
 
     private boolean hasUpdates(Movie existingMovie, UpdateMovieRequestDTO movieDTO) {
         boolean hasUpdates = !existingMovie.getTitle().equals(movieDTO.getTitle()) ||

@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.services;
 
 import com.booleanuk.api.cinema.domain.dtos.CreateMovieRequestDTO;
+import com.booleanuk.api.cinema.domain.dtos.CreateMovieWithScreeningsRequestDTO;
 import com.booleanuk.api.cinema.domain.dtos.MovieResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.UpdateMovieRequestDTO;
 
@@ -16,4 +17,5 @@ public interface MovieService {
     MovieResponseDTO updateMovie(Long movieId, UpdateMovieRequestDTO movieDTO);
 
     MovieResponseDTO deleteMovie(Long movieId);
+    MovieResponseDTO createMovieWithScreenings(CreateMovieWithScreeningsRequestDTO requestDTO);
 }

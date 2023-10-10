@@ -11,6 +11,6 @@ public class ScreeningResponseDTO {
     private LocalDateTime startsAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long movieId;
+//    private Long movieId;
 
 }

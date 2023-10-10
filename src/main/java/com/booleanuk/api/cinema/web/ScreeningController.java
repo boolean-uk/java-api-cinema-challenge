@@ -4,6 +4,7 @@ import com.booleanuk.api.cinema.domain.dtos.CreateScreeningRequestDTO;
 import com.booleanuk.api.cinema.domain.dtos.CustomerResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.ScreeningResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.UpdateScreeningRequestDTO;
+import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.responses.CustomerResponse;
 import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +35,17 @@ public class ScreeningController {
 
 
     @GetMapping
-    public ResponseEntity<List<ScreeningResponseDTO>> getScreeningsByMovieId(@PathVariable Long movieId) {
-        List<ScreeningResponseDTO> screenings = screeningService.getScreeningsByMovieId(movieId);
-        return ResponseEntity.ok(screenings);
+    public ResponseEntity<Response<?>> getScreeningsByMovieId(@PathVariable Long movieId) {
+       try {
+           List<ScreeningResponseDTO> screenings = screeningService.getScreeningsByMovieId(movieId);
+           Response<List<ScreeningResponseDTO>> response = new Response<>();
+           response.set(screenings);
+           return ResponseEntity.ok(response);
+       } catch (ResourceNotFoundException e) {
+           ErrorResponse error = new ErrorResponse();
+           error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
+           return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+       }
     }
 
     @GetMapping("/{id}")
@@ -59,13 +69,24 @@ public class ScreeningController {
             error.set(errorMessages);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
+        try {
+            ScreeningResponseDTO createdScreening = screeningService.createScreening(movieId, screeningDTO);
+            ScreeningResponse screeningResponse = new ScreeningResponse();
+            screeningResponse.set(createdScreening);
+            return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
+        } catch (ResourceNotFoundException e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        } catch (DateTimeParseException ex) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.DATE_TIME_FORMAT_ERROR_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
 
-        ScreeningResponseDTO createdScreening = screeningService.createScreening(movieId, screeningDTO);
-        ScreeningResponse screeningResponse = new ScreeningResponse();
-        screeningResponse.set(createdScreening);
-        return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
     }
-
+// TODO: Don't get rid of constants, use them in the errors thrown with format + id
+//  and set that message to the errorResponse
     @PutMapping("/{id}")
     public ResponseEntity<Response<?>> updateScreening(
             @PathVariable Long id,
