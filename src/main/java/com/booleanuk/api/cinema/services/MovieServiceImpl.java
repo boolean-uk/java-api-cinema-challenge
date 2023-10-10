@@ -71,13 +71,15 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void deleteMovie(Long movieId) {
-        if (movieRepository.existsById(movieId)) {
-            movieRepository.deleteById(movieId);
-        } else {
-            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
-        }
+    public MovieResponseDTO deleteMovie(Long movieId) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + movieId));
+
+        movieRepository.delete(movie);
+
+        return modelMapper.map(movie, MovieResponseDTO.class);
     }
+
     private boolean hasUpdates(Movie existingMovie, UpdateMovieRequestDTO movieDTO) {
         boolean hasUpdates = !existingMovie.getTitle().equals(movieDTO.getTitle()) ||
                 !existingMovie.getRating().equals(movieDTO.getRating()) ||

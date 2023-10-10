@@ -86,14 +86,19 @@ public class ScreeningServiceImpl implements ScreeningService {
     }
 
     @Override
-    public void deleteScreening(Long screeningId) {
-        if (screeningRepository.existsById(screeningId)) {
-            screeningRepository.deleteById(screeningId);
-        } else {
-            throw new ResourceNotFoundException("Screening not found with id: " + screeningId);
-        }
+    public ScreeningResponseDTO deleteScreening(Long screeningId) {
+        Screening screening = screeningRepository.findById(screeningId)
+                .orElseThrow(() -> new ResourceNotFoundException("Screening not found with id: " + screeningId));
+
+        screeningRepository.delete(screening);
+
+        return modelMapper.map(screening, ScreeningResponseDTO.class);
     }
 // TODO: Create a helpers class..
+
+
+    // TODO: add a way to add a movie with a screening
+
     private boolean hasUpdates(Screening existingScreening, UpdateScreeningRequestDTO screeningDTO) {
         boolean hasUpdates = existingScreening.getScreenNumber() != screeningDTO.getScreenNumber() ||
                 existingScreening.getCapacity() != screeningDTO.getCapacity() ||

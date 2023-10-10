@@ -73,12 +73,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(Long customerId) {
-        if (customerRepository.existsById(customerId)) {
-            customerRepository.deleteById(customerId);
-        } else {
-            throw new ResourceNotFoundException("Customer not found with id: " + customerId);
-        }
+    public CustomerResponseDTO deleteCustomer(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
+        customerRepository.delete(customer);
+        return modelMapper.map(customer, CustomerResponseDTO.class);
     }
 
 

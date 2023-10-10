@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "screenings")
-public class Screening {
+public class Screening extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "screening_id")
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+////    @Column(name = "screening_id")
+//    private Long id;
 
     @Column(name = "screen_number", nullable = false)
     private Integer screenNumber;

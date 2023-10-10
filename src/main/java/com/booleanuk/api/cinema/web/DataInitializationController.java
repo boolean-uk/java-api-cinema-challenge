@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.web;
 
-import com.booleanuk.api.cinema.DataInitializer;
+import com.booleanuk.api.cinema.utils.DataInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

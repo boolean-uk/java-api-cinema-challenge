@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "customers")
-public class Customer {
+public class Customer extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "customer_id")
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+////    @Column(name = "customer_id")
+//    private Long id;
 
     @Column(nullable = false)
     private String name;

@@ -15,5 +15,5 @@ public interface ScreeningService {
 
     ScreeningResponseDTO updateScreening(Long screeningId, UpdateScreeningRequestDTO screeningDTO);
 
-    void deleteScreening(Long screeningId);
+    ScreeningResponseDTO deleteScreening(Long screeningId);
 }
