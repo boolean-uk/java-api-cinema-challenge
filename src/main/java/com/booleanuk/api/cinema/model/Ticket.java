@@ -13,23 +13,16 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "screenings")
-@JsonIgnoreProperties({"movie"})
-public class Screening {
+@Table(name = "tickets")
+@JsonIgnoreProperties({"customer", "screening"})
+public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "screen_number")
-    private int screenNumber;
-
-    @Column(name = "capacity")
-    private int capacity;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    @Column(name = "starts_at")
-    private String startsAt;
+    @Column(name = "num_seats")
+    private int numSeats;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column(name = "created_at")
@@ -42,7 +35,11 @@ public class Screening {
     private OffsetDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id")
-    @JsonIgnoreProperties({"movie"})
-    private Movie movie;
+    @JoinColumn(name = "customer_id")
+    @JsonIgnoreProperties({"customer"})
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "screening_id")
+    private Screening screening;
 }
