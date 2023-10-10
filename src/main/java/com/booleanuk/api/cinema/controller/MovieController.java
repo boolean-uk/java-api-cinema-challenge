@@ -1,9 +1,11 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.utility.DataResponse;
 import com.booleanuk.api.cinema.utility.ErrorResponse;
+import com.booleanuk.api.cinema.utility.MovieDTO;
 import com.booleanuk.api.cinema.utility.Responses.MovieListResponse;
 import com.booleanuk.api.cinema.utility.Responses.MovieResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
@@ -21,15 +25,29 @@ public class MovieController {
     private MovieRepository movies;
 
     @PostMapping
-    public ResponseEntity<DataResponse<?>> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<DataResponse<?>> createMovie(@RequestBody MovieDTO movieData) {
+        Movie movie = new Movie();
         Movie movieToCreate;
+        List<Screening> screenings;
         try {
+            movie.setTitle(movieData.title());
+            movie.setRating(movieData.rating());
+            movie.setDescription(movieData.description());
+            movie.setRuntimeMins(movieData.runtimeMins());
             movie.setCreatedAt(ZonedDateTime.now());
             movie.setUpdatedAt(ZonedDateTime.now());
             movieToCreate = this.movies.save(movie);
+            screenings = movieData.screenings();
+            if (screenings != null){
+                String uri = "http://localhost:4000/movies/"+movieToCreate.getMovieId()+"/screenings";
+                RestTemplate restTemplate = new RestTemplate();
+                for (Screening screening : screenings){
+                    restTemplate.postForEntity(uri, screening, String.class);
+                }
+            }
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.set("Could not create a new movie, please check all fields are correct.");
+            error.set("Could not create a new movie, please check all fields are correct.\n" + e);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
         MovieResponse response = new MovieResponse();
