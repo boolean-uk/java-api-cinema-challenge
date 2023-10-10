@@ -38,7 +38,7 @@ public class Movie {
     private Date updatedAt;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"movie"})
+    @JsonIgnoreProperties({"movie"})
     private List<Screening> screenings;
 
     public Movie(int id, String title, String rating, String description, int runtimeMins, Date createdAt, Date updatedAt) {

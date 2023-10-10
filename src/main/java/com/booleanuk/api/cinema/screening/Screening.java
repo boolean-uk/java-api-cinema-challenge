@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
+import com.booleanuk.api.cinema.ticket.Ticket;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -38,6 +39,10 @@ public class Screening {
     @JoinColumn(name = "movie_id")
     @JsonIgnoreProperties({"screenings"})
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"screening"})
+    private List<Ticket> tickets;
 
     public Screening(int id, int screenNumber, int capacity, String startsAt, Date createdAt, Date updatedAt, Movie movie) {
         this.id = id;
