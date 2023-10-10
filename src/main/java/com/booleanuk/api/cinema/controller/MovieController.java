@@ -26,10 +26,9 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<DataResponse<?>> createMovie(@RequestBody MovieDTO movieData) {
-        Movie movie = new Movie();
         Movie movieToCreate;
-        List<Screening> screenings;
         try {
+            Movie movie = new Movie();
             movie.setTitle(movieData.title());
             movie.setRating(movieData.rating());
             movie.setDescription(movieData.description());
@@ -37,7 +36,7 @@ public class MovieController {
             movie.setCreatedAt(ZonedDateTime.now());
             movie.setUpdatedAt(ZonedDateTime.now());
             movieToCreate = this.movies.save(movie);
-            screenings = movieData.screenings();
+            List<Screening> screenings = movieData.screenings();
             if (screenings != null){
                 String uri = "http://localhost:4000/movies/"+movieToCreate.getMovieId()+"/screenings";
                 RestTemplate restTemplate = new RestTemplate();
