@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
+import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.utility.Responses.CustomerListResponse;
 import com.booleanuk.api.cinema.utility.Responses.CustomerResponse;
 import com.booleanuk.api.cinema.utility.DataResponse;
@@ -13,12 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
     @Autowired
     private CustomerRepository customers;
+    @Autowired
+    private TicketRepository tickets;
 
     @PostMapping
     public ResponseEntity<DataResponse<?>> createCustomer(@RequestBody Customer customer) {
@@ -79,6 +84,10 @@ public class CustomerController {
             ErrorResponse error = new ErrorResponse();
             error.set("No customer with that id found.");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        List<Ticket> ticketsToDelete = this.tickets.findByCustomer(customerToDelete);
+        if (ticketsToDelete != null){
+            this.tickets.deleteAll(ticketsToDelete);
         }
         this.customers.delete(customerToDelete);
         CustomerResponse response = new CustomerResponse();
