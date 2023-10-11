@@ -337,7 +337,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
-  /movies/{id}/screenings/{id}:
+  /movies/{id}/screenings/{screeningId}:
     get:
       tags:
         - screenings
@@ -346,6 +346,12 @@ paths:
       operationId: getSpecificScreening
       parameters:
         - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
           in: path
           description: The ID of the screening to retrieve
           required: true
@@ -372,6 +378,12 @@ paths:
       operationId: updateScreening
       parameters:
         - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
           in: path
           description: The ID of the screening to update
           required: true
@@ -409,6 +421,12 @@ paths:
       operationId: deleteScreening
       parameters:
         - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
           in: path
           description: The ID of the screening to delete
           required: true
@@ -506,7 +524,19 @@ paths:
       description: Get a specific ticket by their id
       operationId: getSpecificTicket
       parameters:
-        - name: id
+        - name: customerId
+          in: path
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
           in: path
           description: The ID of the ticket to retrieve
           required: true
@@ -518,23 +548,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Author'
+                $ref: '#/components/schemas/Ticket'
         '404':
-          description: "No authors with that id were found"
+          description: "No tickets with that id were found"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
     put:
       tags:
-        - authors
-      summary: Update an author
-      description: Update the specified author
-      operationId: updateAuthor
+        - tickets
+      summary: Update a ticket
+      description: Update the specified ticket
+      operationId: updateTicket
       parameters:
-        - name: id
+        - name: customerId
           in: path
-          description: The ID of the author to update
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
+          in: path
+          description: The ID of the ticket to update
           required: true
           schema:
             type: integer
@@ -542,48 +584,60 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAuthor'
+              $ref: '#/components/schemas/CreateTicket'
       responses:
         '201':
-          description: Successfully updated the specified author
+          description: Successfully updated the specified ticket
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Author'
+                $ref: '#/components/schemas/Ticket'
         '400':
-          description: "Could not update the author, please check all required fields are correct."
+          description: "Could not update the ticket, please check all required fields are correct."
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error400'
         '404':
-          description: "No authors with that id were found"
+          description: "No tickets with that id were found"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
     delete:
       tags:
-        - authors
-      summary: Delete an author
-      description: Delete the specified author
-      operationId: deleteAuthor
+        - tickets
+      summary: Delete a ticket
+      description: Delete the specified ticket
+      operationId: deleteTicket
       parameters:
-        - name: id
+        - name: customerId
           in: path
-          description: The ID of the author to delete
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
+          in: path
+          description: The ID of the ticket to delete
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: Successfully deleted the specified author
+          description: Successfully deleted the specified ticket
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Author'
+                $ref: '#/components/schemas/Ticket'
         '404':
-          description: "No authors with that id were found"
+          description: "No tickets with that id were found"
           content:
             application/json:
               schema:
