@@ -46,7 +46,7 @@ public class MovieController {
             }
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.set("Could not create a new movie, please check all fields are correct.\n" + e);
+            error.set("Could not create a new movie, please check all fields are correct.");
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
         MovieResponse response = new MovieResponse();
@@ -97,6 +97,10 @@ public class MovieController {
             ErrorResponse error = new ErrorResponse();
             error.set("No movie with that id found.");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        List<Screening> screenings = movieToDelete.getScreenings();
+        for (Screening screening: screenings){
+            screening.setMovie(null);
         }
         this.movies.delete(movieToDelete);
         MovieResponse response = new MovieResponse();

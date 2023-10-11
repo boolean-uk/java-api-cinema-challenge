@@ -29,6 +29,6 @@ public class Screening {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
     private ZonedDateTime updatedAt;
     @ManyToOne
-    @JoinColumn(name = "movieId", referencedColumnName = "movieId", nullable = false)
+    @JoinColumn(name = "movieId", referencedColumnName = "movieId")
     private Movie movie;
 }
