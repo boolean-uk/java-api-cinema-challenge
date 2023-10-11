@@ -3,8 +3,8 @@ package com.booleanuk.api.cinema.domain.dtos;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
 import java.time.LocalDateTime;
+
 @Data
 public class CreateScreeningRequestDTO {
 

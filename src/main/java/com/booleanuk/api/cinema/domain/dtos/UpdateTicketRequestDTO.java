@@ -2,7 +2,6 @@ package com.booleanuk.api.cinema.domain.dtos;
 
 import jakarta.validation.constraints.Min;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data

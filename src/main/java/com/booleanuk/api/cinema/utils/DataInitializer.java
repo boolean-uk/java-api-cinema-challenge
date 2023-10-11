@@ -8,7 +8,6 @@ import com.booleanuk.api.cinema.services.TicketService;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,7 @@ public class DataInitializer {
         for (int i = 0; i < 10; i++) {
             CreateMovieRequestDTO movieDTO = new CreateMovieRequestDTO();
             movieDTO.setTitle(faker.book().title());
-            movieDTO.setRating(faker.options().option("PG-13", "R", "G"));
+            movieDTO.setRating(faker.options().option(MovieRatings.PG_13,MovieRatings.R,MovieRatings.G));
             movieDTO.setDescription(faker.lorem().sentence());
             movieDTO.setRuntimeMins(faker.number().numberBetween(60, 180));
             MovieResponseDTO createdMovie = movieService.createMovie(movieDTO);

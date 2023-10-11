@@ -9,17 +9,15 @@ import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.responses.ScreeningResponse;
 import com.booleanuk.api.cinema.services.ScreeningService;
 import com.booleanuk.api.cinema.utils.ErrorConstants;
+import com.booleanuk.api.cinema.utils.ErrorUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies/{movieId}/screenings")
@@ -41,7 +39,7 @@ public class ScreeningController {
             return ResponseEntity.ok(response);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
+            error.set(e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
     }
@@ -59,7 +57,7 @@ public class ScreeningController {
             return getResponseEntity(screening);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            error.set(e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
 
@@ -71,34 +69,24 @@ public class ScreeningController {
             @RequestBody @Valid CreateScreeningRequestDTO screeningDTO,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            ErrorResponse error = new ErrorResponse();
-            error.set(errorMessages);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        ResponseEntity<Response<?>> error = ErrorUtil.getErrors(bindingResult);
+        if (error != null) return error;
         try {
             ScreeningResponseDTO createdScreening = screeningService.createScreening(movieId, screeningDTO);
             ScreeningResponse screeningResponse = new ScreeningResponse();
             screeningResponse.set(createdScreening);
             return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
         } catch (ResourceNotFoundException e) {
-            ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            ErrorResponse errorNotFound = new ErrorResponse();
+            errorNotFound.set(e.getMessage());
+            return new ResponseEntity<>(errorNotFound, HttpStatus.NOT_FOUND);
         } catch (DateTimeParseException ex) {
-            ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.DATE_TIME_FORMAT_ERROR_MESSAGE);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            ErrorResponse dateError = new ErrorResponse();
+            dateError.set(ErrorConstants.DATE_TIME_FORMAT_ERROR_MESSAGE);
+            return new ResponseEntity<>(dateError, HttpStatus.BAD_REQUEST);
         }
-
     }
 
-    // TODO: Don't get rid of constants, use them in the errors thrown with format + id
-//  and set that message to the errorResponse
     @PutMapping("/{id}")
     public ResponseEntity<Response<?>> updateScreening(
             @PathVariable Long id,
@@ -106,29 +94,22 @@ public class ScreeningController {
             @RequestBody @Valid UpdateScreeningRequestDTO screeningDTO,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            ErrorResponse error = new ErrorResponse();
-            error.set(errorMessages);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-       try {
+        ResponseEntity<Response<?>> error = ErrorUtil.getErrors(bindingResult);
+        if (error != null) return error;
+        try {
            ScreeningResponseDTO updatedScreening = screeningService.updateScreening(id, screeningDTO);
            if (updatedScreening != null && !updatedScreening.getMovieId().equals(movieId)) {
-               ErrorResponse error = new ErrorResponse();
-               error.set(ErrorConstants.SCREENING_NOT_MATCHING_MOVIE_MESSAGE);
-               return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+               ErrorResponse anError = new ErrorResponse();
+               anError.set(ErrorConstants.SCREENING_NOT_MATCHING_MOVIE_MESSAGE);
+               return new ResponseEntity<>(anError, HttpStatus.BAD_REQUEST);
            }
            ScreeningResponse screeningResponse = new ScreeningResponse();
            screeningResponse.set(updatedScreening);
            return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
        } catch (ResourceNotFoundException e) {
-           ErrorResponse error = new ErrorResponse();
-           error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
-           return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+           ErrorResponse errorNotFound = new ErrorResponse();
+            errorNotFound.set(e.getMessage());
+           return new ResponseEntity<>(errorNotFound, HttpStatus.NOT_FOUND);
        }
     }
 
@@ -144,7 +125,7 @@ public class ScreeningController {
             return getResponseEntity(deletedScreening);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            error.set(e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
     }

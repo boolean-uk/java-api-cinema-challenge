@@ -8,12 +8,14 @@ import com.booleanuk.api.cinema.domain.entities.Screening;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import com.booleanuk.api.cinema.utils.ErrorConstants;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,11 +38,14 @@ public class ScreeningServiceImpl implements ScreeningService {
         if (movieOptional.isPresent()) {
             Screening screening = modelMapper.map(screeningDTO, Screening.class);
             screening.setMovie(movieOptional.get());
-            screening.setCreatedAt(LocalDateTime.now());
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            screening.setCreatedAt(currentDateTime);
+            screening.setUpdatedAt(currentDateTime);
+
             Screening savedScreening = screeningRepository.save(screening);
             return modelMapper.map(savedScreening, ScreeningResponseDTO.class);
         } else {
-            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE, movieId));
         }
     }
 
@@ -53,7 +58,7 @@ public class ScreeningServiceImpl implements ScreeningService {
                     .map(screening -> modelMapper.map(screening, ScreeningResponseDTO.class))
                     .collect(Collectors.toList());
         } else {
-            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE, movieId));
         }
     }
 
@@ -63,7 +68,7 @@ public class ScreeningServiceImpl implements ScreeningService {
         if (screeningOptional.isPresent()) {
             return modelMapper.map(screeningOptional.get(), ScreeningResponseDTO.class);
         } else {
-            throw new ResourceNotFoundException("Screening not found with id: " + screeningId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE, screeningId));
         }
     }
 
@@ -76,32 +81,26 @@ public class ScreeningServiceImpl implements ScreeningService {
             if (hasUpdates(existingScreening, screeningDTO)) {
                 existingScreening.setUpdatedAt(LocalDateTime.now());
             }
-
             modelMapper.map(screeningDTO, existingScreening);
             Screening updatedScreening = screeningRepository.save(existingScreening);
             return modelMapper.map(updatedScreening, ScreeningResponseDTO.class);
         } else {
-            throw new ResourceNotFoundException("Screening not found with id: " + screeningId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE, screeningId));
         }
     }
 
     @Override
     public ScreeningResponseDTO deleteScreening(Long screeningId) {
         Screening screening = screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new ResourceNotFoundException("Screening not found with id: " + screeningId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE, screeningId)));
 
         screeningRepository.delete(screening);
-
         return modelMapper.map(screening, ScreeningResponseDTO.class);
     }
-// TODO: Create a helpers class..
-
-
-    // TODO: add a way to add a movie with a screening
 
     private boolean hasUpdates(Screening existingScreening, UpdateScreeningRequestDTO screeningDTO) {
-        boolean hasUpdates = existingScreening.getScreenNumber() != screeningDTO.getScreenNumber() ||
-                existingScreening.getCapacity() != screeningDTO.getCapacity() ||
+        boolean hasUpdates = !Objects.equals(existingScreening.getScreenNumber(), screeningDTO.getScreenNumber()) ||
+                !Objects.equals(existingScreening.getCapacity(), screeningDTO.getCapacity()) ||
                 !existingScreening.getStartsAt().equals(screeningDTO.getStartsAt());
 
         return hasUpdates;

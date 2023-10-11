@@ -2,7 +2,6 @@ package com.booleanuk.api.cinema.responses;
 
 import java.util.List;
 import java.util.Map;
-
 import com.booleanuk.api.cinema.enums.ResponseStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

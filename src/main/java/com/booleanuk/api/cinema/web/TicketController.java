@@ -1,13 +1,11 @@
 package com.booleanuk.api.cinema.web;
 
-
-import com.booleanuk.api.cinema.domain.dtos.CustomerResponseDTO;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.responses.TicketResponse;
 import com.booleanuk.api.cinema.utils.ErrorConstants;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import com.booleanuk.api.cinema.utils.ErrorUtil;
 import com.booleanuk.api.cinema.domain.dtos.CreateTicketRequestDTO;
 import com.booleanuk.api.cinema.domain.dtos.TicketResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.UpdateTicketRequestDTO;
@@ -19,9 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/customers/{customerId}/screenings/{screeningId}")
@@ -53,7 +50,7 @@ public class TicketController {
             tickets = ticketService.getTicketsByCustomerAndScreening(customerId, screeningId);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
-            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            error.set(e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         if (tickets.isEmpty()) {
@@ -73,15 +70,8 @@ public class TicketController {
             @RequestBody @Valid CreateTicketRequestDTO createTicketDTO,
             BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            ErrorResponse error = new ErrorResponse();
-            error.set(errorMessages);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        ResponseEntity<Response<?>> error = ErrorUtil.getErrors(bindingResult);
+        if (error != null) return error;
 
         try {
             TicketResponseDTO createdTicket = ticketService.createTicket(customerId, screeningId, createTicketDTO);
@@ -89,12 +79,9 @@ public class TicketController {
             ticketResponse.set(createdTicket);
             return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
         } catch (ResourceNotFoundException e) {
-            ErrorResponse error = new ErrorResponse();
-//            error.set(ErrorConstants.TICKET_NOT_FOUND_MESSAGE);
-            // TODO: This should be a different error message
-
-            error.set(e.getMessage());
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            ErrorResponse errorNotFound = new ErrorResponse();
+            errorNotFound.set(e.getMessage());
+            return new ResponseEntity<>(errorNotFound, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -104,15 +91,8 @@ public class TicketController {
             @RequestBody @Valid UpdateTicketRequestDTO updateTicketDTO,
             BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            ErrorResponse error = new ErrorResponse();
-            error.set(errorMessages);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        ResponseEntity<Response<?>> error = ErrorUtil.getErrors(bindingResult);
+        if (error != null) return error;
 
         try {
             TicketResponseDTO updatedTicket = ticketService.updateTicket(ticketId, updateTicketDTO);
@@ -120,9 +100,9 @@ public class TicketController {
             ticketResponse.set(updatedTicket);
             return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
         } catch (ResourceNotFoundException e) {
-            ErrorResponse error = new ErrorResponse();
-            error.set(e.getMessage());
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            ErrorResponse errorNotFound = new ErrorResponse();
+            errorNotFound.set(e.getMessage());
+            return new ResponseEntity<>(errorNotFound, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -143,7 +123,6 @@ public class TicketController {
         }
     }
 
-    // Todo: make update get set at create and not just at update
     private ResponseEntity<Response<?>> getResponseEntity(TicketResponseDTO ticket) {
         if (ticket == null) {
             ErrorResponse error = new ErrorResponse();

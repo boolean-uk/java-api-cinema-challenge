@@ -1,8 +1,8 @@
 package com.booleanuk.api.cinema.domain.dtos;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
+
 @Data
 public class MovieResponseDTO {
     private Long id;

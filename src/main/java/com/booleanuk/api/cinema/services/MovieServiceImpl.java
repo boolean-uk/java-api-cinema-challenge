@@ -4,10 +4,10 @@ import com.booleanuk.api.cinema.domain.dtos.*;
 import com.booleanuk.api.cinema.domain.entities.Movie;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
+import com.booleanuk.api.cinema.utils.ErrorConstants;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +30,16 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieResponseDTO createMovie(CreateMovieRequestDTO movieDTO) {
         Movie movie = modelMapper.map(movieDTO, Movie.class);
-        movie.setCreatedAt(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        movie.setCreatedAt(currentDateTime);
+        movie.setUpdatedAt(currentDateTime);
         movie.setScreenings(new ArrayList<>());
         Movie savedMovie = movieRepository.save(movie);
         return modelMapper.map(savedMovie, MovieResponseDTO.class);
     }
+
     public MovieResponseDTO createMovieWithScreenings(CreateMovieWithScreeningsRequestDTO requestDTO) {
-        CreateMovieRequestDTO movieDTO = modelMapper.map(requestDTO,CreateMovieRequestDTO.class);
+        CreateMovieRequestDTO movieDTO = modelMapper.map(requestDTO, CreateMovieRequestDTO.class);
         List<CreateScreeningRequestDTO> screenings = requestDTO.getScreenings();
         MovieResponseDTO createdMovie = createMovie(movieDTO);
 
@@ -47,6 +50,7 @@ public class MovieServiceImpl implements MovieService {
         }
         return createdMovie;
     }
+
     @Override
     public List<MovieResponseDTO> getAllMovies() {
         List<Movie> movies = movieRepository.findAll();
@@ -61,7 +65,7 @@ public class MovieServiceImpl implements MovieService {
         if (movieOptional.isPresent()) {
             return modelMapper.map(movieOptional.get(), MovieResponseDTO.class);
         } else {
-            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE, movieId));
         }
     }
 
@@ -74,26 +78,23 @@ public class MovieServiceImpl implements MovieService {
             if (hasUpdates(existingMovie, movieDTO)) {
                 existingMovie.setUpdatedAt(LocalDateTime.now());
             }
-
             modelMapper.map(movieDTO, existingMovie);
             Movie updatedMovie = movieRepository.save(existingMovie);
             return modelMapper.map(updatedMovie, MovieResponseDTO.class);
         } else {
-            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException(String.format(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE, movieId));
         }
     }
 
     @Override
     public MovieResponseDTO deleteMovie(Long movieId) {
         Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + movieId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE, movieId)));
 
         movieRepository.delete(movie);
 
         return modelMapper.map(movie, MovieResponseDTO.class);
     }
-
-
 
 
     private boolean hasUpdates(Movie existingMovie, UpdateMovieRequestDTO movieDTO) {

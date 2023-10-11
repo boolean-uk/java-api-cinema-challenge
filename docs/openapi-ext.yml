@@ -54,6 +54,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllCustomers'
   /customers/{id}:
+    get:
+      tags:
+        - customers
+      summary: Get a customer
+      description: Get a specific customer by their id
+      operationId: getSpecificCustomer
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the customer to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified customer from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: "No customers with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
     put:
       tags:
         - customers
@@ -157,6 +183,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllMovies'
   /movies/{id}:
+    get:
+      tags:
+        - movies
+      summary: Get a movie
+      description: Get a specific movie by their id
+      operationId: getSpecificMovie
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified movie from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: "No movies with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
     put:
       tags:
         - movies
@@ -285,6 +337,96 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
+  /movies/{id}/screenings/{id}:
+    get:
+      tags:
+        - screenings
+      summary: Get a screening
+      description: Get a specific screening by their id
+      operationId: getSpecificScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified screening from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - screenings
+      summary: Update a screening
+      description: Update the specified screening
+      operationId: updateScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScreening'
+      responses:
+        '201':
+          description: Successfully updated the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '400':
+          description: "Could not update the screening, please check all required fields are correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - screenings
+      summary: Delete a screening
+      description: Delete the specified screening
+      operationId: deleteScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
 
   /customers/{customerId}/screenings/{screeningId}:
     post:
@@ -352,6 +494,96 @@ paths:
                 $ref: '#/components/schemas/AllTickets'
         '404':
           description: No ticket found for the customer and screening with those ids found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /customers/{customerId}/screenings/{screeningId}/{ticketId}:
+    get:
+      tags:
+        - tickets
+      summary: Get a ticket
+      description: Get a specific ticket by their id
+      operationId: getSpecificTicket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the ticket to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified ticket from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: "No authors with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - authors
+      summary: Update an author
+      description: Update the specified author
+      operationId: updateAuthor
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the author to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuthor'
+      responses:
+        '201':
+          description: Successfully updated the specified author
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '400':
+          description: "Could not update the author, please check all required fields are correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: "No authors with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - authors
+      summary: Delete an author
+      description: Delete the specified author
+      operationId: deleteAuthor
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the author to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified author
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: "No authors with that id were found"
           content:
             application/json:
               schema:
