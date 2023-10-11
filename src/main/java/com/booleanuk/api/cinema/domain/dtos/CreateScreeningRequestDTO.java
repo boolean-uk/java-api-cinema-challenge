@@ -19,9 +19,6 @@ public class CreateScreeningRequestDTO {
     @NotNull(message = "Start time is required")
     private LocalDateTime startsAt;
 
-//    @NotNull(message = "Movie id is required")
-//    private Long movieId;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

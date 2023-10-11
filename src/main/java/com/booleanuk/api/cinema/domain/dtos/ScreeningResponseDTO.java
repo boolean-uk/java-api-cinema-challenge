@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.domain.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ public class ScreeningResponseDTO {
     private LocalDateTime startsAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-//    private Long movieId;
+    @JsonIgnore
+    private Long movieId;
 
 }

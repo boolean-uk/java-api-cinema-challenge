@@ -2,20 +2,16 @@ package com.booleanuk.api.cinema.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "customers")
 public class Customer extends BaseEntity {
-
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-////    @Column(name = "customer_id")
-//    private Long id;
-
     @Column(nullable = false)
     private String name;
 

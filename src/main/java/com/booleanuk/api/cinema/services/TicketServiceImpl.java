@@ -78,6 +78,7 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
         return modelMapper.map(ticket, TicketResponseDTO.class);
     }
+
     @Override
     public TicketResponseDTO updateTicket(Long ticketId, UpdateTicketRequestDTO updateTicketDTO) {
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -99,14 +100,17 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketResponseDTO deleteTicket(Long ticketId) {
+    public TicketResponseDTO deleteTicket(Long ticketId, Long customerId) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
-
+        if (!ticket.getCustomer().getId().equals(customerId)) {
+            return null;
+        }
         ticketRepository.delete(ticket);
         return modelMapper.map(ticket, TicketResponseDTO.class);
 
     }
+
     private boolean hasUpdates(Ticket existingTicket, UpdateTicketRequestDTO updateTicketDTO) {
         boolean hasUpdates = false;
 

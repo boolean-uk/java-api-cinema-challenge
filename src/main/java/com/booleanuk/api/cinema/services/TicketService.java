@@ -15,5 +15,5 @@ public interface TicketService {
 
     TicketResponseDTO updateTicket(Long ticketId, UpdateTicketRequestDTO updateTicketDTO);
 
-    TicketResponseDTO deleteTicket(Long ticketId);
+    TicketResponseDTO deleteTicket(Long ticketId, Long customerId);
 }

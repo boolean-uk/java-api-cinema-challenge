@@ -30,11 +30,7 @@ public class MovieController {
     }
     //TODO: Refactor getAll methods
 
-    //    @GetMapping
-//    public ResponseEntity<List<MovieResponseDTO>> getAllMovies() {
-//        List<MovieResponseDTO> movieResponseDTOs = movieService.getAllMovies();
-//        return ResponseEntity.ok(movieResponseDTOs);
-//    }
+
     @GetMapping
     public ResponseEntity<Response<List<MovieResponseDTO>>> getAllMovies() {
         List<MovieResponseDTO> movieResponseDTOs = movieService.getAllMovies();
@@ -55,26 +51,8 @@ public class MovieController {
         }
     }
 
+
     @PostMapping
-    public ResponseEntity<Response<?>> createMovie(@Valid @RequestBody CreateMovieRequestDTO movieDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            ErrorResponse error = new ErrorResponse();
-            error.set(errorMessages);
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-        // TODO: Extract in Util class
-
-        MovieResponseDTO responseDTO = this.movieService.createMovie(movieDTO);
-        MovieResponse movieResponse = new MovieResponse();
-        movieResponse.set(responseDTO);
-        return new ResponseEntity<>(movieResponse, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/with-screenings")
     // TODO: remove the extra mapping maybe?
     //  - by using just this method for creation with or without screenings.
     public ResponseEntity<Response<?>> createMovieWithScreenings(@Valid @RequestBody CreateMovieWithScreeningsRequestDTO requestDTO, BindingResult bindingResult) {
@@ -84,6 +62,7 @@ public class MovieController {
             error.set(errorMessages);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
+//        // TODO: Extract in Util class
 
         MovieResponseDTO movieResponseDTO = movieService.createMovieWithScreenings(requestDTO);
         MovieResponse movieResponse = new MovieResponse();

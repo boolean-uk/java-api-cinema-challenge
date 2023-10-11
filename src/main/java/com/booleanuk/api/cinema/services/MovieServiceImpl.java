@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,10 +31,22 @@ public class MovieServiceImpl implements MovieService {
     public MovieResponseDTO createMovie(CreateMovieRequestDTO movieDTO) {
         Movie movie = modelMapper.map(movieDTO, Movie.class);
         movie.setCreatedAt(LocalDateTime.now());
+        movie.setScreenings(new ArrayList<>());
         Movie savedMovie = movieRepository.save(movie);
         return modelMapper.map(savedMovie, MovieResponseDTO.class);
     }
+    public MovieResponseDTO createMovieWithScreenings(CreateMovieWithScreeningsRequestDTO requestDTO) {
+        CreateMovieRequestDTO movieDTO = modelMapper.map(requestDTO,CreateMovieRequestDTO.class);
+        List<CreateScreeningRequestDTO> screenings = requestDTO.getScreenings();
+        MovieResponseDTO createdMovie = createMovie(movieDTO);
 
+        if (screenings != null && !screenings.isEmpty()) {
+            for (CreateScreeningRequestDTO screeningDTO : screenings) {
+                screeningService.createScreening(createdMovie.getId(), screeningDTO);
+            }
+        }
+        return createdMovie;
+    }
     @Override
     public List<MovieResponseDTO> getAllMovies() {
         List<Movie> movies = movieRepository.findAll();
@@ -80,19 +93,7 @@ public class MovieServiceImpl implements MovieService {
         return modelMapper.map(movie, MovieResponseDTO.class);
     }
 
-    public MovieResponseDTO createMovieWithScreenings(CreateMovieWithScreeningsRequestDTO requestDTO) {
-        CreateMovieRequestDTO movieDTO = requestDTO.getMovie();
-        List<CreateScreeningRequestDTO> screenings = requestDTO.getScreenings();
 
-        MovieResponseDTO createdMovie = createMovie(movieDTO);
-
-        if (screenings != null && !screenings.isEmpty()) {
-            for (CreateScreeningRequestDTO screeningDTO : screenings) {
-                screeningService.createScreening(createdMovie.getId(), screeningDTO);
-            }
-        }
-        return createdMovie;
-    }
 
 
     private boolean hasUpdates(Movie existingMovie, UpdateMovieRequestDTO movieDTO) {

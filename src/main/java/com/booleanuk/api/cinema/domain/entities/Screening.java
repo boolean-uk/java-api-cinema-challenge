@@ -2,21 +2,18 @@ package com.booleanuk.api.cinema.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "screenings")
 public class Screening extends BaseEntity {
-
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-////    @Column(name = "screening_id")
-//    private Long id;
-
     @Column(name = "screen_number", nullable = false)
     private Integer screenNumber;
 
@@ -36,6 +33,8 @@ public class Screening extends BaseEntity {
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets;
     public Screening(Integer screenNumber, Integer capacity, LocalDateTime startsAt, Movie movie) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;

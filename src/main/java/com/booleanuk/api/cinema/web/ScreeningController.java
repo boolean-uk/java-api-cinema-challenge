@@ -1,11 +1,9 @@
 package com.booleanuk.api.cinema.web;
 
 import com.booleanuk.api.cinema.domain.dtos.CreateScreeningRequestDTO;
-import com.booleanuk.api.cinema.domain.dtos.CustomerResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.ScreeningResponseDTO;
 import com.booleanuk.api.cinema.domain.dtos.UpdateScreeningRequestDTO;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
-import com.booleanuk.api.cinema.responses.CustomerResponse;
 import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.responses.ScreeningResponse;
@@ -36,22 +34,35 @@ public class ScreeningController {
 
     @GetMapping
     public ResponseEntity<Response<?>> getScreeningsByMovieId(@PathVariable Long movieId) {
-       try {
-           List<ScreeningResponseDTO> screenings = screeningService.getScreeningsByMovieId(movieId);
-           Response<List<ScreeningResponseDTO>> response = new Response<>();
-           response.set(screenings);
-           return ResponseEntity.ok(response);
-       } catch (ResourceNotFoundException e) {
-           ErrorResponse error = new ErrorResponse();
-           error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
-           return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-       }
+        try {
+            List<ScreeningResponseDTO> screenings = screeningService.getScreeningsByMovieId(movieId);
+            Response<List<ScreeningResponseDTO>> response = new Response<>();
+            response.set(screenings);
+            return ResponseEntity.ok(response);
+        } catch (ResourceNotFoundException e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.MOVIE_NOT_FOUND_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<?>> getScreeningById(@PathVariable Long id) {
-        ScreeningResponseDTO screening = screeningService.getScreeningById(id);
-        return getResponseEntity(screening);
+    public ResponseEntity<Response<?>> getOneScreeningById(@PathVariable Long movieId,
+                                                           @PathVariable Long id) {
+        try {
+            ScreeningResponseDTO screening = screeningService.getScreeningById(id);
+            if (screening != null && !screening.getMovieId().equals(movieId)) {
+                ErrorResponse error = new ErrorResponse();
+                error.set(ErrorConstants.SCREENING_NOT_MATCHING_MOVIE_MESSAGE);
+                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            }
+            return getResponseEntity(screening);
+        } catch (ResourceNotFoundException e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @PostMapping
@@ -85,11 +96,13 @@ public class ScreeningController {
         }
 
     }
-// TODO: Don't get rid of constants, use them in the errors thrown with format + id
+
+    // TODO: Don't get rid of constants, use them in the errors thrown with format + id
 //  and set that message to the errorResponse
     @PutMapping("/{id}")
     public ResponseEntity<Response<?>> updateScreening(
             @PathVariable Long id,
+            @PathVariable Long movieId,
             @RequestBody @Valid UpdateScreeningRequestDTO screeningDTO,
             BindingResult bindingResult
     ) {
@@ -102,17 +115,38 @@ public class ScreeningController {
             error.set(errorMessages);
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
-
-        ScreeningResponseDTO updatedScreening = screeningService.updateScreening(id, screeningDTO);
-        ScreeningResponse screeningResponse = new ScreeningResponse();
-        screeningResponse.set(updatedScreening);
-        return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
+       try {
+           ScreeningResponseDTO updatedScreening = screeningService.updateScreening(id, screeningDTO);
+           if (updatedScreening != null && !updatedScreening.getMovieId().equals(movieId)) {
+               ErrorResponse error = new ErrorResponse();
+               error.set(ErrorConstants.SCREENING_NOT_MATCHING_MOVIE_MESSAGE);
+               return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+           }
+           ScreeningResponse screeningResponse = new ScreeningResponse();
+           screeningResponse.set(updatedScreening);
+           return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
+       } catch (ResourceNotFoundException e) {
+           ErrorResponse error = new ErrorResponse();
+           error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+           return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+       }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<?>> deleteScreening(@PathVariable Long id) {
-        ScreeningResponseDTO deletedScreening = screeningService.deleteScreening(id);
-        return getResponseEntity(deletedScreening);
+    public ResponseEntity<Response<?>> deleteScreening(@PathVariable Long id, @PathVariable Long movieId) {
+        try {
+            ScreeningResponseDTO deletedScreening = screeningService.deleteScreening(id);
+            if (deletedScreening != null && !deletedScreening.getMovieId().equals(movieId)) {
+                ErrorResponse error = new ErrorResponse();
+                error.set(ErrorConstants.SCREENING_NOT_MATCHING_MOVIE_MESSAGE);
+                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            }
+            return getResponseEntity(deletedScreening);
+        } catch (ResourceNotFoundException e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
     }
 
     private ResponseEntity<Response<?>> getResponseEntity(ScreeningResponseDTO screening) {

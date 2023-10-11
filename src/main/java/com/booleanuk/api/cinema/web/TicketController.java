@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.web;
 
 
+import com.booleanuk.api.cinema.domain.dtos.CustomerResponseDTO;
 import com.booleanuk.api.cinema.errors.ResourceNotFoundException;
 import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,15 +44,26 @@ public class TicketController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TicketResponseDTO>> getTickets(
+    public ResponseEntity<Response<?>> getTickets(
             @PathVariable Long customerId,
             @PathVariable Long screeningId
     ) {
-        List<TicketResponseDTO> tickets = ticketService.getTicketsByCustomerAndScreening(customerId, screeningId);
-        if (tickets.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        List<TicketResponseDTO> tickets;
+        try {
+            tickets = ticketService.getTicketsByCustomerAndScreening(customerId, screeningId);
+        } catch (ResourceNotFoundException e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.SCREENING_NOT_FOUND_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(tickets);
+        if (tickets.isEmpty()) {
+            ErrorResponse error = new ErrorResponse();
+            error.set(ErrorConstants.NO_TICKET_FOR_SCREENING_MESSAGE);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        Response<List<TicketResponseDTO>> response = new Response<>();
+        response.set(tickets);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -114,9 +127,14 @@ public class TicketController {
     }
 
     @DeleteMapping("/{ticketId}")
-    public ResponseEntity<Response<?>> deleteTicket(@PathVariable Long ticketId) {
+    public ResponseEntity<Response<?>> deleteTicket(@PathVariable Long ticketId, @PathVariable Long customerId) {
         try {
-            TicketResponseDTO deletedTicket = ticketService.deleteTicket(ticketId);
+            TicketResponseDTO deletedTicket = ticketService.deleteTicket(ticketId, customerId);
+            if (deletedTicket == null) {
+                ErrorResponse error = new ErrorResponse();
+                error.set(ErrorConstants.TICKET_AND_CUSTOMER_MISMATCH_MESSAGE);
+                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            }
             return getResponseEntity(deletedTicket);
         } catch (ResourceNotFoundException e) {
             ErrorResponse error = new ErrorResponse();
@@ -124,6 +142,7 @@ public class TicketController {
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
     }
+
     // Todo: make update get set at create and not just at update
     private ResponseEntity<Response<?>> getResponseEntity(TicketResponseDTO ticket) {
         if (ticket == null) {

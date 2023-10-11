@@ -32,17 +32,12 @@ public class DataInitializer {
         this.faker = new Faker();
     }
 
-
     public void initializeData() {
         for (int i = 0; i < 10; i++) {
             CreateCustomerRequestDTO customerDTO = new CreateCustomerRequestDTO();
             customerDTO.setName(faker.name().fullName());
             customerDTO.setEmail(faker.internet().emailAddress());
             customerDTO.setPhone(faker.phoneNumber().phoneNumber());
-
-//            customerDTO.setCreatedAt(LocalDateTime.now());
-//            customerDTO.setUpdatedAt(LocalDateTime.now());
-
             customerService.createCustomer(customerDTO);
         }
         List<ScreeningResponseDTO> screenings = new ArrayList<>();
@@ -52,8 +47,6 @@ public class DataInitializer {
             movieDTO.setRating(faker.options().option("PG-13", "R", "G"));
             movieDTO.setDescription(faker.lorem().sentence());
             movieDTO.setRuntimeMins(faker.number().numberBetween(60, 180));
-//            movieDTO.setCreatedAt(LocalDateTime.now());
-//            movieDTO.setUpdatedAt(LocalDateTime.now());
             MovieResponseDTO createdMovie = movieService.createMovie(movieDTO);
 
             for (int j = 0; j < 3; j++) {
@@ -64,12 +57,8 @@ public class DataInitializer {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime futureDateTime = now.plusDays(faker.number().numberBetween(1, 30));
                 screeningDTO.setStartsAt(futureDateTime);
-
-//                screeningDTO.setCreatedAt(LocalDateTime.now());
-//                screeningDTO.setUpdatedAt(LocalDateTime.now());
                 ScreeningResponseDTO screening = screeningService.createScreening(createdMovie.getId(), screeningDTO);
                 screenings.add(screening);
-//                screeningService.createScreening(createdMovie.getId(), screeningDTO);
             }
         }
         addTickets(screenings);
