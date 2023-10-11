@@ -9,11 +9,27 @@ info:
 servers:
   - url: http://localhost:4000
 tags:
+  - name: dummyData
   - name: customers
   - name: movies
   - name: screenings
   - name: tickets
+
 paths:
+  /init-data:
+    post:
+      tags:
+        - dummyData
+      summary: Initialize dummy data
+      description: Initialize dummy data for all entities in the database.
+      operationId: createData
+      responses:
+        '201':
+          description: Successfully added dummy data to the database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataInit'
   /customers:
     post:
       tags:
@@ -53,6 +69,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllCustomers'
   /customers/{id}:
+    get:
+      tags:
+        - customers
+      summary: Get a customer
+      description: Get a specific customer by their id
+      operationId: getSpecificCustomer
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the customer to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified customer from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: "No customers with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
     put:
       tags:
         - customers
@@ -156,6 +198,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllMovies'
   /movies/{id}:
+    get:
+      tags:
+        - movies
+      summary: Get a movie
+      description: Get a specific movie by their id
+      operationId: getSpecificMovie
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified movie from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: "No movies with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
     put:
       tags:
         - movies
@@ -284,6 +352,114 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
+  /movies/{id}/screenings/{screeningId}:
+    get:
+      tags:
+        - screenings
+      summary: Get a screening
+      description: Get a specific screening by their id
+      operationId: getSpecificScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified screening from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - screenings
+      summary: Update a screening
+      description: Update the specified screening
+      operationId: updateScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScreening'
+      responses:
+        '201':
+          description: Successfully updated the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '400':
+          description: "Could not update the screening, please check all required fields are correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - screenings
+      summary: Delete a screening
+      description: Delete the specified screening
+      operationId: deleteScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '404':
+          description: "No screenings with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
 
   /customers/{customerId}/screenings/{screeningId}:
     post:
@@ -351,6 +527,132 @@ paths:
                 $ref: '#/components/schemas/AllTickets'
         '404':
           description: No ticket found for the customer and screening with those ids found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /customers/{customerId}/screenings/{screeningId}/{ticketId}:
+    get:
+      tags:
+        - tickets
+      summary: Get a ticket
+      description: Get a specific ticket by their id
+      operationId: getSpecificTicket
+      parameters:
+        - name: customerId
+          in: path
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
+          in: path
+          description: The ID of the ticket to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get the specified ticket from the list given their ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: "No tickets with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - tickets
+      summary: Update a ticket
+      description: Update the specified ticket
+      operationId: updateTicket
+      parameters:
+        - name: customerId
+          in: path
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
+          in: path
+          description: The ID of the ticket to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicket'
+      responses:
+        '201':
+          description: Successfully updated the specified ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: "Could not update the ticket, please check all required fields are correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: "No tickets with that id were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - tickets
+      summary: Delete a ticket
+      description: Delete the specified ticket
+      operationId: deleteTicket
+      parameters:
+        - name: customerId
+          in: path
+          description: The ID of the customer who owns the ticket
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening for the ticket
+          required: true
+          schema:
+            type: integer
+        - name: ticketId
+          in: path
+          description: The ID of the ticket to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: "No tickets with that id were found"
           content:
             application/json:
               schema:
@@ -477,7 +779,7 @@ components:
               startsAt:
                 type: string
                 format: DateTime
-                example: "2023-03-19 11:30:00+00:00"
+                example: "2023-03-19T11:30:00"
     UpdateMovie:
       type: object
       properties:
@@ -575,7 +877,7 @@ components:
         startsAt:
           type: string
           format: DateTime
-          example: "2023-03-19 11:30:00+00:00"
+          example: "2023-03-19T11:30:00"
     SingleScreening:
       type: object
       properties:
@@ -722,3 +1024,8 @@ components:
             message:
               type: string
               example: "not found"
+    DataInit:
+      type: object
+      properties:
+        type: string
+        example: "Data initialization completed."
