@@ -4,6 +4,7 @@ import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import com.booleanuk.api.cinema.response.ScreeningListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,10 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping
-    public List<Screening> getAllScreenings(@PathVariable(name = "id") int id) {
-        Movie movie = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Movie Not Found"));
-        return movie.getScreeningList();
+    public ResponseEntity<ScreeningListResponse> getAllScreenings(@PathVariable(name = "id") int id) {
+        ScreeningListResponse screeningListResponse = new ScreeningListResponse();
+        screeningListResponse.set(this.screeningRepository.findAll());
+        return ResponseEntity.ok(screeningListResponse);
     }
 
     @PostMapping
@@ -34,10 +36,4 @@ public class ScreeningController {
         movie.getScreeningList().add(screening);
         return new ResponseEntity<>(this.screeningRepository.save(screening),HttpStatus.CREATED);
     }
-
-//    @PostMapping
-//    public ResponseEntity<Screening> addScreening(@RequestBody Screening screening) {
-//        screening.setCreatedAt(java.time.LocalDateTime.now());
-//        screening.
-//    }
 }
