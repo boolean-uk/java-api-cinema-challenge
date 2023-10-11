@@ -1,4 +1,3 @@
-#TODO: ADD ADDITIONAL ENDPOINTS TO SPECS
 openapi: 3.1.0
 info:
   title: Java API Cinema Challenge - Extension Criteria
@@ -10,11 +9,27 @@ info:
 servers:
   - url: http://localhost:4000
 tags:
+  - name: dummyData
   - name: customers
   - name: movies
   - name: screenings
   - name: tickets
+
 paths:
+  /init-data:
+    post:
+      tags:
+        - dummyData
+      summary: Initialize dummy data
+      description: Initialize dummy data for all entities in the database.
+      operationId: createData
+      responses:
+        '201':
+          description: Successfully added dummy data to the database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataInit'
   /customers:
     post:
       tags:
@@ -1009,3 +1024,8 @@ components:
             message:
               type: string
               example: "not found"
+    DataInit:
+      type: object
+      properties:
+        type: string
+        example: "Data initialization completed."

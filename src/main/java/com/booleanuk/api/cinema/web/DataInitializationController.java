@@ -17,7 +17,7 @@ public class DataInitializationController {
         this.dataInitializer = dataInitializer;
     }
 
-    @PostMapping("/initialize")
+    @PostMapping
     public ResponseEntity<String> initializeData() {
         dataInitializer.initializeData();
         return ResponseEntity.ok("Data initialization completed.");

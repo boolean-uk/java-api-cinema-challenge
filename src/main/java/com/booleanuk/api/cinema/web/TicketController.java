@@ -38,6 +38,7 @@ public class TicketController {
     public ResponseEntity<Response<?>> getTicketById(@PathVariable Long ticketId) {
         TicketResponseDTO ticketDTO = ticketService.getTicketById(ticketId);
         return getResponseEntity(ticketDTO);
+        // TODO: Add error handling for ticket not belonging to user/screening
     }
 
     @GetMapping
