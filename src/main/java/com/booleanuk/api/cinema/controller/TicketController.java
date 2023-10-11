@@ -6,11 +6,11 @@ import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,19 +27,46 @@ public class TicketController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping("customers/{customerId}/screenings/{screeningsId}")
-    public List<Ticket> getTickets(@PathVariable int customerId, @PathVariable int screeningsId) {
-        return this.ticketRepository.getByCustomerIdAndScreeningId(customerId, screeningsId);
+    public ResponseEntity<Response<?>> getTickets(@PathVariable int customerId, @PathVariable int screeningsId) {
+        TicketListResponse ticketListResponse = new TicketListResponse();
+
+        List<Ticket> tickets = this.ticketRepository.getByCustomerIdAndScreeningId(customerId, screeningsId);
+
+        if (tickets.isEmpty()) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        ticketListResponse.set(tickets);
+        return ResponseEntity.ok(ticketListResponse);
     }
 
     @PostMapping("customers/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<Ticket> createTicket(@RequestBody Ticket ticket, @PathVariable int customerId, @PathVariable int screeningId) {
-        Customer customer = this.customerRepository.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry customer with this id does not exist, can't create a ticket"));
+    public ResponseEntity<Response<?>> createTicket(@RequestBody Ticket ticket, @PathVariable int customerId, @PathVariable int screeningId) {
+        TicketResponse ticketResponse = new TicketResponse();
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+        Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+
+        if (customer == null || screening == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
         ticket.setCustomer(customer);
-        Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry screening with this id does not exist, can't create a ticket"));
         ticket.setScreening(screening);
 
-        ticket.setNumSeats(ticket.getNumSeats());
-
-        return new ResponseEntity<>(this.ticketRepository.save(ticket), HttpStatus.CREATED);
+        if (ticket.getNumSeats() == 0) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("bad request");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            ticketResponse.set(this.ticketRepository.save(ticket));
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("bad request");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
     }
 }
