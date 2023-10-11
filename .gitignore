@@ -36,3 +36,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### User Defined ###
+src/main/resources/application.yml
