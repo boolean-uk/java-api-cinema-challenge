@@ -36,3 +36,9 @@ out/
 
 ### VS Code ###
 .vscode/
+report.html
+report.json
+build.gradle
+build.gradle
+*.gradle
+build.gradle
