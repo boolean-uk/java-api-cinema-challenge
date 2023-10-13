@@ -34,9 +34,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://tfke.db.elephantsql.com/dkshfirn
-    username: dkshfirn
-    password: PFif40fj-eb6btfiF*k3nfEobyGaH
+    url: jdbc:postgresql://
+    username: 
+    password: 
     max-active: 3
     max-idle: 3
   jpa:
