@@ -20,7 +20,7 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Screening> getAllScreenings() {
         return this.screeningRepository.findAll();
     }
@@ -40,7 +40,7 @@ public class ScreeningController {
      * @param id
      * @return
      */
-    private Screening getADepartment(int id) {
+    private Screening getAScreening(int id) {
         return this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
     }
 
