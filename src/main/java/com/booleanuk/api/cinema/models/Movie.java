@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,8 +28,8 @@ public class Movie {
     @Builder.Default
     private ZonedDateTime updatedAt = ZonedDateTime.now();
     @ToString.Exclude
-    @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties(value = "movie")
     @Builder.Default
+    @JsonIgnore // According to OpenAPI Spec
+    @OneToMany(mappedBy = "movie")
     private List<Screening> screenings = new ArrayList<>();
 }

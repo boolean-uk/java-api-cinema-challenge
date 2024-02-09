@@ -42,8 +42,7 @@ public class MovieController {
         // Set screenings to the movie object we return
         // Return the movie with screenings
         movie.setScreenings(screenings);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Response.success(this.movieRepository.save(movie)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(movie));
     }
 
     @GetMapping
