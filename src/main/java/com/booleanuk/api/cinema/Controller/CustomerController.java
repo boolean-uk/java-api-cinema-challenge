@@ -36,14 +36,14 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer request) {
 
-        //validate(request);
+        validate(request);
         Customer customer = new Customer(request.getName(), request.getEmail(), request.getPhone());
         return new ResponseEntity<Customer>(this.repository.save(customer), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> update(@PathVariable int id, @RequestBody Customer request) {
-        //validate(request);
+        validate(request);
         Customer customer = this.repository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
 

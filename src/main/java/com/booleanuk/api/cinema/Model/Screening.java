@@ -22,9 +22,9 @@ public class Screening {
     @JsonIgnore
     private Movie movie;
 
-    // @OneToMany(mappedBy = "screening")
-    // @JsonIncludeProperties(value = {"screenNumber", "startsAt", "capacity"})
-    //private List<Ticket> tickets;
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnore
+    private List<Ticket> tickets;
 
     @Column
     private Integer screenNumber;

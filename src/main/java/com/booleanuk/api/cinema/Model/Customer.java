@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,10 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<Ticket> tickets;
 
     @Column
     private String name;

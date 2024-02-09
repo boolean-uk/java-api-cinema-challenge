@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -16,12 +17,12 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name= "costumer_id", nullable = false)
-    // @JsonIncludeProperties(value = {"id"})
+    @JsonIgnore
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name= "screening_id", nullable = false)
-    // @JsonIncludeProperties(value = {"id"})
+    @JsonIgnore
     private Screening screening;
 
     @Column

@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
@@ -29,16 +30,26 @@ public class Movie {
     @Column
     private String updatedAt;
 
-
-    //@OneToMany(mappedBy = "movie")
-    // @JsonIncludeProperties(value = {"screenNumber", "startsAt", "capacity"})
-    //private List<Screening> screenings;
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnore
+    private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, Integer runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
+        String datetimeNow = LocalDateTime.now().toString();
+        this.createdAt = datetimeNow;
+        this.updatedAt = datetimeNow;
+    }
+
+    public Movie(String title, String rating, String description, Integer runtimeMins, List<Screening> screenings) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.screenings = screenings;
         String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
@@ -86,6 +97,14 @@ public class Movie {
 
     public void setRuntimeMins(Integer runtimeMins) {
         this.runtimeMins = runtimeMins;
+    }
+
+    public List<Screening> getScreenings() {
+        return screenings;
+    }
+
+    public void setScreenings(List<Screening> screenings) {
+        this.screenings = screenings;
     }
 
     public String getCreatedAt() {

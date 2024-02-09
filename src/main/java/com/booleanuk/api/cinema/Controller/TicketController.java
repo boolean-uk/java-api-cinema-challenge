@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("tickets")
+@RequestMapping("/customers/{customerId}/screenings/{screeningId}")
 public class TicketController {
 
     @Autowired
@@ -31,13 +31,6 @@ public class TicketController {
     @GetMapping
     public List<Ticket> getAll() {
         return this.repository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Ticket> getById(@PathVariable int id) {
-        Ticket ticket = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        return ResponseEntity.ok(ticket);
     }
 
     @PostMapping

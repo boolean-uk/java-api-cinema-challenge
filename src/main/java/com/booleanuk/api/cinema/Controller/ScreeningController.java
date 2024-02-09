@@ -33,7 +33,7 @@ public class ScreeningController {
             @PathVariable (name= "id") Integer movieId,
             @RequestBody Screening request) {
 
-        //validate(request);
+        validate(request);
 
         Movie movie = this.movieRepository.findById(movieId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
