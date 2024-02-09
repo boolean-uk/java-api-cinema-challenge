@@ -31,8 +31,8 @@ public class Movie {
     @Column
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "screenings")
-    @JsonIncludeProperties(value = {"screen_number", "capacity", "startsAt"})
+    @OneToMany(mappedBy = "movie")
+    @JsonIncludeProperties(value = {"screen_number", "startsAt"})
     private List<Screening> screenings;
 
     public Movie(int id){

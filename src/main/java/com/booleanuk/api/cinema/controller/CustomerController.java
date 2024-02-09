@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("customers")
 public class CustomerController {
     @Autowired
-    private CustomerRepository customerRepository
+    private CustomerRepository customerRepository;
 
     @GetMapping
     public List<Customer> getAllCustomer(){

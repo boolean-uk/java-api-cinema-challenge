@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,11 +28,16 @@ public class Screening {
     @Column
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
+    @JsonIncludeProperties(value = {"title"})
+    private Movie movie;
+
     public Screening(int id){
         this.id = id;
     }
 
-    public Screening(Integer screenNumber, Integer capacity, LocalDateTime startsAt) {
+    public Screening(Integer screenNumber, Integer capacity, LocalDateTime startsAt, Movie movie) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
@@ -39,5 +45,6 @@ public class Screening {
             this.createdAt = LocalDateTime.now();
         }
         this.updatedAt = LocalDateTime.now();
+        this.movie = movie;
     }
 }
