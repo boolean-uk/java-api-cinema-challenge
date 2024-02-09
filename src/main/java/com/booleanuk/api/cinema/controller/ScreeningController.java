@@ -4,6 +4,7 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.util.DateCreater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,10 @@ public class ScreeningController {
     @PostMapping
     public ResponseEntity<Screening> createScreening(@PathVariable (name = "id") int id, @RequestBody Screening screening) {
         Movie movie = this.getAMovie(id);
-
-        return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
+        Screening newScreening = new Screening(screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), movie);
+        movie.setUpdatedAt(DateCreater.getCurrentDate());
+        movie.getScreenings().add(screening);
+        return new ResponseEntity<>(this.screeningRepository.save(newScreening), HttpStatus.CREATED);
     }
 
     @GetMapping

@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.util.DateCreater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        customer.setCreatedAt(DateCreater.getCurrentDate());
+        customer.setUpdatedAt(DateCreater.getCurrentDate());
         return ResponseEntity.ok(this.customerRepository.save(customer));
     }
 
@@ -34,15 +37,14 @@ public class CustomerController {
 
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setUpdatedAt(customer.getUpdatedAt());
-        customerToUpdate.setCreatedAt(customer.getCreatedAt());
+        customerToUpdate.setUpdatedAt(DateCreater.getCurrentDate());
         customerToUpdate.setPhone(customer.getPhone());
 
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable (name = "id") int id) {
         Customer customerToDelete = this.getACustomer(id);
         this.customerRepository.delete(customerToDelete);
         return new ResponseEntity<>(customerToDelete, HttpStatus.OK);

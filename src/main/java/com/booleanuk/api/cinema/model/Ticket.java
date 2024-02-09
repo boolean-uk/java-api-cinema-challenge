@@ -1,7 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,4 +11,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "tickets")
 public class Ticket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 }
