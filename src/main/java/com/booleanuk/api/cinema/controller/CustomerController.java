@@ -23,6 +23,9 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
     }
 
@@ -35,6 +38,9 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Customer customerToUpdate = getACustomer(id);
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());

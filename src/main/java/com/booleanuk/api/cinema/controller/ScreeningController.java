@@ -27,6 +27,9 @@ public class ScreeningController {
 
     @PostMapping
     public ResponseEntity<Screening> createScreening(@RequestBody Screening screening) {
+        if (screening.getMovie() == null || screening.getScreenNumber() < 1 || screening.getCapacity() < 1 || screening.getStartsAt() == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Movie tempMovie = getAMovie(screening.getMovie().getId());
         screening.setMovie(tempMovie);
         return ResponseEntity.ok(this.screeningRepository.save(screening));

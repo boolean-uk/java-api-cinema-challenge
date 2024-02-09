@@ -25,6 +25,9 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+        if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMinutes() == 0) {
+            return ResponseEntity.badRequest().build();
+        }
         return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
     }
 
@@ -38,6 +41,9 @@ public class MovieController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovieById(@PathVariable int id, @RequestBody Movie movie) {
+        if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMinutes() == 0) {
+            return ResponseEntity.badRequest().build();
+        }
         Movie movieToUpdate = getAMovie(id);
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
