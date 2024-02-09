@@ -38,9 +38,11 @@ public class Movie {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @OneToMany(mappedBy = "screening")
-//    @JsonIgnoreProperties(value = {"screening"})
-//
+
+    @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("movie")
+    private List<Screening> screenings;
+
     public Movie(String title, String rating, String description, int runtimeMins){
         LocalDateTime currentDateTime = LocalDateTime.now(ZoneOffset.UTC);
         this.title = title;

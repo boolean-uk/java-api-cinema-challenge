@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,8 +49,9 @@ public class Screening {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties(value = {"id","title", "rating", "runtimeMins"})
+    @JsonIncludeProperties(value = {"id","title", "rating", "runtimeMins", "description", "createdAt", "updatedAt"})
     private Movie movie;
+
 
     public Screening(int screenNumber, int capacity, OffsetDateTime startsAt){
         OffsetDateTime currentDateTime = OffsetDateTime.now(ZoneOffset.UTC);

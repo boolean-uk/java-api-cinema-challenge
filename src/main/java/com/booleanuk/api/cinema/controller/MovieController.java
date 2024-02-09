@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.booleanuk.api.cinema.helpers.CustomResponse;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -21,33 +22,35 @@ public class MovieController {
     MovieRepository movieRepository;
 
     @GetMapping
-    public List<Movie> getAll(){
-        return movieRepository.findAll();
+    public ResponseEntity<CustomResponse> getAll(){
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> get(@PathVariable int id){
-        Movie movie = movieRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id were found"));
-        return new ResponseEntity<>(movie, HttpStatus.OK);
+    public ResponseEntity<CustomResponse> get(@PathVariable int id){
+        if(!movieRepository.existsById(id)){
+            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(id).get()), HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Movie> create(@RequestBody Movie movie){
+    public ResponseEntity<CustomResponse> create(@RequestBody Movie movie){
         if(movie.getTitle() == null || movie.getDescription() == null || movie.getRating() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create movie, please check all required fields are correct");
+            return new ResponseEntity<>(new CustomResponse("error", "Could not update movie, please check all required fields are correct"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.save(movie)), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Movie> update(@RequestBody Movie movie, @PathVariable int id){
+    public ResponseEntity<CustomResponse> update(@RequestBody Movie movie, @PathVariable int id){
+        if(!movieRepository.existsById(id)){
+            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+        }
         Movie existingMovie = movieRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id were found"));
+                .findById(id).get();
         existingMovie.setTitle(movie.getTitle());
         existingMovie.setDescription(movie.getDescription());
         existingMovie.setRating(movie.getRating());
@@ -55,17 +58,19 @@ public class MovieController {
         existingMovie.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
         if(existingMovie.getTitle() == null || existingMovie.getRating() == null || existingMovie.getRuntimeMins() == 0 || existingMovie.getDescription() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update movie, please check all required fields are correct");
+            return new ResponseEntity<>(new CustomResponse("error", "Could not update movie, please check all required fields are correct"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(movieRepository.save(existingMovie), HttpStatus.CREATED);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.save(existingMovie)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> delete(@PathVariable int id){
+    public ResponseEntity<CustomResponse> delete(@PathVariable int id){
+        if(!movieRepository.existsById(id)){
+            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+        }
         Movie movie = movieRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id were found"));
+                .findById(id).get();
         movieRepository.delete(movie);
-        return ResponseEntity.ok(movie);
+        return new ResponseEntity<>(new CustomResponse("success", movie), HttpStatus.CREATED);
     }
 }
