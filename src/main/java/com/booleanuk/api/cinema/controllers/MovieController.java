@@ -1,10 +1,12 @@
 package com.booleanuk.api.cinema.controllers;
 
+import com.booleanuk.api.cinema.enums.Rating;
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+@Slf4j
 @RestController
 @RequestMapping("movies")
 public class MovieController {
@@ -92,7 +95,11 @@ public class MovieController {
                 .anyMatch(Objects::isNull)) {
             return false;
         }
-        // TODO Validate rating, etc
+
+        if (!Rating.isValidRating(movie.getRating())) {
+            log.debug("Rating.isValidRating failed: " + movie.getRating() + " does not exist");
+            return false;
+        }
         return true;
     }
 }
