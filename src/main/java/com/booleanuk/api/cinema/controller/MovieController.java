@@ -19,7 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("movies")
+@RequestMapping("/movies")
 public class MovieController {
 
     @Autowired
