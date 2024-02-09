@@ -42,6 +42,8 @@ public class CustomerController {
                 .findById((long) id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
         if (customerToUpdate != null) {
             customerToUpdate.setName(customer.getName());
+            customerToUpdate.setEmail(customer.getEmail());
+            customerToUpdate.setPhone(customer.getPhone());
             customerRepository.save(customerToUpdate);
         }
         return customerToUpdate;
