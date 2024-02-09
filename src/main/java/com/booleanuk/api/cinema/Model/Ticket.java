@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Entity
@@ -26,21 +27,22 @@ public class Ticket {
     @Column
     private Integer numSeats;
     @Column
-    private LocalDate createdAt;
+    private String createdAt;
     @Column
-    private LocalDate updatedAt;
+    private String updatedAt;
 
-    public Ticket(Integer numSeats, LocalDate createdAt) {
+    public Ticket(Integer numSeats) {
         this.numSeats = numSeats;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
+        String datetimeNow = LocalDate.now().toString();
+        this.createdAt = datetimeNow;
+        this.updatedAt = datetimeNow;
     }
 
     public Ticket(Customer customer, Screening screening, Integer numSeats) {
         this.customer = customer;
         this.screening = screening;
         this.numSeats = numSeats;
-        LocalDate datetimeNow = LocalDate.now();
+        String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
     }
@@ -81,15 +83,15 @@ public class Ticket {
         this.screening = screening;
     }
 
-    public LocalDate getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDate.now();
+        this.updatedAt = LocalDateTime.now().toString();
     }
 }

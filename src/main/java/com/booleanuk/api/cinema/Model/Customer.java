@@ -1,9 +1,11 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -14,10 +16,6 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy = "customer")
-    // @JsonIncludeProperties(value = {"screenNumber", "startsAt", "capacity"})
-    private List<Ticket> tickets;
-
     @Column
     private String name;
     @Column
@@ -25,15 +23,15 @@ public class Customer {
     @Column
     private String phone;
     @Column
-    private LocalDate createdAt;
+    private String createdAt;
     @Column
-    private LocalDate updatedAt;
+    private String updatedAt;
 
     public Customer(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        LocalDate datetimeNow = LocalDate.now();
+        String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
     }
@@ -74,23 +72,15 @@ public class Customer {
         this.phone = phone;
     }
 
-    public List<Ticket> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<Ticket> tickets) {
-        this.tickets = tickets;
-    }
-
-    public LocalDate getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDate.now();
+        this.updatedAt = LocalDateTime.now().toString();
     }
 }

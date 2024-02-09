@@ -35,8 +35,10 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer request) {
+
         //validate(request);
-        return new ResponseEntity<Customer>(this.repository.save(request), HttpStatus.CREATED);
+        Customer customer = new Customer(request.getName(), request.getEmail(), request.getPhone());
+        return new ResponseEntity<Customer>(this.repository.save(customer), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

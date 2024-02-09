@@ -1,10 +1,12 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -17,39 +19,39 @@ public class Screening {
 
     @ManyToOne
     @JoinColumn(name= "movie_id", nullable = false)
-    // @JsonIncludeProperties(value = {"id"})
+    @JsonIgnore
     private Movie movie;
 
-    @OneToMany(mappedBy = "screening")
+    // @OneToMany(mappedBy = "screening")
     // @JsonIncludeProperties(value = {"screenNumber", "startsAt", "capacity"})
-    private List<Ticket> tickets;
+    //private List<Ticket> tickets;
 
     @Column
     private Integer screenNumber;
     @Column
-    private LocalDate startsAt;
+    private String startsAt;
     @Column
     private Integer capacity;
     @Column
-    private LocalDate createdAt;
+    private String createdAt;
     @Column
-    private LocalDate updatedAt;
+    private String updatedAt;
 
-    public Screening(Integer screenNumber, LocalDate startsAt, Integer capacity) {
+    public Screening(Integer screenNumber, String startsAt, Integer capacity) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        LocalDate datetimeNow = LocalDate.now();
+        String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
     }
 
-    public Screening(Movie movie, Integer screenNumber, LocalDate startsAt, Integer capacity) {
+    public Screening(Movie movie, Integer screenNumber, String startsAt, Integer capacity) {
         this.movie = movie;
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        LocalDate datetimeNow = LocalDate.now();
+        String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
     }
@@ -74,11 +76,11 @@ public class Screening {
         this.screenNumber = screenNumber;
     }
 
-    public LocalDate getStartsAt() {
+    public String getStartsAt() {
         return startsAt;
     }
 
-    public void setStartsAt(LocalDate startsAt) {
+    public void setStartsAt(String startsAt) {
         this.startsAt = startsAt;
     }
 
@@ -98,23 +100,15 @@ public class Screening {
         this.movie = movie;
     }
 
-    public List<Ticket> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<Ticket> tickets) {
-        this.tickets = tickets;
-    }
-
-    public LocalDate getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDate.now();
+        this.updatedAt = LocalDateTime.now().toString();
     }
 }

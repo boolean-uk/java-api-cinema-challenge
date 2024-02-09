@@ -54,6 +54,7 @@ public class TicketController {
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
 
         Ticket ticket = new Ticket(customer, screening, request.getNumSeats());
+
         return new ResponseEntity<Ticket>(this.repository.save(ticket), HttpStatus.CREATED);
     }
 

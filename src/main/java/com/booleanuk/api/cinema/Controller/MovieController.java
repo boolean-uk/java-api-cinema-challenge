@@ -32,7 +32,8 @@ public class MovieController {
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie request) {
         //validate(request);
-        return new ResponseEntity<Movie>(this.repository.save(request), HttpStatus.CREATED);
+        Movie movie = new Movie(request.getTitle(), request.getRating(), request.getDescription(), request.getRuntimeMins());
+        return new ResponseEntity<Movie>(this.repository.save(movie), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -24,21 +25,21 @@ public class Movie {
     @Column
     private Integer runtimeMins;
     @Column
-    private LocalDate createdAt;
+    private String createdAt;
     @Column
-    private LocalDate updatedAt;
+    private String updatedAt;
 
 
-    @OneToMany(mappedBy = "movie")
+    //@OneToMany(mappedBy = "movie")
     // @JsonIncludeProperties(value = {"screenNumber", "startsAt", "capacity"})
-    private List<Screening> screenings;
+    //private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, Integer runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        LocalDate datetimeNow = LocalDate.now();
+        String datetimeNow = LocalDateTime.now().toString();
         this.createdAt = datetimeNow;
         this.updatedAt = datetimeNow;
     }
@@ -87,23 +88,15 @@ public class Movie {
         this.runtimeMins = runtimeMins;
     }
 
-    public List<Screening> getScreenings() {
-        return screenings;
-    }
-
-    public void setScreenings(List<Screening> screenings) {
-        this.screenings = screenings;
-    }
-
-    public LocalDate getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDate.now();
+        this.updatedAt = LocalDateTime.now().toString();
     }
 }
