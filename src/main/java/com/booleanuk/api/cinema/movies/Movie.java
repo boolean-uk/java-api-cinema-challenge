@@ -28,16 +28,16 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+
     private String title;
 
-    @NotBlank
+
     private String rating;
 
-    @NotBlank
+
     private String description;
 
-    @Positive
+
     private int runtimeMins;
 
     @CreationTimestamp
