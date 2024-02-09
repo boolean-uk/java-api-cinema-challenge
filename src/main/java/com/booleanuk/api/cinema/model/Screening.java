@@ -45,11 +45,9 @@ public class Screening {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Screening(Movie movie, int screenNumber, LocalDateTime startsAt, int capacity, List<Ticket> tickets) {
-        this.movie = movie;
+    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        this.tickets = tickets;
     }
 }

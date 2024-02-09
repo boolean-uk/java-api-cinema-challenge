@@ -40,10 +40,9 @@ public class Customer {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Customer(String name, String email, String phone, List<Ticket> tickets) {
+    public Customer(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.tickets = tickets;
     }
 }

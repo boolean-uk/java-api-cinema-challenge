@@ -36,9 +36,7 @@ public class Ticket {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Ticket(Screening screening, Customer customer, int numSeats) {
-        this.screening = screening;
-        this.customer = customer;
+    public Ticket(int numSeats) {
         this.numSeats = numSeats;
     }
 }
