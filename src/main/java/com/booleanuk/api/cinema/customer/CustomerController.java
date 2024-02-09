@@ -30,13 +30,24 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
-        validateCustomerOrThrowException(customer);
+        //validateCustomerOrThrowException(customer);
+
+        if(customer.getName() == null && customer.getEmail() == null && customer.getPhone() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update customer, all provided fields are null.");
+        }
 
         Customer customerToBeUpdated = findCustomerOrThrowException(id);
 
-        customerToBeUpdated.setName(customer.getName());
-        customerToBeUpdated.setEmail(customer.getEmail());
-        customerToBeUpdated.setPhone(customer.getPhone());
+        // If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
+        if(customer.getName() != null) {
+            customerToBeUpdated.setName(customer.getName());
+        }
+        if(customer.getEmail() != null) {
+            customerToBeUpdated.setEmail(customer.getEmail());
+        }
+        if(customer.getPhone() != null) {
+            customerToBeUpdated.setPhone(customer.getPhone());
+        }
 
         this.customerRepository.save(customerToBeUpdated);
 
@@ -54,7 +65,7 @@ public class CustomerController {
 
     private void validateCustomerOrThrowException(Customer customer) {
         if(customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create/update new customer, please check all fields are correct.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new customer, please check all fields are correct.");
         }
     }
 

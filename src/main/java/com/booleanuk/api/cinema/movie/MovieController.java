@@ -23,6 +23,13 @@ public class MovieController {
 
         Movie newMovie = this.movieRepository.save(movie);
 
+        if(movie.getScreenings() == null) {
+            newMovie.setScreenings(new ArrayList<Screening>());
+        }
+        else {
+            newMovie.setScreenings(movie.getScreenings());
+        }
+
         return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
     }
 
@@ -33,7 +40,11 @@ public class MovieController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
-        validateMovieOrThrowException(movie);
+        //validateMovieOrThrowException(movie);
+
+        if(movie.getTitle() == null && movie.getRating() == null && movie.getDescription() == null && movie.getRunTimeMins() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the specified movie, please check all fields are correct.");
+        }
 
         Movie movieToUpdate = findMovieOrThrowException(id);
 
@@ -41,12 +52,6 @@ public class MovieController {
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRunTimeMins(movie.getRunTimeMins());
-        if(movie.getScreenings() == null) {
-            movieToUpdate.setScreenings(new ArrayList<Screening>());    // If no screenings array is provided, the movie should be created as normal.
-        }
-        else {
-            movieToUpdate.setScreenings(movie.getScreenings());
-        }
 
         this.movieRepository.save(movieToUpdate);
 
@@ -64,7 +69,7 @@ public class MovieController {
 
     private void validateMovieOrThrowException(Movie movie) {
         if(movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRunTimeMins() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create movie, please check all fields are correct.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all fields are correct.");
         }
     }
 
