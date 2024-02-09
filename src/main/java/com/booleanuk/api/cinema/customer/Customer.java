@@ -1,11 +1,15 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.ticket.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -28,22 +32,26 @@ public class Customer {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties("customer")
+    private List<Ticket> tickets;
 
     @PrePersist
     public void onCreate() {
-        Date creationDate = new Date();
+        LocalDateTime creationDate = LocalDateTime.now();
         this.createdAt = creationDate;
         this.updatedAt = creationDate;
     }
 
     @PreUpdate
     public void onUpdate() {
-        this.updatedAt = new Date();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Customer(String name, String email, String phone) {

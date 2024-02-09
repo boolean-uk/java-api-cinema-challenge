@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.movie;
 
 import com.booleanuk.api.cinema.screening.Screening;
-import lombok.Getter;
+import com.booleanuk.api.cinema.screening.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,8 @@ import java.util.List;
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
+    @Autowired
+    private ScreeningRepository screeningRepository;
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
@@ -42,7 +44,7 @@ public class MovieController {
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         //validateMovieOrThrowException(movie);
 
-        if(movie.getTitle() == null && movie.getRating() == null && movie.getDescription() == null && movie.getRunTimeMins() < 0) {
+        if(movie.getTitle() == null && movie.getRating() == null && movie.getDescription() == null && movie.getRuntimeMins() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the specified movie, please check all fields are correct.");
         }
 
@@ -51,7 +53,7 @@ public class MovieController {
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRunTimeMins(movie.getRunTimeMins());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
 
         this.movieRepository.save(movieToUpdate);
 
@@ -82,15 +84,19 @@ public class MovieController {
 
         validateScreeningOrThrowException(screening);
 
-        movie.getScreenings().add(screening);
+        screening.setMovie(movie);
 
-        Screening newScreening = this.movieRepository.save(movie).getScreenings().get(movie.getScreenings().size()-1);
+        Screening newScreening = this.screeningRepository.save(screening);
+
+        movie.getScreenings().add(newScreening);
+
+        //returnera screening objekt utan movie detaljer?
 
         return new ResponseEntity<>(newScreening, HttpStatus.CREATED);
     }
 
     private void validateMovieOrThrowException(Movie movie) {
-        if(movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRunTimeMins() < 0) {
+        if(movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all fields are correct.");
         }
     }

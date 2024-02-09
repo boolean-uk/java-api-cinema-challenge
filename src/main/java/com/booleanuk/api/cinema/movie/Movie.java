@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -30,15 +30,15 @@ public class Movie {
     private String description;
 
     @Column
-    private int runTimeMins;
+    private int runtimeMins;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")  //en movie kan ha många screenings
     @JsonIgnoreProperties("movie")
@@ -46,21 +46,21 @@ public class Movie {
 
     @PrePersist
     public void onCreate() {
-        Date creationDate = new Date();
+        LocalDateTime creationDate = LocalDateTime.now();
         this.createdAt = creationDate;
         this.updatedAt = creationDate;
     }
 
     @PreUpdate
     public void onUpdate() {
-        this.updatedAt = new Date();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Movie(String title, String rating, String description, int runTimeMins) {
+    public Movie(String title, String rating, String description, int runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
-        this.runTimeMins = runTimeMins;
+        this.runtimeMins = runtimeMins;
     }
 
     public Movie(int id) {
