@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("screenings")
+@RequestMapping("movies")
 public class ScreeningController {
 
     @Autowired
@@ -22,45 +22,19 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
 
-    @GetMapping
-    public List<Screening> getAllScreenings() {
-        return this.screeningRepository.findAll();
+    @GetMapping("/{movie_id}/screenings")
+    public List<Screening> getAllScreenings(@PathVariable int movie_id) {
+        return this.screeningRepository.findByMovieId(movie_id);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Screening> getScreeningByID(@PathVariable int id) {
-        Screening screening = this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        return ResponseEntity.ok(screening);
-    }
 
-    @PostMapping
-    public ResponseEntity<Screening> createScreening(@RequestBody Screening screening) {
-        Movie tempMov = this.movieRepository.findById(screening.getMovie().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie found"));
+    @PostMapping("/{movie_id}/screenings")
+    public ResponseEntity<Screening> createScreening(@PathVariable int movie_id, @RequestBody Screening screening) {
+        Movie tempMov = this.movieRepository.findById(movie_id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie found"));
         screening.setMovie(tempMov);
 
         return ResponseEntity.ok(this.screeningRepository.save(screening));
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Screening> deleteScreeningByID(@PathVariable int id) {
-        Screening screening = this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        this.screeningRepository.delete(screening);
-        return ResponseEntity.ok(screening);
 
-
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Screening> updateScreening(@PathVariable int id, @RequestBody Screening screening) {
-
-        Screening screeningToUpdate = this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        Movie tempMov = this.movieRepository.findById(screening.getMovie().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie found"));
-        screening.setMovie(tempMov);
-        screeningToUpdate.setScreenNumber(screening.getScreenNumber());
-        screeningToUpdate.setStartsAt(screening.getStartsAt());
-        screeningToUpdate.setCapacity(screening.getCapacity());
-        screeningToUpdate.setCreatedAt(screening.getCreatedAt());
-        screeningToUpdate.setUpdatedAt(screening.getUpdatedAt());
-        return new ResponseEntity<>(this.screeningRepository.save(screeningToUpdate), HttpStatus.CREATED);
-    }
 
 }
