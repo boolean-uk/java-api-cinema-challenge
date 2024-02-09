@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,8 @@ public class Screening {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id")
+    @JoinColumn(name = "movie_id", nullable = false)
+    @JsonIgnoreProperties(value = {"title", "description", "runtime_mins"})
     private Movie movie;
 
     @Column

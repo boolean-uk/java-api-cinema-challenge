@@ -1,11 +1,14 @@
 package com.booleanuk.api.cinema.movie;
 
+import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,4 +37,15 @@ public class Movie {
 
     @Column
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties("movie")
+    private List<Screening> screenings;
+
+    public Movie(String title, String rating, String description, int runtimeMins){
+        setTitle(title);
+        setRating(rating);
+        setDescription(description);
+        setRuntimeMins(runtimeMins);
+    }
 }

@@ -1,11 +1,13 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.ticket.Ticket;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,4 +33,7 @@ public class Customer {
 
     @Column
     private LocalDateTime updatedAt;
+
+    @OneToMany
+    private List<Ticket> tickets;
 }

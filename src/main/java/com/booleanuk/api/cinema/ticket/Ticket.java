@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.ticket;
 
 import com.booleanuk.api.cinema.customer.Customer;
 import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +21,11 @@ public class Ticket {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "screening_id")
+    @JoinColumn(name = "screening_id", nullable = false)
     private Screening screening;
 
     @Column
@@ -35,4 +36,6 @@ public class Ticket {
 
     @Column
     private LocalDateTime updatedAt;
+
+
 }
