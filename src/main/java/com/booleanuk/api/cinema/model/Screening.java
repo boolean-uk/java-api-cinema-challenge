@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,6 +33,10 @@ public class Screening {
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"id", "title", "description", "runtime_mins"})
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     public Screening(int screen_number, int capacity, String starts_at) {
         this.screenNumber = screen_number;

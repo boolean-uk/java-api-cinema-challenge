@@ -1,10 +1,13 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.web.WebProperties;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,6 +28,10 @@ public class Customer {
 
     @Column(name = "phone")
     private String phone;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties("customer")
+    private List<Ticket> tickets;
 
     public Customer(String name, String email, String phone) {
         this.name = name;

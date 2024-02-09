@@ -23,6 +23,9 @@ public class MovieController {
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie) {
         Movie createdMovie = this.repository.save(movie);
+        if(createdMovie.getScreenings() <= 0) {
+
+        }
         createdMovie.setScreenings(new ArrayList<Screening>());
         return new ResponseEntity<Movie>(createdMovie, HttpStatus.CREATED);
     }
