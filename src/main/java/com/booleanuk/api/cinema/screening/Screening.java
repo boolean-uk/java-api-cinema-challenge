@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.screening;
 
+import com.booleanuk.api.cinema.movie.Movie;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,9 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int movieId;
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
 
     @Column
     private int screenNumber;

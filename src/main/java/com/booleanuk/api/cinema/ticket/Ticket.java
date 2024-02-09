@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.ticket;
 
+import com.booleanuk.api.cinema.customer.Customer;
+import com.booleanuk.api.cinema.screening.Screening;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +19,13 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-    @Column
-    private int screeningId;
+    @ManyToOne
+    @JoinColumn(name = "screening_id")
+    private Screening screening;
 
     @Column
     private int numSeats;
