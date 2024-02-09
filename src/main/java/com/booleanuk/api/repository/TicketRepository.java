@@ -1,4 +1,7 @@
 package com.booleanuk.api.repository;
 
-public interface TicketRepository {
+import com.booleanuk.api.model.Ticket;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 }
