@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ScreeningRepository extends JpaRepository<Screening, Integer> {
-    List<ScreeningDto> findAllProjectedBy();
-    ScreeningDto findByIdProjectedBy(int id);
+    List<ScreeningDto> findByMovieId(int id);
 }

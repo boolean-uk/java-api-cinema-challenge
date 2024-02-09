@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     List<CustomerDto> findAllProjectedBy();
-    CustomerDto findByIdProjectedBy(int id);
 }

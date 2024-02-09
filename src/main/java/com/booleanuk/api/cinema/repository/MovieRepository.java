@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface MovieRepository extends JpaRepository<Movie, Integer> {
     List<MovieDto> findAllProjectedBy();
-    MovieDto findByIdProjectedBy(int id);
 }

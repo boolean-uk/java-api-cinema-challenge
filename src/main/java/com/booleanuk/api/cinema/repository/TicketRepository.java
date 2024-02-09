@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<TicketDto> findAllProjectedBy();
-    TicketDto findByIdProjectedBy(int id);
+    //TicketDto findByIdProjectedBy(int id);
 }
