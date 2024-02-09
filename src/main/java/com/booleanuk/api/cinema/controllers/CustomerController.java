@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -58,6 +59,7 @@ public class CustomerController {
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id){
         Customer deleteCustomer = findOne(id);
         this.customerRepository.delete(deleteCustomer);
+        deleteCustomer.setTickets(new ArrayList<>());
         return ResponseEntity.ok(deleteCustomer);
     }
 

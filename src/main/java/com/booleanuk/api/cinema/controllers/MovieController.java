@@ -2,7 +2,9 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
+import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
+import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.List;
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
+    @Autowired
+    ScreeningRepository screeningRepository;
 
     private LocalDateTime today;
     private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
@@ -39,6 +43,15 @@ public class MovieController {
 
         movie.setCreatedAt(today.format(pattern));
         movie.setUpdatedAt(today.format(pattern));
+        /*
+        if (!movie.getScreenings().isEmpty()){
+            for (int i = 0; i < movie.getScreenings().size(); i++){
+                movie.getScreenings().get(i).setCreatedAt(today.format(pattern));
+            }
+        }
+
+         */
+
         return new ResponseEntity<Movie>(this.movieRepository.save(movie),
                 HttpStatus.CREATED);
     }
@@ -53,6 +66,7 @@ public class MovieController {
         updateMovie.setDescription(movie.getDescription());
         updateMovie.setRuntimeMins(movie.getRuntimeMins());
         updateMovie.setUpdatedAt(today.format(pattern));
+
         return new ResponseEntity<Movie>(this.movieRepository.save(updateMovie),
                 HttpStatus.CREATED);
     }

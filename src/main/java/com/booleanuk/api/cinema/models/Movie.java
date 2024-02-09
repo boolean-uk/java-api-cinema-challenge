@@ -44,6 +44,15 @@ public class Movie {
         this.runtimeMins = runtimeMins;
     }
 
+    public Movie(String title, String rating, String description, int runtimeMins, Screening screening) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.screenings.add(screening);
+    }
+
+
     public Movie(int id){
         this.id = id;
     }
