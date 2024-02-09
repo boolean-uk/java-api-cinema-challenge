@@ -4,6 +4,7 @@ import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class CustomerController {
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         customer.setCreatedAt(DateCreater.getCurrentDate());
         customer.setUpdatedAt(DateCreater.getCurrentDate());
+        this.areCustomerValid(customer, "Could not create a new customer, please check all fields are correct");
         return ResponseEntity.ok(this.customerRepository.save(customer));
     }
 
@@ -34,12 +36,12 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.getACustomer(id);
-
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setUpdatedAt(DateCreater.getCurrentDate());
         customerToUpdate.setPhone(customer.getPhone());
 
+        this.areCustomerValid(customerToUpdate, "Could not create a new customer, please check all fields are correct");
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
@@ -51,6 +53,13 @@ public class CustomerController {
     }
 
     private Customer getACustomer(int id) {
-        return this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Customers with that id were find."));
+        return this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID found"));
+    }
+
+    private void areCustomerValid(Customer customer, String message) {
+        if(customer.getName() == null || customer.getPhone() == null || customer.getEmail() == null || customer.getUpdatedAt() == null || customer.getCreatedAt() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
+
     }
 }
