@@ -29,9 +29,9 @@ public class Movie {
     private int runtimeMins;
 
     @Column
-    private LocalDateTime createdAt;
+    private String createdAt;
     @Column
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")

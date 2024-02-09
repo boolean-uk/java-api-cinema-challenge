@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
 
+    private LocalDateTime today;
+    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
 
     @GetMapping
     public List<Screening> findAll(@PathVariable int id){
@@ -33,11 +36,13 @@ public class ScreeningController {
 
     @PostMapping
     public ResponseEntity<Screening> addScreening(@PathVariable int id,@RequestBody Screening screening){
+        today = LocalDateTime.now();
+
         Movie tempMovie = findTheMovie(id);
 
         screening.setMovie(tempMovie);
-        screening.setCreatedAt(LocalDateTime.now());
-        screening.setUpdatedAt(LocalDateTime.now());
+        screening.setCreatedAt(today.format(pattern));
+
 
        return new ResponseEntity<Screening>(this.screeningRepository.save(screening),
                HttpStatus.CREATED);

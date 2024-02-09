@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
+    private LocalDateTime today;
+    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -30,19 +33,23 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer){
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setUpdatedAt(LocalDateTime.now());
+        today = LocalDateTime.now();
+
+        customer.setCreatedAt(today.format(pattern));
+        customer.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Customer>(this.customerRepository.save(customer),
                 HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer){
+        today = LocalDateTime.now();
+
         Customer updateCustomer = findOne(id);
         updateCustomer.setName(customer.getName());
         updateCustomer.setEmail(customer.getEmail());
         updateCustomer.setPhone(customer.getPhone());
-        updateCustomer.setUpdatedAt(LocalDateTime.now());
+        updateCustomer.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Customer>(this.customerRepository.save(updateCustomer),
                 HttpStatus.CREATED);
     }

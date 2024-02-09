@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,9 @@ import java.util.List;
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
+
+    private LocalDateTime today;
+    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
 
     @GetMapping
     public List<Movie> findAll(){
@@ -31,20 +35,24 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie){
-        movie.setCreatedAt(LocalDateTime.now());
-        movie.setUpdatedAt(LocalDateTime.now());
+        today = LocalDateTime.now();
+
+        movie.setCreatedAt(today.format(pattern));
+        movie.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Movie>(this.movieRepository.save(movie),
                 HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie){
+        today = LocalDateTime.now();
+
         Movie updateMovie = findOne(id);
         updateMovie.setTitle(movie.getTitle());
         updateMovie.setRating(movie.getRating());
         updateMovie.setDescription(movie.getDescription());
         updateMovie.setRuntimeMins(movie.getRuntimeMins());
-        updateMovie.setUpdatedAt(LocalDateTime.now());
+        updateMovie.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Movie>(this.movieRepository.save(updateMovie),
                 HttpStatus.CREATED);
     }
