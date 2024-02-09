@@ -39,7 +39,7 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
-    private List<Movie> movies;
+    private List<Screening> screenings;
 
 
     public Movie(String title, String rating, String description, int runtimeMins, String createdAt, String updatedAt) {
