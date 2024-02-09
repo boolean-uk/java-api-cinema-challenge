@@ -51,8 +51,8 @@ public class Screening {
     }
 
     @ManyToOne
-    @JsonIgnore
+    @JsonIgnore // This is to not include the movie object in the response
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "createdAt", "updatedAt"})
+    //@JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "createdAt", "updatedAt"})
     private Movie movie;
 }

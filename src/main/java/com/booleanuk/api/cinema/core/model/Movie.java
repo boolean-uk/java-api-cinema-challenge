@@ -53,7 +53,7 @@ public class Movie {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    @JsonIgnore
+    @JsonIgnore // This is to not include the screenings object in the response
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
     //@JsonIgnoreProperties(value = {"movie"})
     private List<Screening> screenings;
