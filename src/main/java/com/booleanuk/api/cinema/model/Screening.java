@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,12 @@ public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "movie_id")
-    private int movie;
+
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
+    @JsonIncludeProperties(value = {"title", "rating", "description", "runtimeMinutes"})
+    private Movie movie;
+
     @Column(name = "screen_number")
     private int screenNumber;
     @Column(name = "starts_at")
@@ -29,7 +34,7 @@ public class Screening {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    public Screening(int movie, int screenNumber, Date startsAt, int capacity, Date createdAt, Date updatedAt) {
+    public Screening(Movie movie, int screenNumber, Date startsAt, int capacity, Date createdAt, Date updatedAt) {
         this.movie = movie;
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
