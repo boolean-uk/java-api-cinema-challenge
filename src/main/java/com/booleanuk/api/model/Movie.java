@@ -1,11 +1,13 @@
 package com.booleanuk.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -36,6 +38,10 @@ public class Movie {
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties("movie")
+    private List<Screening> screenings;
 
     @PrePersist
     public void prePersist() {

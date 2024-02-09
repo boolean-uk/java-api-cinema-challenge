@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,20 +24,29 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        checkAllCustomerFields(customer);
         Customer createdCustomer = this.customerRepository.save(customer);
+        createdCustomer.setTickets(new ArrayList<>());
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
-        Customer customerToDelete = this.getCustomerWithNotFound(id);
-        this.customerRepository.delete(customerToDelete);
+        Customer customerToDelete = this.getCustomerOrNotFound(id);
+        try {
+            this.customerRepository.delete(customerToDelete);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Customer is a foreign key to a Ticket");
+        }
+        customerToDelete.setTickets(new ArrayList<>());
         return ResponseEntity.ok(customerToDelete);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
-        Customer customerToUpdate = this.getCustomerWithNotFound(id);
+        checkAllCustomerFields(customer);
+        Customer customerToUpdate = this.getCustomerOrNotFound(id);
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
@@ -45,9 +55,18 @@ public class CustomerController {
 
     //--------------------------- Private section---------------------------//
 
-    private Customer getCustomerWithNotFound(int id) {
+    private Customer getCustomerOrNotFound(int id) {
         return this.customerRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+    }
+
+    private void checkAllCustomerFields(Customer customer) {
+        if (customer.getName().isEmpty() ||
+        customer.getEmail().isEmpty() ||
+        customer.getPhone().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Bad data in RequestBody");
+        }
     }
 }

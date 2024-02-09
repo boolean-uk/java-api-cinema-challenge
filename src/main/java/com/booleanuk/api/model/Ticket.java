@@ -1,5 +1,6 @@
 package com.booleanuk.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,15 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int customerID;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIncludeProperties(value = {"id", "name", "email", "phone"})
+    private Customer customer;
 
-    @Column
-    private int screeningID;
+    @ManyToOne
+    @JoinColumn(name = "screening_id", nullable = false)
+    @JsonIncludeProperties(value = {"id", "screenNumber", "capacity"})
+    private Screening screening;
 
     @Column
     private int numSeats;
@@ -36,7 +41,8 @@ public class Ticket {
 
     @PrePersist
     public void prePersist() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern
+                ("yyyy-MM-dd ' ' HH:mm:ss");
         String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
         this.createdAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
         this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
@@ -44,8 +50,13 @@ public class Ticket {
 
     @PreUpdate
     public void preUpdate() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern
+                ("yyyy-MM-dd ' ' HH:mm:ss");
         String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
         this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+    }
+
+    public Ticket(int numSeats) {
+        this.numSeats = numSeats;
     }
 }
