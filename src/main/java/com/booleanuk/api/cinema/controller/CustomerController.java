@@ -19,8 +19,8 @@ public class CustomerController {
     CustomerRepository repository;
 
     @GetMapping
-    public List<CustomerDto> getAllCustomers() {
-        return this.repository.findAllProjectedBy();
+    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
+        return ResponseEntity.ok(this.repository.findAllProjectedBy());
     }
 
     @PostMapping
@@ -35,5 +35,18 @@ public class CustomerController {
 
     public CustomerDto translateToDto(Customer customer) {
         return new CustomerDto(customer.getId(), customer.getName(), customer.getEmail(), customer.getPhone(), customer.getCreatedAt(), customer.getUpdatedAt());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomerDto> deleteCustomer(@PathVariable int id) {
+        Customer customer = this.repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        try {
+            this.repository.delete(customer);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer still references a ticket");
+        }
+        customer.setTickets(new ArrayList<>());
+        return ResponseEntity.ok(this.translateToDto(customer));
     }
 }
