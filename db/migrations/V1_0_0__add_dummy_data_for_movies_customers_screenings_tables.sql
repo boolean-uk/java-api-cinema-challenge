@@ -59,6 +59,13 @@ VALUES
 (5, 2, '2024-02-17 21:00:00', 120, NOW(), NOW()), -- Screening for "The Matrix Resurrections" on screen 2
 (5, 3, '2024-02-18 20:30:00', 80, NOW(), NOW());  -- Screening for "The Matrix Resurrections" on screen 3
 
-
+INSERT INTO tickets
+	(customer_id, screen_id, num_seats, created_at, updated_at)
+VALUES
+  (1, 1, 2, NOW(), NOW()), -- Ticket for customer 1, screening 1 with 2 seats
+  (2, 2, 3, NOW(), NOW()), -- Ticket for customer 2, screening 2 with 3 seats
+  (3, 3, 1, NOW(), NOW()), -- Ticket for customer 3, screening 3 with 1 seat
+  (1, 4, 4, NOW(), NOW()), -- Ticket for customer 1, screening 4 with 4 seats
+  (2, 5, 2, NOW(), NOW()); -- Ticket for customer 2, screening 5 with 2 seats
 
 

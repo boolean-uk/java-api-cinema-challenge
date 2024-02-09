@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -33,6 +35,10 @@ public class Screening {
     private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     public Screening(Movie movie, int screenNumber, Date startsAt, int capacity, Date createdAt, Date updatedAt) {
         this.movie = movie;

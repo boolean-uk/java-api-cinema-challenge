@@ -58,6 +58,12 @@ public class MovieController {
         return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
     }
 
+    /**
+     * This should go to ScreeningController Class, but Mapping Movies is occupied
+     * by this Controller. Have to fix this. Same for method two below.
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}/screenings")
     public ResponseEntity<?> getAllScreeningsByMovieId(@PathVariable int id) {
         Optional<Movie> optionalMovie = movieRepository.findById(id);
