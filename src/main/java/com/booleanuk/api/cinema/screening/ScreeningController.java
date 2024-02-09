@@ -19,6 +19,7 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
 
+    /**
     @PostMapping
     public ResponseEntity<Screening> createScreening(@RequestBody Screening screening) {
         validateScreeningOrThrowException(screening);
@@ -54,4 +55,5 @@ public class ScreeningController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a screening for the specified movie, please check all fields are correct.");
         }
     }
+    */
 }

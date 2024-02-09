@@ -67,6 +67,28 @@ public class MovieController {
         return ResponseEntity.ok(movieToBeDeleted);
     }
 
+    @GetMapping("/{id}/screenings")
+    public ResponseEntity<List<Screening>> getAllScreeningsOfOneMovie(@PathVariable int id) {
+        Movie movie = findMovieOrThrowException(id);
+
+        List<Screening> allScreenings = movie.getScreenings();
+
+        return ResponseEntity.ok(allScreenings);
+    }
+
+    @PostMapping("/{id}/screenings")
+    public ResponseEntity<Screening> createScreening(@PathVariable int id, @RequestBody Screening screening) {
+        Movie movie = findMovieOrThrowException(id);
+
+        validateScreeningOrThrowException(screening);
+
+        movie.getScreenings().add(screening);
+
+        Screening newScreening = this.movieRepository.save(movie).getScreenings().get(movie.getScreenings().size()-1);
+
+        return new ResponseEntity<>(newScreening, HttpStatus.CREATED);
+    }
+
     private void validateMovieOrThrowException(Movie movie) {
         if(movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRunTimeMins() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all fields are correct.");
@@ -77,5 +99,11 @@ public class MovieController {
         return this.movieRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id found."));
+    }
+
+    private void validateScreeningOrThrowException(Screening screening) {
+        if(screening.getScreenNumber() < 0 || screening.getCapacity() < 0 || screening.getStartsAt() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a screening for the specified movie, please check all fields are correct.");
+        }
     }
 }
