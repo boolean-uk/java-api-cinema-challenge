@@ -51,4 +51,19 @@ public class MovieController {
         movie.setScreenings(new ArrayList<>());
         return ResponseEntity.ok(this.translateToDto(movie));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MovieDto> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+        if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
+        Movie updateMovie = this.repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
+        updateMovie.setTitle(movie.getTitle());
+        updateMovie.setRating(movie.getRating());
+        updateMovie.setDescription(movie.getDescription());
+        updateMovie.setRuntimeMins(movie.getRuntimeMins());
+
+        return new ResponseEntity<>(this.translateToDto(this.repository.save(updateMovie)), HttpStatus.CREATED);
+    }
 }
