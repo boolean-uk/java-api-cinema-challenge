@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.Locale;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,9 +25,15 @@ public class Customer {
     @Column
     private String phone;
 
+    @Column
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
     public Customer(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
     }
+
 }

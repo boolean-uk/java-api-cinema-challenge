@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,8 +25,13 @@ public class Screening {
     @Column
     private String startsAt;
 
+    @Column
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
     @ManyToOne
-    @JoinColumn(name = "moive_id",nullable = false)
+    @JoinColumn(name = "movie_id",nullable = false)
     @JsonIgnoreProperties("screenings")
     private Movie movie;
 
