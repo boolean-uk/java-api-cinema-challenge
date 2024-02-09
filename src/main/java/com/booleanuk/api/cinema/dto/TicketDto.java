@@ -4,16 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
 public class TicketDto {
     private int id;
     private int numSeats;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
-    public TicketDto(int id, int numSeats, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public TicketDto(int id, int numSeats, Date createdAt, Date updatedAt) {
         this.id = id;
         this.numSeats = numSeats;
         this.createdAt = createdAt;

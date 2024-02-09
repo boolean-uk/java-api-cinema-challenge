@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -12,10 +13,10 @@ public class CustomerDto {
     private String name;
     private String email;
     private String phone;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
-    public CustomerDto(int id, String name, String email, String phone, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CustomerDto(int id, String name, String email, String phone, Date createdAt, Date updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;

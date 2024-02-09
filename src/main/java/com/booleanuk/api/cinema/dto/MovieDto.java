@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -14,10 +15,10 @@ public class MovieDto {
     private String rating;
     private String description;
     private int runtimeMins;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
-    public MovieDto(int id, String title, String rating, String description, int runtimeMins, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MovieDto(int id, String title, String rating, String description, int runtimeMins,Date createdAt, Date updatedAt) {
         this.id = id;
         this.title = title;
         this.rating = rating;

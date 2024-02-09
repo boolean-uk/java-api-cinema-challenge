@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
@@ -10,6 +11,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -30,7 +35,8 @@ public class Screening {
     private int screenNumber;
 
     @Column
-    private LocalDateTime startsAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private Date startsAt;
 
     @Column
     private int capacity;
@@ -40,12 +46,14 @@ public class Screening {
     private List<Ticket> tickets;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private Date createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private Date updatedAt;
 
-    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
+    public Screening(int screenNumber, int capacity, Date startsAt) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
