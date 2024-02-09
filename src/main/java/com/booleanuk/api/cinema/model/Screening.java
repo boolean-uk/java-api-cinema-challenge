@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +10,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -36,9 +39,18 @@ public class Screening {
     @Column
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "screening")
+    //For multible values to ignore use "value = {value,value}
+    @JsonIgnore
+    private List<Ticket> tickets;
+
     public Screening(int screenNumber, LocalDateTime startsAt, int capacity) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
+    }
+
+    public Screening(int id){
+        this.id = id;
     }
 }

@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,40 +9,38 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name="customers")
-public class Customer {
+@Table(name="tickets")
+public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @ManyToOne
+    @JoinColumn(name= "customer_id",nullable = false)
+    @JsonIgnore
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name= "screening_id",nullable = false)
+    @JsonIgnore
+    private Screening screening;
     @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String email;
-    @Column(nullable = false)
-    private String phone;
+
+    private int numSeats;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(nullable = false)
     private LocalDateTime createdAt;
-
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "customer")
-    //For multible values to ignore use "value = {value,value}
-    @JsonIgnore
-    private List<Ticket> tickets;
-
-    public Customer(String name, String email, String phone) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
+    public Ticket(int numSeats) {
+        this.numSeats = numSeats;
     }
 }

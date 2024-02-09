@@ -65,7 +65,6 @@ public class MovieController {
         Movie movie = this.movieRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the movie"));
         screening.setMovie(movie);
-
         //Dates
         LocalDateTime currentDateTime = LocalDateTime.now();
         screening.setCreatedAt(currentDateTime);
