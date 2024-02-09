@@ -42,6 +42,10 @@ public class Movie {
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 
+    public Movie(int id){
+        setId(id);
+    }
+
     public Movie(String title, String rating, String description, int runtimeMins){
         setTitle(title);
         setRating(rating);

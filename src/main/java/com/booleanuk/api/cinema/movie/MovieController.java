@@ -19,13 +19,11 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie){
-        Movie created = repo.save(movie);
+        movie.setScreenings(new ArrayList<Screening>());
+        movie.setCreatedAt(LocalDateTime.now());
+        movie.setUpdatedAt(LocalDateTime.now());
 
-        created.setScreenings(new ArrayList<Screening>());
-        created.setCreatedAt(LocalDateTime.now());
-        created.setUpdatedAt(LocalDateTime.now());
-
-        return new ResponseEntity<Movie>(created, HttpStatus.CREATED);
+        return new ResponseEntity<Movie>(repo.save(movie), HttpStatus.CREATED);
     }
 
     @GetMapping

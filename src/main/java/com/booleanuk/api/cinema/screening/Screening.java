@@ -1,13 +1,14 @@
 package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class Screening {
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIgnoreProperties(value = {"title", "description", "runtime_mins"})
+    @JsonIncludeProperties(value = {"title", "description", "runtimeMins"})
     private Movie movie;
 
     @Column
@@ -38,4 +39,25 @@ public class Screening {
 
     @Column
     private LocalDateTime updatedAt;
+
+    public Screening(int id){
+        setId(id);
+    }
+
+    public Screening(int screenNumber, int capacity, String startsAt) throws DateTimeParseException{
+        setScreenNumber(screenNumber);
+        setCapacity(capacity);
+        setStartsAt(LocalDateTime.parse(startsAt));
+        /*
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime startsAtDateTime = LocalDateTime.parse(startsAt, formatter);
+            setStartsAt(startsAtDateTime);
+
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid format for startsAt. Please use 'yyyy-MM-dd HH:mm' format.", e);
+        }
+
+         */
+    }
 }

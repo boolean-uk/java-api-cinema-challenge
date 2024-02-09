@@ -36,4 +36,14 @@ public class Customer {
 
     @OneToMany
     private List<Ticket> tickets;
+
+    public Customer(int id){
+        setId(id);
+    }
+
+    public Customer(String name, String email, String phone){
+        setName(name);
+        setEmail(email);
+        setPhone(phone);
+    }
 }

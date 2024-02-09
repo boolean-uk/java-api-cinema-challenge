@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@RestController
+@RequestMapping("movies/{id}/screenings")
 public class ScreeningController {
     @Autowired
     private ScreeningRepository repo;
@@ -19,11 +21,9 @@ public class ScreeningController {
     private MovieRepository movies;
 
     @PostMapping
-    public ResponseEntity<Screening> create(@RequestBody Screening screening){
-        Screening created = repo.save(screening);
-
+    public ResponseEntity<Screening> create(@PathVariable int id, @RequestBody Screening screening){
         Movie tempMovie = movies
-                .findById(screening.getMovie().getId())
+                .findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with this ID."));
 
@@ -31,46 +31,18 @@ public class ScreeningController {
         screening.setCreatedAt(LocalDateTime.now());
         screening.setUpdatedAt(LocalDateTime.now());
 
-        return new ResponseEntity<Screening>(created, HttpStatus.CREATED);
+        return new ResponseEntity<Screening>(repo.save(screening), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Screening> getAll(){
-        return repo.findAll();
-    }
-
-    @GetMapping("{id}")
-    public ResponseEntity<Screening> getOne(@PathVariable int id){
-        return ResponseEntity.ok(getById(id));
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<Screening> update(@PathVariable int id, @RequestBody Screening screening){
-        Screening toUpdate = getById(id);
-
-        Movie tempMovie = movies
-                .findById(screening.getMovie().getId())
+    public ResponseEntity<List<Screening>> getScreeningsForMovie(@PathVariable int id) {
+        Movie movie = movies
+                .findById(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with this ID."));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        toUpdate.setMovie(tempMovie);
-        toUpdate.setScreenNumber(screening.getScreenNumber());
-        toUpdate.setStartsAt(screening.getStartsAt());
-        toUpdate.setCapacity(toUpdate.getCapacity());
-        toUpdate.setUpdatedAt(LocalDateTime.now());
+        List<Screening> screenings = movie.getScreenings();
 
-        return new ResponseEntity<Screening>(repo.save(toUpdate), HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<Screening> delete(@PathVariable int id){
-        Screening toDelete = getById(id);
-        repo.delete(toDelete);
-
-        return ResponseEntity.ok(toDelete);
-    }
-
-    private Screening getById(int id){
-        return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok(screenings);
     }
 }
