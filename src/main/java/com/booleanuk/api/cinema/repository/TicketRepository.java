@@ -10,4 +10,6 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByScreeningId (int id);
     List<Ticket> findByCustomerId (int id);
+
+    List<Ticket> findByCustomerIdAndScreeningId(int customer_id, int screening_id);
 }

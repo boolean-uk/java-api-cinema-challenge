@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,14 +24,16 @@ public class ScreeningController {
 
 
     @GetMapping("/{movie_id}/screenings")
-    public List<Screening> getAllScreenings(@PathVariable int movie_id) {
-        return this.screeningRepository.findByMovieId(movie_id);
+    public ResponseEntity<List<Screening>> getAllScreenings(@PathVariable int movie_id) {
+        Movie movie = this.movieRepository.findById(movie_id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
+
+        return ResponseEntity.ok(movie.getScreenings());
     }
 
 
     @PostMapping("/{movie_id}/screenings")
     public ResponseEntity<Screening> createScreening(@PathVariable int movie_id, @RequestBody Screening screening) {
-        Movie tempMov = this.movieRepository.findById(movie_id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie found"));
+        Movie tempMov = this.movieRepository.findById(screening.getMovie().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie found"));
         screening.setMovie(tempMov);
 
         return ResponseEntity.ok(this.screeningRepository.save(screening));
