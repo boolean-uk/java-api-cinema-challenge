@@ -3,6 +3,7 @@ package com.booleanuk.api.cinema.controllers;
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +70,12 @@ public class CustomerController {
         }
 
         Customer customerToDelete = this.customerRepository.findById(id).get();
-        this.customerRepository.delete(customerToDelete);
+        try {
+            this.customerRepository.delete(customerToDelete);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error("violation of foreign key constraint"));
+        }
+
         return ResponseEntity.ok(Response.success(customerToDelete));
     }
 

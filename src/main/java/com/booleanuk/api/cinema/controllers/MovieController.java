@@ -5,6 +5,7 @@ import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,7 +78,12 @@ public class MovieController {
         }
 
         Movie movieToDelete = this.movieRepository.findById(id).get();
-        this.movieRepository.delete(movieToDelete);
+        try {
+            this.movieRepository.delete(movieToDelete);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error("violation of foreign key constraint"));
+        }
+
         return ResponseEntity.ok(Response.success(movieToDelete));
     }
 
