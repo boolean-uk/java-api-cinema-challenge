@@ -1,8 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.dto.CustomerDto;
 import com.booleanuk.api.cinema.dto.ScreeningDto;
-import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
@@ -12,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
