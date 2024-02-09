@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.controller;
 import com.booleanuk.api.cinema.dto.MovieDto;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.response.ApiException;
+import com.booleanuk.api.cinema.response.ApiSuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +21,18 @@ public class MovieController {
     MovieRepository repository;
 
     @GetMapping
-    public List<MovieDto> getAllMovies() {
-        return this.repository.findAllProjectedBy();
+    public ResponseEntity<ApiSuccessResponse<List<MovieDto>>> getAllMovies() {
+        return ResponseEntity.ok(new ApiSuccessResponse<>(this.repository.findAllProjectedBy()));
     }
 
     @PostMapping
-    public ResponseEntity<MovieDto> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<ApiSuccessResponse<MovieDto>> createMovie(@RequestBody Movie movie) {
         if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
         }
         Movie createdMovie = this.repository.save(movie);
         createdMovie.setScreenings(new ArrayList<>());
-        return new ResponseEntity<>(this.translateToDto(createdMovie), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiSuccessResponse<>(this.translateToDto(createdMovie)), HttpStatus.CREATED);
     }
 
     public MovieDto translateToDto(Movie movie) {
@@ -38,30 +40,30 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MovieDto> deleteMovie(@PathVariable int id) {
+    public ResponseEntity<ApiSuccessResponse<MovieDto>> deleteMovie(@PathVariable int id) {
         Movie movie = this.repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "not found"));
         try {
             this.repository.delete(movie);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Movie still references a screening");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Movie still references a screening");
         }
         movie.setScreenings(new ArrayList<>());
-        return ResponseEntity.ok(this.translateToDto(movie));
+        return ResponseEntity.ok(new ApiSuccessResponse<>(this.translateToDto(movie)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MovieDto> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+    public ResponseEntity<ApiSuccessResponse<MovieDto>> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
         }
         Movie updateMovie = this.repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "not found"));
         updateMovie.setTitle(movie.getTitle());
         updateMovie.setRating(movie.getRating());
         updateMovie.setDescription(movie.getDescription());
         updateMovie.setRuntimeMins(movie.getRuntimeMins());
 
-        return new ResponseEntity<>(this.translateToDto(this.repository.save(updateMovie)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiSuccessResponse<>(this.translateToDto(this.repository.save(updateMovie))), HttpStatus.CREATED);
     }
 }
