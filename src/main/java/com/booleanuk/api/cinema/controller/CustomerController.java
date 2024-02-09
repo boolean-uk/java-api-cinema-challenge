@@ -1,8 +1,10 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.dto.CustomerDto;
+import com.booleanuk.api.cinema.dto.*;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.response.ApiSuccessResponse;
+import com.booleanuk.api.cinema.response.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +21,18 @@ public class CustomerController {
     CustomerRepository repository;
 
     @GetMapping
-    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-        return ResponseEntity.ok(this.repository.findAllProjectedBy());
+    public ResponseEntity<ApiSuccessResponse<List<CustomerDto>>> getAllCustomers() {
+        return ResponseEntity.ok(new ApiSuccessResponse<>(this.repository.findAllProjectedBy()));
     }
 
     @PostMapping
-    public ResponseEntity<CustomerDto> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<ApiSuccessResponse<CustomerDto>> createCustomer(@RequestBody Customer customer) {
         if (customer.getEmail() == null || customer.getName() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
         }
         Customer createdCustomer = this.repository.save(customer);
         createdCustomer.setTickets(new ArrayList<>());
-        return new ResponseEntity<>(this.translateToDto(createdCustomer), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiSuccessResponse<>(this.translateToDto(createdCustomer)), HttpStatus.CREATED);
     }
 
     public CustomerDto translateToDto(Customer customer) {
@@ -38,29 +40,29 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CustomerDto> deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<ApiSuccessResponse<CustomerDto>> deleteCustomer(@PathVariable int id) {
         Customer customer = this.repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "not found"));
         try {
             this.repository.delete(customer);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer still references a ticket");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer still references a ticket");
         }
         customer.setTickets(new ArrayList<>());
-        return ResponseEntity.ok(this.translateToDto(customer));
+        return ResponseEntity.ok(new ApiSuccessResponse<>(this.translateToDto(customer)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<ApiSuccessResponse<CustomerDto>> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         if (customer.getEmail() == null || customer.getName() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
         }
         Customer updateCustomer = this.repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "not found"));
         updateCustomer.setName(customer.getName());
         updateCustomer.setEmail(customer.getEmail());
         updateCustomer.setPhone(customer.getPhone());
 
-        return new ResponseEntity<>(this.translateToDto(this.repository.save(updateCustomer)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiSuccessResponse<>(this.translateToDto(this.repository.save(updateCustomer))), HttpStatus.CREATED);
     }
 }
