@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
 import com.booleanuk.api.cinema.movie.MovieRepository;
+import com.booleanuk.api.cinema.ticket.Ticket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,6 +32,7 @@ public class ScreeningController {
         screening.setMovie(tempMovie);
         screening.setCreatedAt(LocalDateTime.now());
         screening.setUpdatedAt(LocalDateTime.now());
+        screening.setTickets(new ArrayList<Ticket>());
 
         return new ResponseEntity<Screening>(repo.save(screening), HttpStatus.CREATED);
     }

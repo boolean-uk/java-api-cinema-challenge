@@ -2,7 +2,6 @@ package com.booleanuk.api.cinema.ticket;
 
 import com.booleanuk.api.cinema.customer.Customer;
 import com.booleanuk.api.cinema.screening.Screening;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

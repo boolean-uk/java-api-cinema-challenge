@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
+import com.booleanuk.api.cinema.ticket.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,6 +42,10 @@ public class Screening {
 
     @Column
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     public Screening(int id){
         setId(id);

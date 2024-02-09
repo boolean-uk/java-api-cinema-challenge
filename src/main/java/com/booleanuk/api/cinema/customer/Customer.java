@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.customer;
 
 import com.booleanuk.api.cinema.ticket.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,8 @@ public class Customer {
     @Column
     private LocalDateTime updatedAt;
 
-    @OneToMany
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties("customer")
     private List<Ticket> tickets;
 
     public Customer(int id){
