@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.dto.CustomerDto;
 import com.booleanuk.api.cinema.dto.MovieDto;
+import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +37,18 @@ public class MovieController {
 
     public MovieDto translateToDto(Movie movie) {
         return new MovieDto(movie.getId(), movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins(), movie.getCreatedAt(), movie.getUpdatedAt());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MovieDto> deleteMovie(@PathVariable int id) {
+        Movie movie = this.repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
+        try {
+            this.repository.delete(movie);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Movie still references a screening");
+        }
+        movie.setScreenings(new ArrayList<>());
+        return ResponseEntity.ok(this.translateToDto(movie));
     }
 }
