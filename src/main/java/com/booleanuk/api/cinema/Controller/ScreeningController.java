@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("screenings")
+@RequestMapping("movies/{id}/screenings")
 public class ScreeningController {
     @Autowired
     private ScreeningRepository repository;
@@ -28,19 +28,12 @@ public class ScreeningController {
         return this.repository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Screening> getById(@PathVariable int id) {
-        Screening screening = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        return ResponseEntity.ok(screening);
-    }
-
     @PostMapping
     public ResponseEntity<Screening> create(
-            @PathVariable ( name= "id") Integer movieId,
+            @PathVariable (name= "id") Integer movieId,
             @RequestBody Screening request) {
 
-        validate(request);
+        //validate(request);
 
         Movie movie = this.movieRepository.findById(movieId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
