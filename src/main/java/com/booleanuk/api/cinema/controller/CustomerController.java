@@ -49,4 +49,18 @@ public class CustomerController {
         customer.setTickets(new ArrayList<>());
         return ResponseEntity.ok(this.translateToDto(customer));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+        if (customer.getEmail() == null || customer.getName() == null || customer.getPhone() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
+        Customer updateCustomer = this.repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        updateCustomer.setName(customer.getName());
+        updateCustomer.setEmail(customer.getEmail());
+        updateCustomer.setPhone(customer.getPhone());
+
+        return new ResponseEntity<>(this.translateToDto(this.repository.save(updateCustomer)), HttpStatus.CREATED);
+    }
 }
