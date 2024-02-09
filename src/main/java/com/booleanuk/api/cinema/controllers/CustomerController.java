@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -56,7 +56,7 @@ public class CustomerController {
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate.setUpdatedAt(LocalDateTime.now());
+        customerToUpdate.setUpdatedAt(ZonedDateTime.now());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Response.success(this.customerRepository.save(customerToUpdate)));

@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Builder
 @Entity
@@ -23,7 +23,7 @@ public class Customer {
     private String email;
     private String phone;
     @Builder.Default
-    private final LocalDateTime createdAt = LocalDateTime.now();
+    private final ZonedDateTime createdAt = ZonedDateTime.now();
     @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private ZonedDateTime updatedAt = ZonedDateTime.now();
 }
