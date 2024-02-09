@@ -19,10 +19,11 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnore
     // Don't want the movie_id to be shown in the response.
-    private int movie_id;
+    private Movie movie;
 
     @Column
     private int screenNumber;
@@ -42,8 +43,7 @@ public class Screening {
     @Column
     private Date updatedAt;
 
-    public Screening(int movie_id, int screenNumber, int capacity,  Date startsAt) {
-        this.movie_id = movie_id;
+    public Screening(int screenNumber, int capacity,  Date startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
