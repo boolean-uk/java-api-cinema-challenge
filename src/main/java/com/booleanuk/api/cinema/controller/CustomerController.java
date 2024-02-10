@@ -1,12 +1,12 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,23 @@ public class CustomerController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<ApiResponse<Customer>> getAllCustomers() {
+        try {
+            List<Customer> customers = this.customerRepository.findAll();
+            if (!customers.isEmpty()) {
+                ApiResponse<Customer> badRequest = new ApiResponse<>();
+                badRequest.setStatus("error");
+                badRequest.setData(new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                ApiResponse<Customer> okRequest = new ApiResponse<>();
+                okRequest.setStatus("success");
+                okRequest.setData(customers);
+                return ResponseEntity.ok().body(okRequest);
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @PostMapping
