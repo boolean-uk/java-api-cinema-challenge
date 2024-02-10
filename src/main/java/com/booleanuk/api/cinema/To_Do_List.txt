@@ -1,0 +1,2 @@
+(1) Finish CustomerController ApiResponse implementations
+(2) Refactor Bad Request ApiResponse to a helper method as it's generic for all bad requests.

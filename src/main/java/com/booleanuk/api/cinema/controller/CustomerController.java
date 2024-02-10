@@ -29,11 +29,19 @@ public class CustomerController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    /**
+     * Logic: Use ApiResponse Class (and nested Message Class) to construct a JSON object,
+     * that references a Generic Type 'T', which in this case is any of the Models.
+     * The method checks if any instances of Customer exists on the server.
+     * If false, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If true, instantiate an ApiResponse and wrap it around the body of a List of Customers.
+     * @return
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<Customer>> getAllCustomers() {
         try {
             List<Customer> customers = this.customerRepository.findAll();
-            if (!customers.isEmpty()) {
+            if (customers.isEmpty()) {
                 ApiResponse<Customer> badRequest = new ApiResponse<>();
                 badRequest.setStatus("error");
                 badRequest.setData(new ApiResponse.Message("bad request"));
@@ -42,19 +50,44 @@ public class CustomerController {
                 ApiResponse<Customer> okRequest = new ApiResponse<>();
                 okRequest.setStatus("success");
                 okRequest.setData(customers);
-                return ResponseEntity.ok().body(okRequest);
+                return ResponseEntity.ok(okRequest);
             }
         } catch (Exception e) {
             return null;
         }
     }
 
+    /**
+     * Logic: Capture a snapshot of the instantiation time of Customer (since accurate precision of creation
+     * is irrelevant, doing it at the top of the method body is ok). The method checks if any of the
+     * payload criteria are missing.
+     * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Customer.
+     * @param customer
+     * @return
+     */
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<ApiResponse<Customer>> createCustomer(@RequestBody Customer customer) {
+        try {
+            Date date = new Date();
+            customer.setCreatedAt(date);
+            customer.setUpdatedAt(date);
+            if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+                ApiResponse<Customer> badRequest = new ApiResponse<>();
+                badRequest.setStatus("error");
+                badRequest.setData(new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                Customer savedCustomer = this.customerRepository.save(customer);
+                ApiResponse<Customer> okRequest = new ApiResponse<>();
+                okRequest.setStatus("success");
+                okRequest.setData(savedCustomer);
+                return ResponseEntity.status(HttpStatus.CREATED).body(okRequest);
+            }
+        } catch (Exception e) {
+            return null;
         }
-        return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
+
     }
 
     @DeleteMapping("/{id}")
