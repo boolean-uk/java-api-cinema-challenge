@@ -1,4 +1,5 @@
 package com.booleanuk.api.model;
+
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -6,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-
 
 @NoArgsConstructor
 @Setter
@@ -28,21 +28,21 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    @JsonIncludeProperties(value = {"id","name", "email","phone","createdAt","updatedAt"})
+    @JsonIncludeProperties(value = {"id", "name", "email", "phone"})
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "screening_id", nullable = false)
-    @JsonIncludeProperties(value = {"id","screenNumber", "startsAt","capacity","createdAt","updatedAt"})
+    @JsonIncludeProperties(value = {"id", "screenNumber", "capacity", "startsAt"})
     private Screening screening;
 
-    public Ticket(int numSeats, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.numSeats = numSeats;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = LocalDateTime.now();
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

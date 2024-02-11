@@ -11,73 +11,65 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("tickets")
+@RequestMapping("/tickets")
 public class TicketController {
 
     @Autowired
     private TicketRepository ticketRepository;
+
     @Autowired
     private CustomerRepository customerRepository;
+
     @Autowired
     private ScreeningRepository screeningRepository;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ticket> getById(@PathVariable int id){
-        Ticket employee = this.ticketRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-        return ResponseEntity.ok(employee);
-
+    public ResponseEntity<Ticket> getById(@PathVariable int id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+        return ResponseEntity.ok(ticket);
     }
+
     @GetMapping
-    public List<Ticket> getAll(){
-        return this.ticketRepository.findAll();
+    public List<Ticket> getAll() {
+        return ticketRepository.findAll();
     }
 
     @PostMapping
-    public ResponseEntity<Ticket> create(@RequestBody Ticket ticket){
-        //if you have many to one relation in employee 'class for department, then
-        //you need to do it like this, by making a temp department.
-        Customer tempAuthor = customerRepository.findById(ticket.getCustomer()
-                        .getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"No author with ID"));
-        ticket.setCustomer(tempAuthor);
-
-        Screening tempScreening = screeningRepository.findById(ticket.getScreening()
-                        .getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"No publisher with ID"));
-        ticket.setScreening(tempScreening);
-
-        return ResponseEntity.ok(ticketRepository.save(ticket));
+    public ResponseEntity<Ticket> create(@RequestBody Ticket ticket) {
+        Customer customer = customerRepository.findById(ticket.getCustomer().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        Screening screening = screeningRepository.findById(ticket.getScreening().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
+        ticket.setCustomer(customer);
+        ticket.setScreening(screening);
+        Ticket savedTicket = ticketRepository.save(ticket);
+        return new ResponseEntity<>(savedTicket, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Ticket> delete(@PathVariable int id){
-        Ticket delete = this.ticketRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-        this.ticketRepository.delete(delete);
-        return ResponseEntity.ok(delete);
+    public ResponseEntity<Ticket> delete(@PathVariable int id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+        ticketRepository.delete(ticket);
+        return ResponseEntity.ok(ticket);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Ticket> updateEmployee(@PathVariable int id, @RequestBody Ticket book){
-        Ticket update = this.ticketRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-
-        Customer tempCustomer = customerRepository.findById(book.getCustomer()
-                        .getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"No author with ID"));
-
-
-        Screening tempScreening = screeningRepository.findById(book.getScreening()
-                        .getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"No publisher with ID"));
-
-        update.setCustomer(tempCustomer);
-        update.setScreening(tempScreening);
-        update.setCreatedAt(book.getCreatedAt());
-        update.setUpdatedAt(book.getUpdatedAt());
-        return new ResponseEntity<>(this.ticketRepository.save(update), HttpStatus.CREATED);
+    public ResponseEntity<Ticket> update(@PathVariable int id, @RequestBody Ticket ticketDetails) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+        Customer customer = customerRepository.findById(ticketDetails.getCustomer().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        Screening screening = screeningRepository.findById(ticketDetails.getScreening().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
+        ticket.setCustomer(customer);
+        ticket.setScreening(screening);
+        Ticket updatedTicket = ticketRepository.save(ticket);
+        return ResponseEntity.ok(updatedTicket);
     }
 }

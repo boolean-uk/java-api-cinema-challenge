@@ -1,4 +1,5 @@
 package com.booleanuk.api.model;
+
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @NoArgsConstructor
 @Setter
@@ -34,24 +34,17 @@ public class Movie {
     @Column
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "movie")
-    @JsonIncludeProperties(value = {"id","title", "rating", "description", "runtimeMins"})
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "screenNumber", "capacity", "startsAt"})
     private List<Screening> screenings;
 
-    public Movie(int id){
-        this.id = id;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
-    public Movie(String title, String rating, String description, int runtimeMins, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMins = runtimeMins;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = LocalDateTime.now();
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }
