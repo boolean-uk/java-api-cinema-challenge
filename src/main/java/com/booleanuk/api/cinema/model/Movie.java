@@ -53,5 +53,4 @@ public class Movie {
         this.createdAt = currentDateTime;
         this.updatedAt = this.createdAt;
     }
-
 }
