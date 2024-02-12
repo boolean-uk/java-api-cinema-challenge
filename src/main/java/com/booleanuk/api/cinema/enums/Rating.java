@@ -2,7 +2,9 @@ package com.booleanuk.api.cinema.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @AllArgsConstructor
 public enum Rating {
@@ -20,6 +22,7 @@ public enum Rating {
                 return true;
             }
         }
+        log.debug(ratingStr + " is not recognised as a rating");
         return false;
     }
 }

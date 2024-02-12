@@ -95,11 +95,6 @@ public class MovieController {
                 .anyMatch(Objects::isNull)) {
             return false;
         }
-
-        if (!Rating.isValidRating(movie.getRating())) {
-            log.debug("Rating.isValidRating failed: " + movie.getRating() + " does not exist");
-            return false;
-        }
-        return true;
+        return Rating.isValidRating(movie.getRating());
     }
 }
