@@ -1,8 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,9 +39,9 @@ public class Movie {
     @Column
     private LocalDateTime updatedAt;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Screening> screenings;
 
     @PrePersist

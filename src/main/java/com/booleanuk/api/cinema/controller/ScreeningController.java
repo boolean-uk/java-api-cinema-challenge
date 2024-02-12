@@ -74,7 +74,6 @@ public class ScreeningController {
     }
 
     private boolean containsNull(Screening screening) {
-        System.out.println(screening.getScreenNumber() + "  " + screening.getStartsAt() + "   " + screening.getCapacity() + screening.getMovie());
         return screening.getScreenNumber() == null || screening.getStartsAt() == null || screening.getCapacity() == null || screening.getMovie() == null;
     }
 }
