@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("customers/{customer_id}/screenings/{screening_id}")
@@ -27,7 +28,7 @@ public class TicketController {
     private ScreeningRepository screeningRepository;
 
     private LocalDateTime today;
-    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
+    private DateTimeFormatter pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(Locale.UK);
 
 
     @GetMapping

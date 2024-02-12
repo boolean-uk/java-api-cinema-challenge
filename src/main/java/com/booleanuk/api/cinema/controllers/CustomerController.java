@@ -12,12 +12,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
     private LocalDateTime today;
-    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
+    private final DateTimeFormatter pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(Locale.UK);
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -36,6 +38,8 @@ public class CustomerController {
     public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer){
         today = LocalDateTime.now();
 
+
+
         customer.setCreatedAt(today.format(pattern));
         customer.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Customer>(this.customerRepository.save(customer),
@@ -47,9 +51,15 @@ public class CustomerController {
         today = LocalDateTime.now();
 
         Customer updateCustomer = findOne(id);
-        updateCustomer.setName(customer.getName());
-        updateCustomer.setEmail(customer.getEmail());
-        updateCustomer.setPhone(customer.getPhone());
+        Optional.ofNullable(customer.getName())
+                .ifPresent(updateCustomer::setName);
+
+        Optional.ofNullable(customer.getEmail())
+                .ifPresent(updateCustomer::setEmail);
+
+        Optional.ofNullable(customer.getPhone())
+                        .ifPresent(updateCustomer::setPhone);
+
         updateCustomer.setUpdatedAt(today.format(pattern));
         return new ResponseEntity<Customer>(this.customerRepository.save(updateCustomer),
                 HttpStatus.CREATED);

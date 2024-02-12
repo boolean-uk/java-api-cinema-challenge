@@ -11,21 +11,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.AttributedCharacterIterator;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("movies")
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
-    @Autowired
-    ScreeningRepository screeningRepository;
 
     private LocalDateTime today;
-    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
+    private DateTimeFormatter pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(Locale.UK);
 
     @GetMapping
     public List<Movie> findAll(){
@@ -43,14 +45,13 @@ public class MovieController {
 
         movie.setCreatedAt(today.format(pattern));
         movie.setUpdatedAt(today.format(pattern));
-        /*
-        if (!movie.getScreenings().isEmpty()){
-            for (int i = 0; i < movie.getScreenings().size(); i++){
-                movie.getScreenings().get(i).setCreatedAt(today.format(pattern));
+
+        if (movie.getScreenings() != null){
+            for (Screening screening : movie.getScreenings()){
+                screening.setCreatedAt(today.format(pattern));
+                screening.setMovie(movie);
             }
         }
-
-         */
 
         return new ResponseEntity<Movie>(this.movieRepository.save(movie),
                 HttpStatus.CREATED);
@@ -61,10 +62,19 @@ public class MovieController {
         today = LocalDateTime.now();
 
         Movie updateMovie = findOne(id);
-        updateMovie.setTitle(movie.getTitle());
-        updateMovie.setRating(movie.getRating());
-        updateMovie.setDescription(movie.getDescription());
-        updateMovie.setRuntimeMins(movie.getRuntimeMins());
+
+        Optional.ofNullable(movie.getTitle())
+                        .ifPresent(title -> updateMovie.setTitle(title));
+
+        Optional.ofNullable(movie.getRating())
+                        .ifPresent(rating -> updateMovie.setRating(rating));
+
+        Optional.ofNullable(movie.getDescription())
+                        .ifPresent(description -> updateMovie.setDescription(description));
+
+        Optional.ofNullable(movie.getRuntimeMins())
+                        .ifPresent(runtimeMins -> updateMovie.setRuntimeMins(runtimeMins));
+
         updateMovie.setUpdatedAt(today.format(pattern));
 
         return new ResponseEntity<Movie>(this.movieRepository.save(updateMovie),

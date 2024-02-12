@@ -33,7 +33,7 @@ public class Movie {
     @Column
     private String updatedAt;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 

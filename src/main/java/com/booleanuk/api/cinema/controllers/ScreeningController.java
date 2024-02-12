@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("movies/{id}/screenings")
@@ -25,7 +26,7 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     private LocalDateTime today;
-    private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm");
+    private DateTimeFormatter pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(Locale.UK);
 
     @GetMapping
     public List<Screening> findAll(@PathVariable int id){
