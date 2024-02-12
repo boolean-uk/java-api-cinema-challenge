@@ -4,6 +4,9 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.response.BadRequestResponse;
+import com.booleanuk.api.cinema.response.NotFoundResponse;
+import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,23 +24,26 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
     @GetMapping("/{id}/screenings")
-    public List<Screening> getAll(@PathVariable int id) {
-        Movie tempMovie = this.movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies with that ID were found"));
+    public ResponseEntity<Response> getAll(@PathVariable int id) {
+        Movie tempMovie = this.movieRepository.findById(id).orElse(null);
+        if(tempMovie == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+        }
 
-        return tempMovie.getScreenings();
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(tempMovie.getScreenings(), "success"));
     }
 
     @PostMapping("/{id}/screenings")
-    public ResponseEntity<Screening> createScreening(@PathVariable int id, @RequestBody Screening screening) {
-        Movie tempMovie = this.movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies with that ID were found"));
+    public ResponseEntity<Response> createScreening(@PathVariable int id, @RequestBody Screening screening) {
+        Movie tempMovie = this.movieRepository.findById(id).orElse(null);
+        if(tempMovie == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+        }
         screening.setMovie(tempMovie);
         if(containsNull(screening)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create screening, please check all required fields are correct.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-
-        return new ResponseEntity<>(screeningRepository.save(screening), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(screeningRepository.save(screening), "success"));
     }
 
 
