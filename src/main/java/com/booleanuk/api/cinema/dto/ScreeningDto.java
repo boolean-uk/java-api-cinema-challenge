@@ -1,21 +1,26 @@
 package com.booleanuk.api.cinema.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 public class ScreeningDto {
     private int id;
     private int screenNumber;
-    private LocalDateTime startsAt;
+    @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSxxx")
+    private OffsetDateTime startsAt;
     private int capacity;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSxxx")
+    private OffsetDateTime createdAt;
+    @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSxxx")
+    private OffsetDateTime updatedAt;
 
-    public ScreeningDto(int id, int screenNumber, int capacity, LocalDateTime startsAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ScreeningDto(int id, int screenNumber, int capacity, OffsetDateTime startsAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.screenNumber = screenNumber;
         this.capacity = capacity;

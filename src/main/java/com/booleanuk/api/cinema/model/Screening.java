@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Getter
@@ -31,7 +31,7 @@ public class Screening {
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private LocalDateTime startsAt;
+    private OffsetDateTime startsAt;
 
     @Column
     private int capacity;
@@ -41,14 +41,12 @@ public class Screening {
     private List<Ticket> tickets;
 
     @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
-    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
+    public Screening(int screenNumber, int capacity, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
