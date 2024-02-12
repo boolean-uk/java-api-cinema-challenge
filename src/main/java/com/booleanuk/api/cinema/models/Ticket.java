@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
 
@@ -25,8 +27,8 @@ public class Ticket {
     @JoinColumn(name = "customer_id")
     private Customer customer;
     private Integer numSeats;
-    @Builder.Default
-    private final ZonedDateTime createdAt = ZonedDateTime.now();
-    @Builder.Default
-    private ZonedDateTime updatedAt = ZonedDateTime.now();
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+    @UpdateTimestamp
+    private ZonedDateTime updatedAt;
 }

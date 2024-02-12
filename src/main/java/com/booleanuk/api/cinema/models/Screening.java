@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
 
@@ -24,8 +26,8 @@ public class Screening {
     private Integer screenNumber;
     private Integer capacity;
     private ZonedDateTime startsAt;
-    @Builder.Default
-    private final ZonedDateTime createdAt = ZonedDateTime.now();
-    @Builder.Default
-    private ZonedDateTime updatedAt = ZonedDateTime.now();
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+    @UpdateTimestamp
+    private ZonedDateTime updatedAt;
 }

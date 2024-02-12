@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
 
@@ -22,8 +24,8 @@ public class Customer {
     private String name;
     private String email;
     private String phone;
-    @Builder.Default
-    private final ZonedDateTime createdAt = ZonedDateTime.now();
-    @Builder.Default
-    private ZonedDateTime updatedAt = ZonedDateTime.now();
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+    @UpdateTimestamp
+    private ZonedDateTime updatedAt;
 }

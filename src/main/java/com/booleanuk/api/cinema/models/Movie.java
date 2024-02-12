@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.models;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -23,13 +25,12 @@ public class Movie {
     private String rating;
     private String description;
     private Integer runtimeMins;
-    @Builder.Default
-    private final ZonedDateTime createdAt = ZonedDateTime.now();
-    @Builder.Default
-    private ZonedDateTime updatedAt = ZonedDateTime.now();
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+    @UpdateTimestamp
+    private ZonedDateTime updatedAt;
     @ToString.Exclude
-    @Builder.Default
-    @JsonIncludeProperties(value = {"id", "screenNumber", "capacity", "startsAt"})
     @OneToMany(mappedBy = "movie")
+    @JsonIncludeProperties(value = {"id", "screenNumber", "capacity", "startsAt"})
     private List<Screening> screenings = new ArrayList<>();
 }
