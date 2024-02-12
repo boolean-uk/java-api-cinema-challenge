@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,14 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie){
-        movie.setCreatedAt(LocalDateTime.now());
-        movie.setUpdatedAt(LocalDateTime.now());
+        movie.setCreatedAt(nowFormatted());
+        movie.setUpdatedAt(nowFormatted());
 
         if (movie.getScreenings() != null && !movie.getScreenings().isEmpty()) {
             for (Screening screening : movie.getScreenings()) {
                 screening.setMovie(movie);
-                screening.setCreatedAt(LocalDateTime.now());
-                screening.setUpdatedAt(LocalDateTime.now());
+                screening.setCreatedAt(nowFormatted());
+                screening.setUpdatedAt(nowFormatted());
             }
         }
 
@@ -57,7 +58,7 @@ public class MovieController {
         Optional.of(movie.getRuntimeMins())
                 .ifPresent(runtimeMins -> toUpdate.setRuntimeMins(runtimeMins));
 
-        toUpdate.setUpdatedAt(LocalDateTime.now());
+        toUpdate.setUpdatedAt(nowFormatted());
 
         return new ResponseEntity<Movie>(repo.save(toUpdate), HttpStatus.CREATED);
     }
@@ -73,5 +74,12 @@ public class MovieController {
 
     private Movie getById(int id){
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private String nowFormatted(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return now.format(format);
     }
 }

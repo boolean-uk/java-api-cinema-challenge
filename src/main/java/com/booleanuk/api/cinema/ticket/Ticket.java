@@ -34,10 +34,10 @@ public class Ticket {
     private int numSeats;
 
     @Column
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Column
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     public Ticket(int numSeats){
         setNumSeats(numSeats);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -55,9 +56,16 @@ public class TicketController {
 
         ticket.setScreening(tempScreening);
         ticket.setCustomer(tempCustomer);
-        ticket.setCreatedAt(LocalDateTime.now());
-        ticket.setUpdatedAt(LocalDateTime.now());
+        ticket.setCreatedAt(nowFormatted());
+        ticket.setUpdatedAt(nowFormatted());
 
         return new ResponseEntity<Ticket>(repo.save(ticket), HttpStatus.CREATED);
+    }
+
+    private String nowFormatted(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return now.format(format);
     }
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
@@ -32,16 +33,16 @@ public class Screening {
     private int screenNumber;
 
     @Column
-    private LocalDateTime startsAt;
+    private String startsAt;
 
     @Column
     private int capacity;
 
     @Column
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Column
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     @OneToMany(mappedBy = "screening")
     @JsonIgnoreProperties("screening")
@@ -54,6 +55,9 @@ public class Screening {
     public Screening(int screenNumber, int capacity, String startsAt) throws DateTimeParseException{
         setScreenNumber(screenNumber);
         setCapacity(capacity);
-        setStartsAt(LocalDateTime.parse(startsAt));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime parsed = LocalDateTime.parse(startsAt, formatter);
+        setStartsAt(parsed.toString());
     }
 }

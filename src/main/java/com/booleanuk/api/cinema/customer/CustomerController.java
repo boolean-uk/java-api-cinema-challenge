@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +22,8 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer customer){
         customer.setTickets(new ArrayList<Ticket>());
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setUpdatedAt(LocalDateTime.now());
+        customer.setCreatedAt(nowFormatted());
+        customer.setUpdatedAt(nowFormatted());
 
         return new ResponseEntity<Customer>(repo.save(customer), HttpStatus.CREATED);
     }
@@ -48,7 +49,7 @@ public class CustomerController {
         Optional.ofNullable(customer.getPhone())
                 .ifPresent(phone -> toUpdate.setPhone(phone));
 
-        toUpdate.setUpdatedAt(LocalDateTime.now());
+        toUpdate.setUpdatedAt(nowFormatted());
 
         return new ResponseEntity<Customer>(repo.save(toUpdate), HttpStatus.CREATED);
     }
@@ -64,5 +65,12 @@ public class CustomerController {
 
     private Customer getById(int id){
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private String nowFormatted(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return now.format(format);
     }
 }

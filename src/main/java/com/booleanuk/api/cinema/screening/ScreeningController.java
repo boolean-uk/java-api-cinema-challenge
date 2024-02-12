@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class ScreeningController {
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with this ID."));
 
         screening.setMovie(tempMovie);
-        screening.setCreatedAt(LocalDateTime.now());
-        screening.setUpdatedAt(LocalDateTime.now());
+        screening.setCreatedAt(nowFormatted());
+        screening.setUpdatedAt(nowFormatted());
         screening.setTickets(new ArrayList<Ticket>());
 
         return new ResponseEntity<Screening>(repo.save(screening), HttpStatus.CREATED);
@@ -47,5 +48,12 @@ public class ScreeningController {
         List<Screening> screenings = movie.getScreenings();
 
         return ResponseEntity.ok(screenings);
+    }
+
+    private String nowFormatted(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return now.format(format);
     }
 }
