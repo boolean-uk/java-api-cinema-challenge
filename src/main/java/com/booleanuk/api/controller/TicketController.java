@@ -6,11 +6,14 @@ import com.booleanuk.api.model.Ticket;
 import com.booleanuk.api.repository.CustomerRepository;
 import com.booleanuk.api.repository.ScreeningRepository;
 import com.booleanuk.api.repository.TicketRepository;
+import com.booleanuk.api.response.BadRequestResponse;
+import com.booleanuk.api.response.NotFoundResponse;
+import com.booleanuk.api.response.ResponseTemplate;
+import com.booleanuk.api.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,87 +29,84 @@ public class TicketController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping("/{customer_id}/screenings/{screening_id}")
-    public List<Ticket> getAllTickets(@PathVariable int customer_id,
-                                      @PathVariable int screening_id) {
-        checkIfCustomerExists(customer_id);
-        checkIfScreeningExists(screening_id);
-
+    public ResponseEntity<ResponseTemplate> getAllTickets(@PathVariable int customer_id,
+                                                          @PathVariable int screening_id) {
+        if (this.doesCustomerIDNotExist(customer_id) ||
+                this.doesScreeningIDNotExist(screening_id)) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
         List<Ticket> allSpecifiedTickets = new ArrayList<>();
-
         for (Ticket ticket : this.ticketRepository.findAll()) {
             if (ticket.getCustomer().getId() == customer_id &&
                     ticket.getScreening().getId() == screening_id) {
                 allSpecifiedTickets.add(ticket);
             }
         }
-        return allSpecifiedTickets;
+        return new ResponseEntity<>(new SuccessResponse(allSpecifiedTickets), HttpStatus.OK);
     }
 
     @PostMapping("/{customer_id}/screenings/{screening_id}")
-    public ResponseEntity<Ticket> createTicket(@PathVariable int customer_id,
+    public ResponseEntity<ResponseTemplate> createTicket(@PathVariable int customer_id,
                                                @PathVariable int screening_id,
                                                @RequestBody Ticket ticket) {
-        checkAllTicketFields(ticket);
-        Customer tempCustomer = getCustomerOrNotFound(customer_id);
-        Screening tempScreening = getScreeningOrNotFound(screening_id);
+        if (this.doesCustomerIDNotExist(customer_id) ||
+                this.doesScreeningIDNotExist(screening_id)) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
+        if (areAnyFieldsBadForCreating(ticket)) {
+            return new ResponseEntity<>(new BadRequestResponse(), HttpStatus.BAD_REQUEST);
+        }
+        Customer tempCustomer = getCustomerByID(customer_id);
+        Screening tempScreening = getScreeningByID(screening_id);
         ticket.setCustomer(tempCustomer);
         ticket.setScreening(tempScreening);
-        return ResponseEntity.ok(this.ticketRepository.save(ticket));
-    }
-
-    @DeleteMapping("/{customer_id}/screenings/{screening_id}")
-    public ResponseEntity<Ticket> deleteTicket(@PathVariable int customer_id,
-                                               @PathVariable int screening_id,
-                                               @PathVariable int id) {
-        checkIfCustomerExists(customer_id);
-        checkIfScreeningExists(screening_id);
-        Ticket ticketToDelete = getTicketOrNotFound(id);
-        this.ticketRepository.delete(ticketToDelete);
-        return ResponseEntity.ok(ticketToDelete);
+        this.ticketRepository.save(ticket);
+        return new ResponseEntity<>(new SuccessResponse(ticket), HttpStatus.CREATED);
     }
 
     //--------------------------- Private section---------------------------//
 
-    private Ticket getTicketOrNotFound(int id) {
-        return this.ticketRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No ticket with that ID"));
-    }
-
-    private Customer getCustomerOrNotFound(int id) {
-        return this.customerRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No customer with that ID"));
-    }
-
-    private Screening getScreeningOrNotFound(int id) {
-        return this.screeningRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No screening with that ID"));
-    }
-
-    private void checkIfCustomerExists(int id) {
-        try {
-            this.customerRepository.findById(id);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID");
+    private boolean areAnyFieldsBadForCreating(Ticket ticket) {
+        if (ticket.getNumSeats() == 0)
+        {
+            return true;
         }
+        return false;
     }
 
-    private void checkIfScreeningExists(int id) {
-        try {
-            this.screeningRepository.findById(id);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that ID");
+    private boolean doesCustomerIDNotExist(int id) {
+        for (Customer customer : this.customerRepository.findAll()) {
+            if (customer.getId() == id) {
+                return false;
+            }
         }
+        return true;
     }
 
-    private void checkAllTicketFields(Ticket ticket) {
-        if (ticket.getNumSeats() == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Bad data in RequestBody");
+    private boolean doesScreeningIDNotExist(int id) {
+        for (Screening screening : this.screeningRepository.findAll()) {
+            if (screening.getId() == id) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    private Customer getCustomerByID(int id) {
+        for (Customer customer : this.customerRepository.findAll()) {
+            if (customer.getId() == id) {
+                return customer;
+            }
+        }
+        return new Customer();
+    }
+
+    private Screening getScreeningByID(int id) {
+        for (Screening screening : this.screeningRepository.findAll()) {
+            if (screening.getId() == id) {
+                return screening;
+            }
+        }
+        return new Screening();
     }
 }

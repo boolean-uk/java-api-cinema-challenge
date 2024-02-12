@@ -4,11 +4,14 @@ import com.booleanuk.api.model.Movie;
 import com.booleanuk.api.model.Screening;
 import com.booleanuk.api.repository.MovieRepository;
 import com.booleanuk.api.repository.ScreeningRepository;
+import com.booleanuk.api.response.BadRequestResponse;
+import com.booleanuk.api.response.NotFoundResponse;
+import com.booleanuk.api.response.ResponseTemplate;
+import com.booleanuk.api.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,73 +25,62 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping("/{movie_id}/screenings")
-    public List<Screening> getAllScreenings(@PathVariable int movie_id) {
-        checkIfMovieExists(movie_id);
-
+    public ResponseEntity<ResponseTemplate> getAllScreenings(@PathVariable int movie_id) {
+        if (this.doesMovieIDNotExist(movie_id)) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
         List<Screening> allSpecifiedScreenings = new ArrayList<>();
-
         for (Screening screening : this.screeningRepository.findAll()) {
             if (screening.getMovie().getId() == movie_id) {
                 allSpecifiedScreenings.add(screening);
             }
         }
-        return allSpecifiedScreenings;
+        return new ResponseEntity<>(new SuccessResponse(allSpecifiedScreenings), HttpStatus.OK);
     }
 
     @PostMapping("/{movie_id}/screenings")
-    public ResponseEntity<Screening> createScreening(@PathVariable int movie_id,
+    public ResponseEntity<ResponseTemplate> createScreening(@PathVariable int movie_id,
                                                      @RequestBody Screening screening) {
-        checkAllScreeningFields(screening);
-        Movie tempMovie = getMovieWithOrFound(movie_id);
+        if (doesMovieIDNotExist(movie_id)) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
+        if (areAnyFieldsBadForCreating(screening)) {
+            return new ResponseEntity<>(new BadRequestResponse(), HttpStatus.BAD_REQUEST);
+        }
+        Movie tempMovie = getMovieByID(movie_id);
         screening.setMovie(tempMovie);
         screening.setTickets(new ArrayList<>());
-        return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{movie_id}/screenings/{id}")
-    public ResponseEntity<Screening> deleteScreening(@PathVariable int movie_id,
-                                                     @PathVariable int id) {
-        checkIfMovieExists(movie_id);
-        Screening screeningToDelete = getScreeningOrNotFound(id);
-        try {
-            this.screeningRepository.delete(screeningToDelete);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Screening is a foreign key to a Ticket");
-        }
-        screeningToDelete.setTickets(new ArrayList<>());
-        return ResponseEntity.ok(screeningToDelete);
+        this.screeningRepository.save(screening);
+        return new ResponseEntity<>(new SuccessResponse(screening), HttpStatus.CREATED);
     }
 
     //--------------------------- Private section---------------------------//
 
-    private Screening getScreeningOrNotFound(int id) {
-        return this.screeningRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-    }
-
-    private Movie getMovieWithOrFound(int id) {
-        return this.movieRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No movie with that ID"));
-    }
-
-    private void checkIfMovieExists(int id) {
-        try {
-            this.movieRepository.findById(id);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID");
+    private boolean doesMovieIDNotExist(int id) {
+        for (Movie movie : this.movieRepository.findAll()) {
+            if (movie.getId() == id) {
+                return false;
+            }
         }
+        return true;
     }
 
-    private void checkAllScreeningFields(Screening screening) {
+    private boolean areAnyFieldsBadForCreating(Screening screening) {
         if (screening.getScreenNumber() == 0 ||
-        screening.getCapacity() == 0 ||
-        screening.getStartsAt() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Bad data in RequestBody");
+            screening.getCapacity() == 0 ||
+            screening.getStartsAt() == null)
+        {
+            return true;
         }
+        return false;
+    }
+
+    private Movie getMovieByID(int id) {
+        for (Movie movie : this.movieRepository.findAll()) {
+            if (movie.getId() == id) {
+                return movie;
+            }
+        }
+        return new Movie();
     }
 }

@@ -1,11 +1,13 @@
 package com.booleanuk.api.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor
@@ -31,29 +33,23 @@ public class Ticket {
     @Column
     private int numSeats;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern
-                ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.createdAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern
-                ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public Ticket(int numSeats) {

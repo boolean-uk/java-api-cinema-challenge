@@ -1,11 +1,12 @@
 package com.booleanuk.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -30,12 +31,12 @@ public class Customer {
     private String phone;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    private OffsetDateTime createdAt;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties("customer")
@@ -43,17 +44,13 @@ public class Customer {
 
     @PrePersist
     public void prePersist() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.createdAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public Customer(String name, String email, String phone) {

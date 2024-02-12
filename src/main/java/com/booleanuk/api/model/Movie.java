@@ -1,11 +1,13 @@
 package com.booleanuk.api.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "movies")
+@JsonIgnoreProperties("screenings")
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +34,13 @@ public class Movie {
     @Column
     private int runTimeMins;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
@@ -45,17 +48,13 @@ public class Movie {
 
     @PrePersist
     public void prePersist() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.createdAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern ("yyyy-MM-dd ' ' HH:mm:ss");
-        String dateTimeNow = LocalDateTime.now().format(dateTimeFormat);
-        this.updatedAt = LocalDateTime.parse(dateTimeNow, dateTimeFormat);
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public Movie(String title, String rating, String description, int runTimeMins) {
