@@ -23,10 +23,12 @@ public class MovieController {
         movie.setCreatedAt(LocalDateTime.now());
         movie.setUpdatedAt(LocalDateTime.now());
 
-        for (Screening screening : movie.getScreenings()){
-            screening.setMovie(movie);
-            screening.setCreatedAt(LocalDateTime.now());
-            screening.setUpdatedAt(LocalDateTime.now());
+        if (movie.getScreenings() != null && !movie.getScreenings().isEmpty()) {
+            for (Screening screening : movie.getScreenings()) {
+                screening.setMovie(movie);
+                screening.setCreatedAt(LocalDateTime.now());
+                screening.setUpdatedAt(LocalDateTime.now());
+            }
         }
 
         return new ResponseEntity<Movie>(repo.save(movie), HttpStatus.CREATED);
