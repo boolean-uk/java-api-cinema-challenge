@@ -52,12 +52,18 @@ public class MovieController {
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         Movie movieToUpdate = this.findMovieById(id);
-        // TODO: change checkHasRequiredFileds() to update only provided fields.
-        this.checkHasRequiredFields(movie);
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        if (movie.getTitle() != null) {
+            movieToUpdate.setTitle(movie.getTitle());
+        }
+        if (movie.getRating() != null) {
+            movieToUpdate.setRating(movie.getRating());
+        }
+        if (movie.getDescription() != null) {
+            movieToUpdate.setDescription(movie.getDescription());
+        }
+        if (movie.getRuntimeMins() > 0) {
+            movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        }
         movieToUpdate.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
     }
@@ -78,7 +84,7 @@ public class MovieController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies with that id were found."));
     }
 
-    // Method to check if all required fields are contained in the request, used in createMovie() and updateMovie()
+    // Method to check if all required fields are contained in the createMovie request, used in createMovie()
     private void checkHasRequiredFields(Movie movie) {
         if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all required fields are correct.");
