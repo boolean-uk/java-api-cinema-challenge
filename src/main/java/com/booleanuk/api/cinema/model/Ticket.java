@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -32,10 +32,10 @@ public class Ticket {
     private Screening screening;
 
     @Column
-    private Date createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
-    private Date updatedAt;
+    private ZonedDateTime updatedAt;
 
     public Ticket(int numSeats) {
         this.numSeats = numSeats;

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -20,8 +20,8 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         this.checkHasRequiredFields(customer);
-        customer.setCreatedAt(new Date());
-        customer.setUpdatedAt(new Date());
+        customer.setCreatedAt(ZonedDateTime.now());
+        customer.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
     }
 
@@ -37,7 +37,7 @@ public class CustomerController {
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate.setUpdatedAt(new Date());
+        customerToUpdate.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 

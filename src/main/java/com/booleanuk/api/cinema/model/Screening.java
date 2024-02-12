@@ -1,13 +1,13 @@
 package com.booleanuk.api.cinema.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -32,20 +32,24 @@ public class Screening {
     private int capacity;
 
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    // Pattern made to match the date format for post request in spec.
-    // Differs from the expected response date format in the spec.
-    private Date startsAt;
+    private ZonedDateTime startsAt;
 
     @Column
-    private Date createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
-    private Date updatedAt;
+    private ZonedDateTime updatedAt;
 
-    public Screening(int screenNumber, int capacity,  Date startsAt) {
+    public Screening(int screenNumber, int capacity,  String startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
-        this.startsAt = startsAt;
+        this.setStartsAt(startsAt);
     }
+
+    public void setStartsAt(String startsAt) {
+        // Matches the expected request date format (no 'T' or nanoseconds), but differs from the expected response date format in the spec.
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
+        this.startsAt = ZonedDateTime.parse(startsAt, formatter);
+    }
+
 }

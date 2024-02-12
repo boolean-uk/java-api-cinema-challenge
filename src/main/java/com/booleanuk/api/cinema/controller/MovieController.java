@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -25,8 +25,8 @@ public class MovieController {
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         this.checkHasRequiredFields(movie);
         // TODO: If screenings included in request add them to screenings table with correct movie relationship
-        movie.setCreatedAt(new Date());
-        movie.setUpdatedAt(new Date());
+        movie.setCreatedAt(ZonedDateTime.now());
+        movie.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
     }
 
@@ -44,7 +44,7 @@ public class MovieController {
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-        movieToUpdate.setUpdatedAt(new Date());
+        movieToUpdate.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
     }
 

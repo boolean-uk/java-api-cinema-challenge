@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -36,10 +36,10 @@ public class Movie {
     private int runtimeMins;
 
     @Column
-    private Date createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
-    private Date updatedAt;
+    private ZonedDateTime updatedAt;
 
     public Movie(String title, String rating, String description, int runtimeMins) {
         this.title = title;

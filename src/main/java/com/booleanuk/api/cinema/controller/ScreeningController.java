@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -26,8 +26,8 @@ public class ScreeningController {
     public ResponseEntity<Screening> createScreening(@PathVariable int id, @RequestBody Screening screening) {
         this.checkHasRequiredFields(screening);
         screening.setMovie(this.checkMovieExists(id));
-        screening.setCreatedAt(new Date());
-        screening.setUpdatedAt(new Date());
+        screening.setCreatedAt(ZonedDateTime.now());
+        screening.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
     }
 

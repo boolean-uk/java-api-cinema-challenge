@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+
 
 @Getter
 @Setter
@@ -27,10 +28,10 @@ public class Customer {
     private String phone;
 
     @Column
-    private Date createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
-    private Date updatedAt;
+    private ZonedDateTime updatedAt;
 
     public Customer(String name, String email, String phone) {
         this.name = name;
