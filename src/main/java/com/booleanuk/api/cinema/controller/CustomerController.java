@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.exceptions.CustomDataNotFoundException;
+import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
@@ -23,7 +25,7 @@ public class CustomerController {
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         customer.setCreatedAt(DateCreater.getCurrentDate());
         customer.setUpdatedAt(DateCreater.getCurrentDate());
-        this.areCustomerValid(customer, "Could not create a new customer, please check all fields are correct");
+        this.areCustomerValid(customer);
         return ResponseEntity.ok(this.customerRepository.save(customer));
     }
 
@@ -41,7 +43,7 @@ public class CustomerController {
         customerToUpdate.setUpdatedAt(DateCreater.getCurrentDate());
         customerToUpdate.setPhone(customer.getPhone());
 
-        this.areCustomerValid(customerToUpdate, "Could not create a new customer, please check all fields are correct");
+        this.areCustomerValid(customerToUpdate);
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
@@ -53,12 +55,12 @@ public class CustomerController {
     }
 
     private Customer getACustomer(int id) {
-        return this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID found"));
+        return this.customerRepository.findById(id).orElseThrow(() -> new CustomDataNotFoundException("No customer with that ID found"));
     }
 
-    private void areCustomerValid(Customer customer, String message) {
+    private void areCustomerValid(Customer customer) {
         if(customer.getName() == null || customer.getPhone() == null || customer.getEmail() == null || customer.getUpdatedAt() == null || customer.getCreatedAt() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+            throw new CustomParameterConstraintException("Could not create a new customer, please check all fields are correct");
         }
 
     }

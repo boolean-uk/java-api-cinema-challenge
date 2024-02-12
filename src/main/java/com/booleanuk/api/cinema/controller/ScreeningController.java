@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.exceptions.CustomDataNotFoundException;
+import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -27,6 +29,7 @@ public class ScreeningController {
     public ResponseEntity<Screening> createScreening(@PathVariable (name = "id") int id, @RequestBody Screening screening) {
         Movie movie = this.getAMovie(id);
         Screening newScreening = new Screening(screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), movie);
+        areScreeningValid(newScreening);
         movie.setUpdatedAt(DateCreater.getCurrentDate());
         movie.getScreenings().add(screening);
         return new ResponseEntity<>(this.screeningRepository.save(newScreening), HttpStatus.CREATED);
@@ -41,10 +44,18 @@ public class ScreeningController {
 
 
     private Screening getAScreening(int id) {
-        return this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Screening with that id were find."));
+        return this.screeningRepository.findById(id).orElseThrow(() -> new CustomDataNotFoundException("No screening with that id were find."));
     }
 
     private Movie getAMovie(int id) {
-        return this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Movie with that id were find."));
+        return this.movieRepository.findById(id).orElseThrow(() -> new CustomParameterConstraintException("No movie with that id were find."));
     }
+
+    private void areScreeningValid(Screening screening) {
+        if(screening.getCreatedAt() == null || screening.getUpdatedAt() == null || screening.getStartsAt() == null) {
+            throw new CustomParameterConstraintException("Could not create a screening for the specified movie, please check all fields are correct");
+        }
+
+    }
+
 }
