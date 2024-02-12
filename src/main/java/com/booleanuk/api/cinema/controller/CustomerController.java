@@ -37,6 +37,7 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
 
+    //TODO: make sure tickets are deleted
     @DeleteMapping("/{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = findCustomer(id);

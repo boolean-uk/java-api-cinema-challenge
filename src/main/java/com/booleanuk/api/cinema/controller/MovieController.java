@@ -73,6 +73,7 @@ public class MovieController {
             Response response = new NotFoundResponse();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+        //TODO: make sure tickets are deleted from the screenings that are deleted
         for(Screening screening: movieToDelete.getScreenings()) {
             screeningRepository.delete(screening);
         }
