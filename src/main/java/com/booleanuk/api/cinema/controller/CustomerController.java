@@ -33,10 +33,19 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.findCustomerById(id);
-        this.checkHasRequiredFields(customer);
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
+        // 400 Bad request if no fields are present in the put request
+        if (customer.getName() == null && customer.getEmail() == null && customer.getPhone() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the customer, please check all required fields are correct.");
+        }
+        if (customer.getName() != null) {
+            customerToUpdate.setName(customer.getName());
+        }
+        if (customer.getEmail() != null) {
+            customerToUpdate.setEmail(customer.getEmail());
+        }
+        if (customer.getPhone() != null) {
+            customerToUpdate.setPhone(customer.getPhone());
+        }
         customerToUpdate.setUpdatedAt(ZonedDateTime.now());
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
@@ -54,7 +63,7 @@ public class CustomerController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers with that id were found."));
     }
 
-    // Method to check if all required fields are contained in the request, used in createCustomer() and updateCustomer()
+    // Method to check if all required fields are contained in the request, used in createCustomer()
     private void checkHasRequiredFields(Customer customer) {
         if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please check all required fields are correct.");
