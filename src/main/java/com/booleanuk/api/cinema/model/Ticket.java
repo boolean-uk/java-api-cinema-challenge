@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -25,14 +23,14 @@ public class Ticket {
 
     @Column
     private Integer numSeats;
-
-    //TODO: fix so ouput when get request is correct
-    //  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @JsonIgnore
     @ManyToOne
@@ -49,34 +47,19 @@ public class Ticket {
 
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         createdAt = now;
         updatedAt = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
 
     public Ticket(Integer numSeats) {
         this.numSeats = numSeats;
     }
 
-//
-//    public String getStartsAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return startsAt.format(outputFormatter);
-//    }
-//
-//    public String getCreatedAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return createdAt.format(outputFormatter);
-//    }
-//
-//    public String getUpdatedAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return updatedAt.format(outputFormatter);
-//    }
 }
 

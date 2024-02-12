@@ -7,14 +7,12 @@ import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.BadRequestResponse;
-import com.booleanuk.api.cinema.response.MovieResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +52,11 @@ public class MovieController {
             movie.setScreenings(screenings);
             Movie data = movieRepository.save(movie);
             screeningRepository.saveAll(screenings);
-            Response response = new MovieResponse(data, "success");
+            Response response = new Response(data, "success");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
 
-        Response response = new MovieResponse(movieRepository.save(movie), "success");
+        Response response = new Response(movieRepository.save(movie), "success");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

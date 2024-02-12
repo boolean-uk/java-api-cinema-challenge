@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -33,11 +32,13 @@ public class Movie {
     @Column
     private Integer runtimeMins;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
@@ -46,14 +47,14 @@ public class Movie {
 
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         createdAt = now;
         updatedAt = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
 
     public Movie(String title, String rating, String description, int runtimeMins) {
@@ -69,11 +70,11 @@ public class Movie {
 
 //    public String getCreatedAt() {
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return createdAt.format(formatter);
+//        return createdAt.atOffset(ZoneOffset.UTC).format(formatter);
 //    }
 //
 //    public String getUpdatedAt() {
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return updatedAt.format(formatter);
+//        return createdAt.atOffset(ZoneOffset.UTC).format(formatter);
 //    }
 }

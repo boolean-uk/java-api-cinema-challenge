@@ -1,9 +1,7 @@
 package com.booleanuk.api.cinema.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,5 +20,4 @@ public class Response {
         this.data = data;
         this.status = status;
     }
-
 }

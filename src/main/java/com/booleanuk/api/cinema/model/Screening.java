@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -28,16 +27,17 @@ public class Screening {
     @Column
     private Integer capacity;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime startsAt;
+    private OffsetDateTime startsAt;
 
-    //TODO: fix so ouput when get request is correct
-  //  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @JsonIgnore
     @ManyToOne
@@ -52,45 +52,26 @@ public class Screening {
 
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         createdAt = now;
         updatedAt = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
-    public Screening(int screenNumber, LocalDateTime startsAt) {
+    public Screening(int screenNumber, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
     }
 
 
     public void setStartsAt(String startsAt) {
-        // Define the formatter for the input format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
 
-        // Parse the date-time string into a ZonedDateTime object
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(startsAt, formatter);
-
-        // Convert ZonedDateTime to LocalDateTime by removing timezone information
-        this.startsAt = zonedDateTime.toLocalDateTime();
+        this.startsAt = OffsetDateTime.parse(startsAt, formatter);
     }
-//
-//    public String getStartsAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return startsAt.format(outputFormatter);
-//    }
-//
-//    public String getCreatedAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return createdAt.format(outputFormatter);
-//    }
-//
-//    public String getUpdatedAt() {
-//        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return updatedAt.format(outputFormatter);
-//    }
+
 }
 

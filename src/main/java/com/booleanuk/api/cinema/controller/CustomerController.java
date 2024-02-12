@@ -1,22 +1,16 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.Movie;
-import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.BadRequestResponse;
-import com.booleanuk.api.cinema.response.MovieResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("customers")
