@@ -22,18 +22,4 @@ public class TicketController {
     public List<Ticket> getAllTickets() {
         return this.ticketRepository.findAll();
     }
-
-    /**
-     * TESTING RESPONSE THINGY
-     * @return
-     */
-    @GetMapping("/responsetest")
-    public ResponseEntity<ApiResponse<Ticket>> getErrorOnPurpose() {
-
-        ApiResponse<Ticket> response = new ApiResponse<>();
-        response.setStatus("success");
-        response.setData(response.asList(getAllTickets()));
-
-        return ResponseEntity.ok(response);
-    }
 }

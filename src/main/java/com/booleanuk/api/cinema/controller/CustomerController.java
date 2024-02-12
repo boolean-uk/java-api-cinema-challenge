@@ -7,6 +7,7 @@ import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.ApiResponse;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -133,28 +134,50 @@ public class CustomerController {
      * @return
      */
     @PostMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<Ticket> createTicket(@PathVariable int customerId, @RequestBody Ticket ticket, @PathVariable int screeningId) {
-        Customer tempCustomer = getACustomer(customerId);
-        Screening tempScreening = getAScreening(screeningId);
-        ticket.setCustomer(tempCustomer);
-        ticket.setScreening(tempScreening);
-        ticket.setNumSeats(ticket.getNumSeats());
-        ticket.setCreatedAt(new Date());
-        return new ResponseEntity<>(this.ticketRepository.save(ticket), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Ticket>> createTicket(@PathVariable int customerId, @RequestBody Ticket ticket, @PathVariable int screeningId) {
+        try {
+            Date date = new Date();
+            ticket.setCreatedAt(date);
+            ticket.setUpdatedAt(date);
+            if (getACustomer(customerId) == null || getAScreening(screeningId) == null) {
+                ApiResponse<Ticket> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                Customer tempCustomer = getACustomer(customerId);
+                Screening tempScreening = getAScreening(screeningId);
+                ticket.setCustomer(tempCustomer);
+                ticket.setScreening(tempScreening);
+                ticket.setNumSeats(ticket.getNumSeats());
+                Ticket savedTicket = this.ticketRepository.save(ticket);
+                ApiResponse<Ticket> createdRequest = new ApiResponse<>("success", savedTicket);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+            }
+        } catch (Exception e) {
+            ApiResponse<Ticket> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+        }
     }
 
     @GetMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<List<Ticket>> getAllTicketsByCustomerId(@PathVariable int customerId, @PathVariable int screeningId) {
-        List<Ticket> tempTicketList = new ArrayList<>();
-        for(Ticket ticket : ticketRepository.findAll()) {
-            if (ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId) {
-                tempTicketList.add(ticket);
+    public ResponseEntity<ApiResponse<List<Ticket>>> getAllTicketsByCustomerId(@PathVariable int customerId, @PathVariable int screeningId) {
+        try {
+            List<Ticket> tempTicketList = new ArrayList<>();
+            for(Ticket ticket : ticketRepository.findAll()) {
+                if (ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId) {
+                    tempTicketList.add(ticket);
+                }
             }
+            if (tempTicketList.isEmpty()) {
+                ApiResponse<List<Ticket>> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                ApiResponse<List<Ticket>> okRequest = new ApiResponse<>("success", tempTicketList);
+                return ResponseEntity.status(HttpStatus.OK).body(okRequest);
+            }
+        } catch (Exception e) {
+            ApiResponse<List<Ticket>> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
         }
-        if (tempTicketList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(tempTicketList);
     }
 
 

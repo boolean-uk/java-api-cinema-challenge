@@ -4,12 +4,14 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,13 +28,25 @@ public class ScreeningController {
     }
 
     @PostMapping
-    public ResponseEntity<Screening> createScreening(@RequestBody Screening screening) {
-        if (screening.getMovie() == null || screening.getScreenNumber() < 1 || screening.getCapacity() < 1 || screening.getStartsAt() == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<ApiResponse<Screening>> createScreening(@RequestBody Screening screening) {
+        try {
+            Date date = new Date();
+            screening.setCreatedAt(date);
+            screening.setUpdatedAt(date);
+            if (screening.getMovie() == null || screening.getScreenNumber() < 1 || screening.getCapacity() < 1 || screening.getStartsAt() == null) {
+                ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                Movie tempMovie = getAMovie(screening.getMovie().getId());
+                screening.setMovie(tempMovie);
+                Screening savedScreening = this.screeningRepository.save(screening);
+                ApiResponse<Screening> createdRequest = new ApiResponse<>("success", savedScreening);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+            }
+        } catch (Exception e) {
+            ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
         }
-        Movie tempMovie = getAMovie(screening.getMovie().getId());
-        screening.setMovie(tempMovie);
-        return ResponseEntity.ok(this.screeningRepository.save(screening));
     }
 
     /**
