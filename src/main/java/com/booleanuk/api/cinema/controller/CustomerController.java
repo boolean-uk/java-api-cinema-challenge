@@ -5,6 +5,8 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.response.CustomResponse;
+import com.booleanuk.api.cinema.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,32 +25,57 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<CustomResponse> getAllCustomers() {
+        if (customerRepository.count() < 1) {
+            CustomResponse errResponse = new CustomResponse("Error", new Error("No data found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+        }
+
+        return ResponseEntity.ok(new CustomResponse("success", this.customerRepository.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerByID(@PathVariable int id) {
+    public ResponseEntity<CustomResponse> getCustomerByID(@PathVariable int id) {
+        if (!customerRepository.existsById(id)) {
+            CustomResponse errResponse = new CustomResponse("Error", new Error("Id is not in database!"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+        }
+
         Customer customer = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(new CustomResponse("Success", customer));
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        return ResponseEntity.ok(this.customerRepository.save(customer));
+    public ResponseEntity<CustomResponse> createCustomer(@RequestBody Customer customer) {
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+        }
+        return ResponseEntity.ok(new CustomResponse("success", this.customerRepository.save(customer)));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomerByID(@PathVariable int id) {
+    public ResponseEntity<CustomResponse> deleteCustomerByID(@PathVariable int id) {
+
+        if (!customerRepository.existsById(id)) {
+            CustomResponse errResponse = new CustomResponse("Error", new Error("Id is not in database!"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+        }
+
         Customer customer = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
         this.customerRepository.delete(customer);
         customer.setTickets(new ArrayList<Ticket>());
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(new CustomResponse("Success", customer));
 
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<CustomResponse> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+        }
 
         Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
         customerToUpdate.setName(customer.getName());
@@ -57,7 +84,7 @@ public class CustomerController {
         customerToUpdate.setCreatedAt(customer.getCreatedAt());
         customerToUpdate.setUpdatedAt(customer.getUpdatedAt());
 
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+        return ResponseEntity.ok(new CustomResponse("Success", this.customerRepository.save(customerToUpdate)));
     }
 
 }
