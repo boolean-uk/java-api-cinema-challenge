@@ -1,8 +1,8 @@
 package com.booleanuk.api.cinema.response;
 
-public class SuccessResponse extends Response{
+public class SuccessResponse<T> extends Response<T>{
 
-    public SuccessResponse(Object object) {
-        super(object, "success");
+    public SuccessResponse(T data) {
+        super("success", data);
     }
 }

@@ -43,7 +43,7 @@ public class TicketController {
                         ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId)
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(tickets));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(tickets));
     }
 
     @PostMapping("/customers/{customerId}/screenings/{screeningId}")
@@ -61,7 +61,7 @@ public class TicketController {
         if(ticket.getNumSeats() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(ticketRepository.save(ticket)));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(ticketRepository.save(ticket)));
     }
 
     @DeleteMapping("/tickets/{id}")
@@ -73,7 +73,7 @@ public class TicketController {
         }
 
         ticketRepository.delete(ticket);
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(ticket));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(ticket));
     }
 
 }

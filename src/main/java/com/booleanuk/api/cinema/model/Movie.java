@@ -68,13 +68,4 @@ public class Movie {
         this.id = id;
     }
 
-//    public String getCreatedAt() {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return createdAt.atOffset(ZoneOffset.UTC).format(formatter);
-//    }
-//
-//    public String getUpdatedAt() {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        return createdAt.atOffset(ZoneOffset.UTC).format(formatter);
-//    }
 }

@@ -2,10 +2,9 @@ package com.booleanuk.api.cinema.response;
 
 import com.booleanuk.api.cinema.model.Error;
 
-public class NotFoundResponse extends Response{
+public class NotFoundResponse extends Response<Error>{
 
-    //TODO: fix
     public NotFoundResponse() {
-        super(new Error("not found"), "error");
+        super("error", new Error("not found"));
     }
 }

@@ -8,16 +8,16 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonPropertyOrder({"status", "data"})
-public class Response {
-
-    @JsonProperty
-    private Object data;
+public class Response<T> {
 
     @JsonProperty
     private String status;
 
-    public Response(Object data, String status) {
-        this.data = data;
+    @JsonProperty
+    private T data;
+
+    public Response(String status, T data) {
         this.status = status;
+        this.data = data;
     }
 }

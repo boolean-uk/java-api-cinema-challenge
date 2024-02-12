@@ -28,7 +28,7 @@ public class ScreeningController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(tempMovie.getScreenings()));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(tempMovie.getScreenings()));
     }
 
     @PostMapping("/{id}/screenings")
@@ -41,37 +41,8 @@ public class ScreeningController {
         if(containsNull(screening)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(screeningRepository.save(screening)));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(screeningRepository.save(screening)));
     }
-
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Screening> getScreeningById(@PathVariable int id) {
-//        Screening screening = findScreening(id);
-//        return ResponseEntity.ok(screening);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Screening> deleteScreening(@PathVariable int id) {
-//        Screening screeningToDelete = findScreening(id);
-//        screeningRepository.delete(screeningToDelete);
-//        return ResponseEntity.ok(screeningToDelete);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Screening> updateScreening(@PathVariable int id, @RequestBody Screening screening) {
-//        Screening screeningToUpdate = findScreening(id);
-//
-//        if(containsNull(screening)) {
-//            Ticket new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the screening, please check all required fields are correct.");
-//        }
-//        screeningToUpdate.setScreenNumber(screening.getScreenNumber());
-//        screeningToUpdate.setStartsAt(screening.getStartsAt());
-//        screeningToUpdate.setCapacity(screening.getCapacity());
-//        screeningToUpdate.setMovie(screening.getMovie());
-//
-//        return new ResponseEntity<>(screeningRepository.save(screeningToUpdate), HttpStatus.CREATED);
-//    }
 
     private Screening findScreening(int id) {
         return screeningRepository.findById(id).orElse(null);

@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
@@ -23,8 +25,8 @@ public class CustomerController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ResponseEntity<Response> getAllCustomers() {
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.customerRepository.findAll()));
+    public ResponseEntity<Response<List<Customer>>> getAllCustomers() {
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(this.customerRepository.findAll()));
 
     }
 
@@ -33,7 +35,7 @@ public class CustomerController {
         if(containsNull(customer)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-        Response response = new SuccessResponse(customerRepository.save(customer));
+        Response<Customer> response = new SuccessResponse<>(customerRepository.save(customer));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -49,7 +51,7 @@ public class CustomerController {
         }
 
         customerRepository.delete(customerToDelete);
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(customerToDelete));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(customerToDelete));
     }
 
 
@@ -70,7 +72,7 @@ public class CustomerController {
             customerToUpdate.setEmail(customer.getEmail());
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse(customerToUpdate));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>(customerToUpdate));
     }
 
     private Customer findCustomer(int id) {

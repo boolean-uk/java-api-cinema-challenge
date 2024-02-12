@@ -30,8 +30,8 @@ public class MovieController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ResponseEntity<Response> getAllMovies() {
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.movieRepository.findAll()));
+    public ResponseEntity<Response<List<Movie>>> getAllMovies() {
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(this.movieRepository.findAll()));
 
     }
 
@@ -55,11 +55,11 @@ public class MovieController {
             movie.setScreenings(screenings);
             Movie data = movieRepository.save(movie);
             screeningRepository.saveAll(screenings);
-            Response response = new SuccessResponse(data);
+            Response<Movie> response = new SuccessResponse<>(data);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
 
-        Response response = new SuccessResponse(movieRepository.save(movie));
+        Response<Movie> response = new SuccessResponse<>(movieRepository.save(movie));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -68,8 +68,7 @@ public class MovieController {
         Movie movieToDelete = findMovie(id);
 
         if(movieToDelete == null) {
-            Response response = new NotFoundResponse();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
         }
 
         // Delete screenings of the movie
@@ -82,15 +81,14 @@ public class MovieController {
         }
 
         movieRepository.delete(movieToDelete);
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(movieToDelete));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<Movie>(movieToDelete));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         Movie movieToUpdate = findMovie(id);
         if(movieToUpdate == null) {
-            Response response = new NotFoundResponse();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
         }
 
         if(movie.getTitle() != null ) {
@@ -106,7 +104,7 @@ public class MovieController {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse(movieRepository.save(movieToUpdate)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<Movie>(movieRepository.save(movieToUpdate)));
 
     }
 
