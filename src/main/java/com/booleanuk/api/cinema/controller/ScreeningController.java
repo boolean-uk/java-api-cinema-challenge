@@ -7,13 +7,11 @@ import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.response.BadRequestResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("movies")
@@ -30,7 +28,7 @@ public class ScreeningController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(tempMovie.getScreenings(), "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(tempMovie.getScreenings()));
     }
 
     @PostMapping("/{id}/screenings")
@@ -43,7 +41,7 @@ public class ScreeningController {
         if(containsNull(screening)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(screeningRepository.save(screening), "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(screeningRepository.save(screening)));
     }
 
 

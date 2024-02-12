@@ -7,6 +7,7 @@ import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.BadRequestResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,16 +24,16 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<Response> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(this.customerRepository.findAll(), "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.customerRepository.findAll()));
 
     }
 
     @PostMapping
     public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
         if(containsNull(customer)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BadRequestResponse());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
-        Response response = new Response(customerRepository.save(customer), "success");
+        Response response = new SuccessResponse(customerRepository.save(customer));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,7 +55,7 @@ public class CustomerController {
         }
 
         customerRepository.delete(customerToDelete);
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(customerToDelete, "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(customerToDelete));
     }
 
 
@@ -75,7 +76,7 @@ public class CustomerController {
             customerToUpdate.setEmail(customer.getEmail());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(customerToUpdate, "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(customerToUpdate));
     }
 
     private Customer findCustomer(int id) {

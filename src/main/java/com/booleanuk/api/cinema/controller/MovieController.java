@@ -9,6 +9,7 @@ import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.BadRequestResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,22 +30,24 @@ public class MovieController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public Response getAll() {
-        return new Response(this.movieRepository.findAll(), "success");
+    public ResponseEntity<Response> getAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.movieRepository.findAll()));
+
     }
 
     @PostMapping
     public ResponseEntity<Response> createMovie(@RequestBody Movie movie) {
         if(containsNull(movie)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BadRequestResponse());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
 
+        // Set screenings
         if(movie.getScreenings() != null) {
             List<Screening> screenings = new ArrayList<>();
 
             for(Screening screening: movie.getScreenings()) {
                 if(screening.getScreenNumber() == null || screening.getStartsAt() == null || screening.getCapacity() == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BadRequestResponse());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
                 }
                 screening.setMovie(movie);
                 screenings.add(screening);
@@ -52,11 +55,11 @@ public class MovieController {
             movie.setScreenings(screenings);
             Movie data = movieRepository.save(movie);
             screeningRepository.saveAll(screenings);
-            Response response = new Response(data, "success");
+            Response response = new SuccessResponse(data);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
 
-        Response response = new Response(movieRepository.save(movie), "success");
+        Response response = new SuccessResponse(movieRepository.save(movie));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -70,19 +73,23 @@ public class MovieController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> deleteMovie(@PathVariable int id) {
         Movie movieToDelete = findMovie(id);
+
         if(movieToDelete == null) {
             Response response = new NotFoundResponse();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        //TODO: make sure tickets are deleted from the screenings that are deleted
+
+        // Delete screenings of the movie
         for(Screening screening: movieToDelete.getScreenings()) {
+            //Delete tickets of screening
             for(Ticket ticket: screening.getTickets()) {
                 ticketRepository.delete(ticket);
             }
             screeningRepository.delete(screening);
         }
+
         movieRepository.delete(movieToDelete);
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(movieToDelete, "success"));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(movieToDelete));
     }
 
     @PutMapping("/{id}")
@@ -106,7 +113,7 @@ public class MovieController {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new Response(movieRepository.save(movieToUpdate), "success"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse(movieRepository.save(movieToUpdate)));
 
     }
 
