@@ -69,7 +69,24 @@ public class CustomerController {
         LocalDateTime currentDateTime = LocalDateTime.now();
         customer.setCreatedAt(currentDateTime);
         customer.setUpdatedAt(null);
+
+        //Regex to make sure the names are strings
+        String regexName = "^[a-zA-Z\\s]+$";
+        if(!customer.getName().matches(regexName)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write the name correctly");
+        }
+        //Regex for email
+        String regexEmail = "^[^@]+@[^@]+\\.[^@]+$";
+        if(!customer.getEmail().matches(regexEmail)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid email!");
+        }
+        //Regex for norwegian phonenumber
+        String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
+        if(!customer.getPhone().matches(regexPhone)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid phonenumber!");
+        }
         Customer createdCustomer = this.customerRepository.save(customer);
+
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
 
@@ -98,6 +115,22 @@ public class CustomerController {
     public ResponseEntity<Customer> updateACustomer(@PathVariable int id,@RequestBody Customer customer){
         Customer customerToUpdate = this.customerRepository.findById(id).
                 orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the customer...."));
+
+        //Regex to make sure the names are strings
+        String regexName = "^[a-zA-Z\\s]+$";
+        if(!customer.getName().matches(regexName)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write the name correctly");
+        }
+        //Regex for email
+        String regexEmail =  "^[^@]+@[^@]+\\.[^@]+$";
+        if(!customer.getEmail().matches(regexEmail)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid email!");
+        }
+        //Regex for norwegian phonenumber
+        String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
+        if(!customer.getPhone().matches(regexPhone)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid phonenumber!");
+        }
 
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());

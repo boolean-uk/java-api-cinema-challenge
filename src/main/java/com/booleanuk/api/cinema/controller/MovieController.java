@@ -50,6 +50,11 @@ public class MovieController {
     //Post a movie
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie) {
+
+        //Check the fields
+        if(movie.getTitle().isEmpty() || movie.getRating().isEmpty() || movie.getDescription().isEmpty() || movie.getRuntimeMins() <= 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Fill in the required fields");
+        }
         //Dates
         LocalDateTime currentDateTime = LocalDateTime.now();
         movie.setCreatedAt(currentDateTime);
@@ -64,6 +69,12 @@ public class MovieController {
     public ResponseEntity<Screening> createScreening(@PathVariable(name="id") Integer id,@RequestBody Screening screening) {
         Movie movie = this.movieRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the movie"));
+
+        //Check the fields
+        if(screening.getStartsAt() == null || screening.getScreenNumber() <= 0 || screening.getCapacity() <= 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Fill in the required fields");
+        }
+
         screening.setMovie(movie);
         //Dates
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -77,6 +88,11 @@ public class MovieController {
     public ResponseEntity<Movie> updateAMovie(@PathVariable int id,@RequestBody Movie movie){
         Movie movieToUpdate = this.movieRepository.findById(id).
                 orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the movie...."));
+
+        //Check the fields
+        if(movie.getTitle().isEmpty() || movie.getRating().isEmpty() || movie.getDescription().isEmpty()  || movie.getRuntimeMins() <= 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Fill in the required fields");
+        }
 
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
