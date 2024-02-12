@@ -78,7 +78,8 @@ public class CustomerController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(okRequest);
             }
         } catch (Exception e) {
-            return null;
+            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request caused exception thrown"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
         }
 
     }
