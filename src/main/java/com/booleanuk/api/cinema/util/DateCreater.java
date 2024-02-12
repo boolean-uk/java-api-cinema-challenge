@@ -8,9 +8,12 @@ import java.util.Calendar;
 public class DateCreater {
 
     public static String getCurrentDate() {
+        ZonedDateTime zonedDateTimeNow = ZonedDateTime.now(ZoneId.of("UTC"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy - HH:mm:ss Z");
 
-        return new SimpleDateFormat("yyyy-MM-dd 'T' HH:mm:ss+00:00").format(Calendar.getInstance().getTime());
+        return zonedDateTimeNow.format(formatter);
     }
+
 
 
 }
