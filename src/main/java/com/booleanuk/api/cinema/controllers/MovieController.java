@@ -91,7 +91,7 @@ public class MovieController {
     }
 
     private boolean isValidObject(Movie movie) {
-        if (Stream.of(movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins())
+        if (Stream.of(movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins(), movie.getScreenings())
                 .anyMatch(Objects::isNull)) {
             return false;
         }

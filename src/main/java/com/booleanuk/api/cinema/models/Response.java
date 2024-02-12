@@ -13,11 +13,17 @@ public class Response<T> {
         return new Response<>("success", data);
     }
 
-    public static Response<String> error(String message) {
-        return new Response<>("error", message);
+    public static Response<ErrorMessage> error(String message) {
+        return new Response<>("error", new ErrorMessage(message));
     }
 
-    public static final Response<String> BAD_REQUEST = new Response<>("error", "bad request");
+    public static final Response<ErrorMessage> BAD_REQUEST = new Response<>("error", new ErrorMessage("bad request"));
 
-    public static final Response<String> NOT_FOUND = new Response<>("error", "not found");
+    public static final Response<ErrorMessage> NOT_FOUND = new Response<>("error", new ErrorMessage("not found"));
+
+    @Data
+    @AllArgsConstructor
+    public static class ErrorMessage {
+        String message;
+    }
 }
