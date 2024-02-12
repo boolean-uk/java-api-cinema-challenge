@@ -66,7 +66,6 @@ public class MovieController {
 //        return ResponseEntity.ok(movie);
 //    }
 
-    //TODO: fix so all screenings are deleted too
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> deleteMovie(@PathVariable int id) {
         Movie movieToDelete = findMovie(id);
@@ -74,11 +73,13 @@ public class MovieController {
             Response response = new NotFoundResponse();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+        for(Screening screening: movieToDelete.getScreenings()) {
+            screeningRepository.delete(screening);
+        }
         movieRepository.delete(movieToDelete);
         return ResponseEntity.status(HttpStatus.OK).body(new Response(movieToDelete, "success"));
     }
 
-    //TODO: fix so u dont have to supply all fields to update
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         Movie movieToUpdate = findMovie(id);
@@ -86,13 +87,19 @@ public class MovieController {
             Response response = new NotFoundResponse();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        if(containsNull(movie)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the specified movie, please check all fields are correct");
+
+        if(movie.getTitle() != null ) {
+            movieToUpdate.setTitle(movie.getTitle());
         }
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        if(movie.getRating() != null ) {
+            movieToUpdate.setRating(movie.getRating());
+        }
+        if(movie.getDescription() != null ) {
+            movieToUpdate.setDescription(movie.getDescription());
+        }
+        if(movie.getRuntimeMins() != null) {
+            movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new Response(movieRepository.save(movieToUpdate), "success"));
 
