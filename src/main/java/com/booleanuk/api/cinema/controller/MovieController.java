@@ -30,7 +30,7 @@ public class MovieController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ResponseEntity<Response> getAll() {
+    public ResponseEntity<Response> getAllMovies() {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.movieRepository.findAll()));
 
     }
@@ -62,13 +62,6 @@ public class MovieController {
         Response response = new SuccessResponse(movieRepository.save(movie));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Movie> getMovieById(@PathVariable int id) {
-//        Movie movie = findMovie(id);
-//        return ResponseEntity.ok(movie);
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> deleteMovie(@PathVariable int id) {

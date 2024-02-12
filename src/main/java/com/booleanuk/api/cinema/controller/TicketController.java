@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("customers")
+@RequestMapping
 public class TicketController {
 
     @Autowired
@@ -28,8 +28,8 @@ public class TicketController {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @GetMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<Response> getAll(@PathVariable int customerId, @PathVariable int screeningId) {
+    @GetMapping("/customers/{customerId}/screenings/{screeningId}")
+    public ResponseEntity<Response> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
         Screening tempScreening = screeningRepository.findById(screeningId).orElse(null);
         Customer tempCustomer = customerRepository.findById(customerId).orElse(null);
 
@@ -46,7 +46,7 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(tickets));
     }
 
-    @PostMapping("/{customerId}/screenings/{screeningId}")
+    @PostMapping("/customers/{customerId}/screenings/{screeningId}")
     public ResponseEntity<Response> createTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
         Screening tempScreening = screeningRepository.findById(screeningId).orElse(null);
         Customer tempCustomer = customerRepository.findById(customerId).orElse(null);
@@ -58,18 +58,22 @@ public class TicketController {
         ticket.setCustomer(tempCustomer);
         ticket.setScreening(tempScreening);
 
-        if(containsNull(ticket)) {
+        if(ticket.getNumSeats() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
         }
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(ticketRepository.save(ticket)));
     }
 
-//
-//    private Ticket findTicket(int id) {
-//        return ticketRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No tickets with that id were found"));
-//    }
+    @DeleteMapping("/tickets/{id}")
+    public ResponseEntity<Response> deleteTicket(@PathVariable int id) {
+        Ticket ticket = ticketRepository.findById(id).orElse(null);
 
-    private boolean containsNull(Ticket ticket) {
-        return ticket.getNumSeats() == null;
+        if(ticket == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+        }
+
+        ticketRepository.delete(ticket);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(ticket));
     }
+
 }

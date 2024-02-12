@@ -23,7 +23,7 @@ public class CustomerController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ResponseEntity<Response> getAll() {
+    public ResponseEntity<Response> getAllCustomers() {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(this.customerRepository.findAll()));
 
     }
@@ -36,12 +36,6 @@ public class CustomerController {
         Response response = new SuccessResponse(customerRepository.save(customer));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Customer> getCustomerById(@PathVariable int id) {
-//        Customer customer = findCustomer(id);
-//        return ResponseEntity.ok(customer);
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> deleteCustomer(@PathVariable int id) {
@@ -76,7 +70,7 @@ public class CustomerController {
             customerToUpdate.setEmail(customer.getEmail());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse(customerToUpdate));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse(customerToUpdate));
     }
 
     private Customer findCustomer(int id) {

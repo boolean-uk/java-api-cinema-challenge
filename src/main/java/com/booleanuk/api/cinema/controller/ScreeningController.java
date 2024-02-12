@@ -22,7 +22,7 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
     @GetMapping("/{id}/screenings")
-    public ResponseEntity<Response> getAll(@PathVariable int id) {
+    public ResponseEntity<Response> getAllScreenings(@PathVariable int id) {
         Movie tempMovie = this.movieRepository.findById(id).orElse(null);
         if(tempMovie == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
