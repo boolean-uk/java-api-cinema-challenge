@@ -1,15 +1,17 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.response.BadRequestResponse;
+import com.booleanuk.api.cinema.response.NotFoundResponse;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("customers")
@@ -18,25 +20,33 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        this.checkHasRequiredFields(customer);
+    public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
+        // 400 Bad request if not all fields are present
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            return new ResponseEntity<>(new BadRequestResponse(), HttpStatus.BAD_REQUEST);
+        }
         customer.setCreatedAt(ZonedDateTime.now());
         customer.setUpdatedAt(ZonedDateTime.now());
-        return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SuccessResponse(this.customerRepository.save(customer)), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<Response> getAllCustomers() {
+        return new ResponseEntity<>(new SuccessResponse(this.customerRepository.findAll()), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<Response> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.findCustomerById(id);
+        // 404 Not found if no customer with given id exists
+        if (customerToUpdate == null) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
         // 400 Bad request if no fields are present in the put request
         if (customer.getName() == null && customer.getEmail() == null && customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the customer, please check all required fields are correct.");
+            return new ResponseEntity<>(new BadRequestResponse(), HttpStatus.BAD_REQUEST);
         }
+        // Update field only if present
         if (customer.getName() != null) {
             customerToUpdate.setName(customer.getName());
         }
@@ -46,28 +56,25 @@ public class CustomerController {
         if (customer.getPhone() != null) {
             customerToUpdate.setPhone(customer.getPhone());
         }
+        // Update updatedAt
         customerToUpdate.setUpdatedAt(ZonedDateTime.now());
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SuccessResponse(this.customerRepository.save(customerToUpdate)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<Response> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = this.findCustomerById(id);
+        // 404 Not found if no customer with the given id exists
+        if (customerToDelete == null) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
         this.customerRepository.delete(customerToDelete);
-        return ResponseEntity.ok(customerToDelete);
+        return ResponseEntity.ok(new SuccessResponse(customerToDelete));
     }
 
     // Method used in updateCustomer() and deleteCustomer() to find a customer by the id
     private Customer findCustomerById(int id) {
-        return this.customerRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customers with that id were found."));
-    }
-
-    // Method to check if all required fields are contained in the request, used in createCustomer()
-    private void checkHasRequiredFields(Customer customer) {
-        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please check all required fields are correct.");
-        }
+        return this.customerRepository.findById(id).orElse(null);
     }
 
 }
