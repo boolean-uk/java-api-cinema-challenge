@@ -1,6 +1,5 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.dto.CustomerDto;
 import com.booleanuk.api.cinema.dto.TicketDto;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Screening;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("customers/{customerId}/screenings/{screeningId}")
+@RequestMapping("customers/{customerId}/screenings")
 public class TicketController {
     @Autowired
     TicketRepository repository;
@@ -30,6 +29,15 @@ public class TicketController {
     ScreeningRepository screeningRepository;
 
     @GetMapping
+    public ResponseEntity<ApiSuccessResponse<List<TicketDto>>> getAllTicketsForCustomer(@PathVariable int customerId) {
+        List<TicketDto> tickets = this.repository.findByCustomerId(customerId);
+        if (tickets.isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "not found");
+        }
+        return ResponseEntity.ok(new ApiSuccessResponse<>(tickets));
+    }
+
+    @GetMapping("/{screeningId}")
     public ResponseEntity<ApiSuccessResponse<List<TicketDto>>> getScreeningsForCustomer(@PathVariable int customerId, @PathVariable int screeningId) {
         List<TicketDto> tickets = this.repository.findByCustomerIdAndScreeningId(customerId, screeningId);
         if (tickets.isEmpty()) {
@@ -38,7 +46,7 @@ public class TicketController {
         return ResponseEntity.ok(new ApiSuccessResponse<>(tickets));
     }
 
-    @PostMapping
+    @PostMapping("/{screeningId}")
     public ResponseEntity<ApiSuccessResponse<TicketDto>> bookTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
         if (ticket.getNumSeats() <= 0) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
