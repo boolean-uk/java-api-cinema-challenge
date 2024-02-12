@@ -1,11 +1,14 @@
 package com.booleanuk.api.cinema.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,6 +40,11 @@ public class Screening {
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "createdAt", "updatedAt"})
     private Movie movie;
+
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     public Screening(int screenNumber, String startsAt, int capacity, String createdAt, String updatedAt, Movie movie) {
         this.screenNumber = screenNumber;

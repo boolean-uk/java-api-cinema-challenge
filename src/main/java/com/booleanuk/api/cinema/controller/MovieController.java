@@ -3,6 +3,7 @@ package com.booleanuk.api.cinema.controller;
 import com.booleanuk.api.cinema.exceptions.CustomDataNotFoundException;
 import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,15 @@ public class MovieController {
     private MovieRepository movieRepository;
 
     @PostMapping
-
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         movie.setCreatedAt(DateCreater.getCurrentDate());
         movie.setUpdatedAt(DateCreater.getCurrentDate());
 
+
         areMovieValid(movie);
         return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
+
+
     }
 
     @GetMapping
