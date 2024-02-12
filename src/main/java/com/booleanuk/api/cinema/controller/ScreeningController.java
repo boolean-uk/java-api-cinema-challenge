@@ -65,7 +65,7 @@ public class ScreeningController {
 //        Screening screeningToUpdate = findScreening(id);
 //
 //        if(containsNull(screening)) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the screening, please check all required fields are correct.");
+//            Ticket new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the screening, please check all required fields are correct.");
 //        }
 //        screeningToUpdate.setScreenNumber(screening.getScreenNumber());
 //        screeningToUpdate.setStartsAt(screening.getStartsAt());
@@ -76,7 +76,7 @@ public class ScreeningController {
 //    }
 
     private Screening findScreening(int id) {
-        return screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screenings with that id were found"));
+        return screeningRepository.findById(id).orElse(null);
     }
 
     private boolean containsNull(Screening screening) {

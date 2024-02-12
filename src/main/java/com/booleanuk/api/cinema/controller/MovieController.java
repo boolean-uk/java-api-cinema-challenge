@@ -2,8 +2,11 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
+import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.BadRequestResponse;
 import com.booleanuk.api.cinema.response.MovieResponse;
 import com.booleanuk.api.cinema.response.NotFoundResponse;
 import com.booleanuk.api.cinema.response.Response;
@@ -22,9 +25,10 @@ public class MovieController {
 
     @Autowired
     private MovieRepository movieRepository;
-
     @Autowired
     private ScreeningRepository screeningRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @GetMapping
     public Response getAll() {
@@ -34,7 +38,7 @@ public class MovieController {
     @PostMapping
     public ResponseEntity<Response> createMovie(@RequestBody Movie movie) {
         if(containsNull(movie)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all fields are correct");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BadRequestResponse());
         }
 
         if(movie.getScreenings() != null) {
@@ -42,11 +46,10 @@ public class MovieController {
 
             for(Screening screening: movie.getScreenings()) {
                 if(screening.getScreenNumber() == null || screening.getStartsAt() == null || screening.getCapacity() == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create movie, please check all required fields are correct.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BadRequestResponse());
                 }
                 screening.setMovie(movie);
                 screenings.add(screening);
-
             }
             movie.setScreenings(screenings);
             Movie data = movieRepository.save(movie);
@@ -75,6 +78,9 @@ public class MovieController {
         }
         //TODO: make sure tickets are deleted from the screenings that are deleted
         for(Screening screening: movieToDelete.getScreenings()) {
+            for(Ticket ticket: screening.getTickets()) {
+                ticketRepository.delete(ticket);
+            }
             screeningRepository.delete(screening);
         }
         movieRepository.delete(movieToDelete);
