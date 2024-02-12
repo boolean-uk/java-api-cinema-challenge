@@ -26,9 +26,9 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping("/movies/{id}/screenings")
-    public ResponseEntity<DataResponse<?>> getAll(@PathVariable int id){
+    public ResponseEntity<DataResponse<?>> getAll(@PathVariable int id) {
         Movie findMovie = this.movieRepository.findById(id).orElse(null);
-        if(findMovie == null){
+        if (findMovie == null) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.set("No movie with that id");
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
@@ -40,7 +40,7 @@ public class ScreeningController {
     }
 
     @PostMapping("/movies/{id}/screenings")
-    public ResponseEntity<DataResponse<?>> create(@PathVariable int id, @RequestBody Screening screening){
+    public ResponseEntity<DataResponse<?>> create(@PathVariable int id, @RequestBody Screening screening) {
         Screening createScreening;
         try {
             screening.setCreatedAt(ZonedDateTime.now());
@@ -48,11 +48,11 @@ public class ScreeningController {
             screening.setMovie(this.movieRepository.findById(id).orElseThrow(NullPointerException::new));
             createScreening = this.screeningRepository.save(screening);
 
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.set("No movie with this id");
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        }catch (Exception e){
+        } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.set("Could not create screening for movie");
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
