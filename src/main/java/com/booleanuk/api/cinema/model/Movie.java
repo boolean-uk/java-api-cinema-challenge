@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -40,11 +40,11 @@ public class Movie {
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     public Movie(String title, String rating, String description, int runtimeMins) {//, List<Screening> screenings) {
         this.title = title;

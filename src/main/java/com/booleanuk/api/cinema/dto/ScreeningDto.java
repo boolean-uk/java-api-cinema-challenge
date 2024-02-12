@@ -3,19 +3,19 @@ package com.booleanuk.api.cinema.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class ScreeningDto {
     private int id;
     private int screenNumber;
-    private Date startsAt;
+    private LocalDateTime startsAt;
     private int capacity;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public ScreeningDto(int id, int screenNumber, int capacity, Date startsAt, Date createdAt, Date updatedAt) {
+    public ScreeningDto(int id, int screenNumber, int capacity, LocalDateTime startsAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.screenNumber = screenNumber;
         this.capacity = capacity;

@@ -3,7 +3,7 @@ package com.booleanuk.api.cinema.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,10 +14,10 @@ public class MovieDto {
     private String rating;
     private String description;
     private int runtimeMins;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public MovieDto(int id, String title, String rating, String description, int runtimeMins,Date createdAt, Date updatedAt) {
+    public MovieDto(int id, String title, String rating, String description, int runtimeMins,LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.rating = rating;

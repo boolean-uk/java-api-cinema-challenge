@@ -3,17 +3,17 @@ package com.booleanuk.api.cinema.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class TicketDto {
     private int id;
     private int numSeats;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public TicketDto(int id, int numSeats, Date createdAt, Date updatedAt) {
+    public TicketDto(int id, int numSeats, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.numSeats = numSeats;
         this.createdAt = createdAt;
