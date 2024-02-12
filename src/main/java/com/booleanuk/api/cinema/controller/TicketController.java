@@ -6,6 +6,8 @@ import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,21 +30,23 @@ public class TicketController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping
-    public List<Ticket> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
+    public ResponseEntity<Response> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
+        // Check if customer and screening with given ids exist, return 404 Not found if they don't
         this.findCustomer(customerId);
         this.findScreening(screeningId);
-        return this.ticketRepository.findAll().stream().filter(ticket -> ticket.getCustomer().getId() == customerId &&
-                ticket.getScreening().getId() == screeningId).toList();
+        List<Ticket> tickets = this.ticketRepository.findAll().stream().filter(ticket ->
+                ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId).toList();
+        return ResponseEntity.ok(new SuccessResponse(tickets));
     }
 
     @PostMapping
-    public ResponseEntity<Ticket> bookTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
+    public ResponseEntity<Response> bookTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
         ticket.setCustomer(findCustomer(customerId));
         ticket.setScreening(findScreening(screeningId));
         this.checkCapacityOfScreening(screeningId, ticket.getNumSeats());
         ticket.setCreatedAt(ZonedDateTime.now());
         ticket.setUpdatedAt(ZonedDateTime.now());
-        return new ResponseEntity<>(this.ticketRepository.save(ticket), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SuccessResponse(this.ticketRepository.save(ticket)), HttpStatus.CREATED);
     }
 
     // Checks if customerId exists or throws 404
@@ -57,7 +61,7 @@ public class TicketController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id found."));
     }
 
-    // Check capacity for screening
+    // Check capacity for screening, return 400 Bad request if numSeats are too large
     private void checkCapacityOfScreening(int screeningId, int numSeats) {
         Screening screening = this.screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id found."));
