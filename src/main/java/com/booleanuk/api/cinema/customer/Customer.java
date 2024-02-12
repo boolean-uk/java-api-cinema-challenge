@@ -41,4 +41,8 @@ public class Customer {
         this.email = email;
         this.phone = phone;
     }
+
+    public Customer(int id) {
+        this.id = id;
+    }
 }

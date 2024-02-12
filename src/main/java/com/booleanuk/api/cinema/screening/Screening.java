@@ -47,7 +47,7 @@ public class Screening {
         this.capacity = capacity;
     }
 
-    public Screening(Movie movie){
-
+    public Screening(int id) {
+        this.id = id;
     }
 }

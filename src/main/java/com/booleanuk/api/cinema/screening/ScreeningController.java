@@ -2,6 +2,8 @@ package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
 import com.booleanuk.api.cinema.movie.MovieRepository;
+import com.booleanuk.api.cinema.response.*;
+import com.booleanuk.api.cinema.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,20 +30,29 @@ public class ScreeningController {
 //    }
 
     @GetMapping("{id}/screenings")
-    public List<Screening> getScreening(@PathVariable int id) {
+    public ResponseEntity<Response> getScreening(@PathVariable int id) {
         Movie movie = this.movieRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+        if (movie == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
+        }
 
-        return movie.getScreeningList();
+        return new ResponseEntity<>(new ScreeningListResponse(movie.getScreeningList()), HttpStatus.OK);
     }
 
     @PostMapping("{id}/screenings")
-    public ResponseEntity<Screening> createScreening(@PathVariable Movie id, @RequestBody Screening screening) {
+    public ResponseEntity<Response> createScreening(@PathVariable int id, @RequestBody Screening screening) {
+        Movie movie = this.movieRepository
+                .findById(id)
+                .orElse(null);
+        if (movie == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
+        }
         screening.setCreatedAt(currentTime);
         screening.setUpdatedAt(currentTime);
-        screening.setMovie(id);
-        return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
+        screening.setMovie(screening.getMovie());
+        return new ResponseEntity<>(new ScreeningResponse(screening), HttpStatus.OK);
     }
 
 }

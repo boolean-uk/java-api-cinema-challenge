@@ -1,12 +1,13 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.response.*;
+import com.booleanuk.api.cinema.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("customers")
@@ -19,45 +20,60 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @GetMapping
-    public List<Customer> getAll() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<Response> getAll() {
+        return new ResponseEntity<>(new CustomerListResponse(this.customerRepository.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable int id) {
+    public ResponseEntity<Response> getCustomer(@PathVariable int id) {
         Customer customer = this.customerRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-
-        return ResponseEntity.ok(customer);
+                .orElse(null);
+        if (customer == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new CustomerResponse(customer), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
+
+        if(customer.getEmail().isEmpty() || customer.getPhone().isEmpty() || customer.getName().isEmpty()){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad Request")), HttpStatus.BAD_REQUEST);
+        }
         customer.setCreatedAt(currentTime);
         customer.setUpdatedAt(currentTime);
-        return new ResponseEntity<Customer>(this.customerRepository.save(customer), HttpStatus.CREATED);
+        this.customerRepository.save(customer);
+        return new ResponseEntity<>(new CustomerResponse(customer), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer (@PathVariable int id) {
+    public ResponseEntity<Response> deleteCustomer (@PathVariable int id) {
         Customer deleted = this.customerRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+
+        if (deleted == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")), HttpStatus.NOT_FOUND);
+        }
         this.customerRepository.delete(deleted);
-        return ResponseEntity.ok(deleted);
+        return new ResponseEntity<>(new CustomerResponse(deleted), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer (@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<Response> updateCustomer (@PathVariable int id, @RequestBody Customer customer) {
 
         Customer customerToUpdate = this.customerRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+        if(customerToUpdate == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")), HttpStatus.NOT_FOUND);
+        }
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
         customerToUpdate.setUpdatedAt(currentTime);
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+        this.customerRepository.save(customerToUpdate);
+        return new ResponseEntity<>(new CustomerResponse(customerToUpdate), HttpStatus.OK);
     }
 }

@@ -1,14 +1,14 @@
 package com.booleanuk.api.cinema.movie;
 
-import com.booleanuk.api.cinema.customer.Customer;
+import com.booleanuk.api.cinema.response.*;
+
+import com.booleanuk.api.cinema.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("movies")
@@ -19,47 +19,71 @@ public class MovieController {
     private MovieRepository movieRepository;
 
     @GetMapping
-    public List<Movie> getAll() {
-        return this.movieRepository.findAll();
+    public ResponseEntity<Response> getAll() {
+        return new ResponseEntity<>(new MovieListResponse(this.movieRepository.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Movie> getMovie(@PathVariable int id) {
+    public ResponseEntity<Response> getMovie(@PathVariable int id) {
         Movie movie = this.movieRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+        if (movie == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
+        }
 
-        return ResponseEntity.ok(movie);
+        return new ResponseEntity<>(new MovieResponse(movie), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<Response> createMovie(@RequestBody Movie movie) {
+        //String regex= "/^[a-zA-Z\\s]*$/";
+
+        if(movie.getTitle().isEmpty() || movie.getDescription().isEmpty() || movie.getRating().isEmpty()){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad Request")), HttpStatus.BAD_REQUEST);
+        }
+
         movie.setCreatedAt(currentTime);
         movie.setUpdatedAt(currentTime);
-        return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
+        this.movieRepository.save(movie);
+        return new ResponseEntity<>(new MovieResponse(movie), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
+    public ResponseEntity<Response> deleteMovie(@PathVariable int id) {
         Movie deleted = this.movieRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+
+        if (deleted == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
+        }
         this.movieRepository.delete(deleted);
-        return ResponseEntity.ok(deleted);
+        return new ResponseEntity<>(new MovieResponse(deleted), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie (@PathVariable int id, @RequestBody Movie movie) {
+    public ResponseEntity<Response> updateMovie (@PathVariable int id, @RequestBody Movie movie) {
 
         Movie movieToUpdate = this.movieRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+                .orElse(null);
+
+        if (movieToUpdate == null) {
+            return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
+        }
+
+        if(movie.getTitle().isEmpty() || movie.getDescription().isEmpty() || movie.getRating().isEmpty()){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad Request")), HttpStatus.BAD_REQUEST);
+        }
+
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRunTimeMins(movie.getRunTimeMins());
         movieToUpdate.setUpdatedAt(currentTime);
-        return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+        this.movieRepository.save(movieToUpdate);
+        return new ResponseEntity<>(new MovieResponse(movieToUpdate), HttpStatus.OK);
     }
 
 }
