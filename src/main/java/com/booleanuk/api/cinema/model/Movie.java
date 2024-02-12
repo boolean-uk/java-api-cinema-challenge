@@ -40,13 +40,22 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     //For multible values to ignore use "value = {value,value}
-    @JsonIgnore
+    //@JsonIgnore
     private List<Screening> screenings;
+
     public Movie(String title, String rating, String description, int runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
+    }
+
+    public Movie(String title, String rating, String description, int runtimeMins,List<Screening> screenings) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.screenings = screenings;
     }
     public Movie(int id){
         this.id = id;

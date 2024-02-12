@@ -7,6 +7,8 @@ import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.*;
+import com.booleanuk.api.cinema.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 import org.springframework.http.HttpStatus;
@@ -21,50 +23,51 @@ import java.util.List;
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
-
     @Autowired
     private CustomerRepository customerRepository;
-
     @Autowired
     private TicketRepository ticketRepository;
-
     @Autowired
     private ScreeningRepository screeningRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers(){
-        return this.customerRepository.findAll();
+    public ResponseEntity<Response> getAllCustomers(){
+        return new ResponseEntity<>(new CustomerListResponse(this.customerRepository.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Customer> getById(@PathVariable("id") Integer id) {
-        Customer customer = this.customerRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find "));
-
-        return ResponseEntity.ok(customer);
+    public ResponseEntity<Response> getById(@PathVariable("id") Integer id) {
+        Customer customer = this.customerRepository.findById(id).orElse(null);
+        if (customer ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")),HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new CustomerResponse(customer), HttpStatus.OK);
     }
-
 
     //Get all tickets
     @GetMapping("{customerId}/screenings/{screeningId}")
-    public List<Ticket> getAllTickets(@PathVariable(name="customerId") Integer customerId,
+    public ResponseEntity<Response> getAllTickets(@PathVariable(name="customerId") Integer customerId,
                                       @PathVariable(name="screeningId") Integer screeningId) {
-        Customer customer = this.customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the customer"));
 
-        Screening screening = this.screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the screening"));
-
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+        if (customer ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")),HttpStatus.NOT_FOUND);
+        }
+        Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+        if (screening ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Screening not found")),HttpStatus.NOT_FOUND);
+        }
         //Combine both ticket lists and remove tickets that does not match
         List<Ticket> combinedList = new ArrayList<>(customer.getTickets());
         List<Ticket> screeningTickets = screening.getTickets();
         combinedList.retainAll(screeningTickets);
-        return combinedList;
+        return new ResponseEntity<>(new TicketListResponse(combinedList), HttpStatus.OK);
+
     }
 
     //Post for customer
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
         //Dates
         LocalDateTime currentDateTime = LocalDateTime.now();
         customer.setCreatedAt(currentDateTime);
@@ -73,34 +76,37 @@ public class CustomerController {
         //Regex to make sure the names are strings
         String regexName = "^[a-zA-Z\\s]+$";
         if(!customer.getName().matches(regexName)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write the name correctly");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
         //Regex for email
         String regexEmail = "^[^@]+@[^@]+\\.[^@]+$";
         if(!customer.getEmail().matches(regexEmail)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid email!");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
         //Regex for norwegian phonenumber
         String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
         if(!customer.getPhone().matches(regexPhone)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid phonenumber!");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
         Customer createdCustomer = this.customerRepository.save(customer);
 
-        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+        return new ResponseEntity<>(new CustomerResponse(customer), HttpStatus.CREATED);
     }
 
     //Post for ticket
     @PostMapping("{customerId}/screenings/{screeningId}")
-    public ResponseEntity<Ticket> createTicket(@PathVariable(name="customerId") Integer customerId,
+    public ResponseEntity<Response> createTicket(@PathVariable(name="customerId") Integer customerId,
                                                @PathVariable(name="screeningId") Integer screeningId,
                                                @RequestBody Ticket ticket) {
-        Customer customer = this.customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the customer"));
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+        if (customer ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")),HttpStatus.NOT_FOUND);
+        }
+        Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+        if (screening ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Screening not found")),HttpStatus.NOT_FOUND);
+        }
         ticket.setCustomer(customer);
-
-        Screening screening = this.screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the screening"));
         ticket.setScreening(screening);
 
         //Dates
@@ -108,28 +114,29 @@ public class CustomerController {
         ticket.setCreatedAt(currentDateTime);
         ticket.setUpdatedAt(null);
         Ticket createdTicket = this.ticketRepository.save(ticket);
-        return new ResponseEntity<>(createdTicket, HttpStatus.CREATED);
+        return new ResponseEntity<>(new TicketResponse(createdTicket), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateACustomer(@PathVariable int id,@RequestBody Customer customer){
-        Customer customerToUpdate = this.customerRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the customer...."));
-
+    public ResponseEntity<Response> updateACustomer(@PathVariable int id,@RequestBody Customer customer){
+        Customer customerToUpdate = this.customerRepository.findById(id).orElse(null);
+        if (customer ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")),HttpStatus.NOT_FOUND);
+        }
         //Regex to make sure the names are strings
         String regexName = "^[a-zA-Z\\s]+$";
         if(!customer.getName().matches(regexName)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write the name correctly");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
         //Regex for email
         String regexEmail =  "^[^@]+@[^@]+\\.[^@]+$";
         if(!customer.getEmail().matches(regexEmail)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid email!");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
         //Regex for norwegian phonenumber
         String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
         if(!customer.getPhone().matches(regexPhone)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Write a valid phonenumber!");
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
         }
 
         customerToUpdate.setName(customer.getName());
@@ -139,15 +146,17 @@ public class CustomerController {
         //Set update to right now
         LocalDateTime currentDateTime = LocalDateTime.now();
         customerToUpdate.setUpdatedAt(currentDateTime);
-
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate),HttpStatus.CREATED);
+        this.customerRepository.save(customerToUpdate);
+        return new ResponseEntity<>(new CustomerResponse(customer), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteACustomer(@PathVariable int id){
-        Customer customerToDelete = this.customerRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Cant find the customer!!!"));
+    public ResponseEntity<Response> deleteACustomer(@PathVariable int id){
+        Customer customerToDelete = this.customerRepository.findById(id).orElse(null);
+        if (customerToDelete ==null){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")),HttpStatus.NOT_FOUND);
+        }
         this.customerRepository.delete(customerToDelete);
-        return ResponseEntity.ok(customerToDelete);
+        return new ResponseEntity<>(new CustomerResponse(customerToDelete), HttpStatus.OK);
     }
 }

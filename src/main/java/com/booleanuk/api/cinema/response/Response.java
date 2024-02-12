@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.model;
+package com.booleanuk.api.cinema.response;
 
 import lombok.Getter;
 
@@ -7,8 +7,8 @@ public class Response<T> {
     private String status;
     private T data;
 
-    public void set(T data) {
-        this.status = "success";
+    public Response(String status,T data) {
+        this.status = status;
         this.data = data;
     }
 }
