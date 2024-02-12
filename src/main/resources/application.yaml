@@ -11,8 +11,8 @@ spring:
     url: jdbc:postgresql://mel.db.elephantsql.com:5432/vkkpmajz
     username: vkkpmajz
     password: 3Yb4lolg991vAiYLcVO-mjtArECEAAGj
-    max-active: 3
-    max-idle: 3
+    max-active: 2
+    max-idle: 2
   jpa:
     hibernate:
       ddl-auto: update

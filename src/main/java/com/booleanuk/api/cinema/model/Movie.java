@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -26,33 +28,28 @@ public class Movie {
     private String description;
     @Column(nullable = false)
     private int runtimeMins;
-    @Column
-    private LocalDateTime createdAt;
-    @Column
-    private LocalDateTime updatedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime createdAt = ZonedDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIncludeProperties(value = {"screen_number", "startsAt"})
     private List<Screening> screenings;
 
-    public Movie(int id){
-        this.id = id;
-    }
-    public Movie(String title, String rating, String description, int runtimeMins) {
+    public Movie(String title, String rating, String description, int runtimeMins, Screening screening) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        if (createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-        this.updatedAt = LocalDateTime.now();
+        this.screenings.add(screening);
     }
 
     public List<Screening> getScreenings(){
         return screenings;
     }
-    public void setBooks(List<Screening> screenings){
+
+    public void setScreenings(List<Screening> screenings){
         this.screenings = screenings;
     }
 }

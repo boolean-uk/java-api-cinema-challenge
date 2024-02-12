@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -19,10 +21,10 @@ public class Ticket {
     private int id;
     @Column
     int numSeats;
-    @Column
-    private LocalDateTime createdAt;
-    @Column
-    private LocalDateTime updatedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime createdAt = ZonedDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime updatedAt = ZonedDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -33,14 +35,4 @@ public class Ticket {
     @JoinColumn(name = "screening_id", nullable = false)
     @JsonIncludeProperties(value = {"startsAt", "title"})
     private Screening screening;
-
-    public Ticket(int id){
-        this.id = id;
-    }
-
-    public Ticket(int numSeats, Customer customer, Screening screening) {
-        this.numSeats = numSeats;
-        this.customer = customer;
-        this.screening = screening;
-    }
 }

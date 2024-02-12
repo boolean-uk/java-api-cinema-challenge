@@ -5,8 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -21,30 +22,22 @@ public class Screening {
     private Integer screenNumber;
     @Column(nullable = false)
     private Integer capacity;
-    @Column(nullable = false)
-    private LocalDateTime startsAt;
-    @Column
-    private LocalDateTime createdAt;
-    @Column
-    private LocalDateTime updatedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime startsAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime createdAt = ZonedDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime updatedAt = ZonedDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"title"})
     private Movie movie;
 
-    public Screening(int id){
-        this.id = id;
-    }
-
-    public Screening(Integer screenNumber, Integer capacity, LocalDateTime startsAt, Movie movie) {
+    public Screening(Integer screenNumber, Integer capacity, ZonedDateTime startsAt, Movie movie) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
-        if (createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-        this.updatedAt = LocalDateTime.now();
         this.movie = movie;
     }
 }

@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -25,21 +27,8 @@ public class Customer {
     private String email;
     @Column(nullable = false)
     private String phone;
-    @Column
-    private LocalDateTime createdAt;
-    @Column
-    private LocalDateTime updatedAt;
-
-    public Customer(int id){
-        this.id = id;
-    }
-    public Customer(String name, String email, String phone) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        if (createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-        this.updatedAt = LocalDateTime.now();
-    }
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime createdAt = ZonedDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+    private ZonedDateTime updatedAt = ZonedDateTime.now();
 }
