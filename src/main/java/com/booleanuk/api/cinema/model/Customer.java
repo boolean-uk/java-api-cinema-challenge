@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @NoArgsConstructor
 @Getter
@@ -38,11 +41,23 @@ public class Customer {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
     }
 
     public Customer(int id) {
         this.id = id;
     }
+
+    public void setUpdatedAtToCurrentTimeInGMTPlus1() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
+        String formattedDate = sdf.format(new Date());
+        try {
+            this.updatedAt = sdf.parse(formattedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -21,6 +21,11 @@ public class ApiResponse<T> {
     private String status;
     private Object data;
 
+    public ApiResponse(String status, Object data) {
+        this.status = status;
+        this.data = data;
+    }
+
     public void setData(T data) {
         this.data = data;
     }

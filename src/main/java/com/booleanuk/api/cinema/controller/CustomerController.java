@@ -42,14 +42,10 @@ public class CustomerController {
         try {
             List<Customer> customers = this.customerRepository.findAll();
             if (customers.isEmpty()) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>();
-                badRequest.setStatus("error");
-                badRequest.setData(new ApiResponse.Message("bad request"));
+                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
-                ApiResponse<Customer> okRequest = new ApiResponse<>();
-                okRequest.setStatus("success");
-                okRequest.setData(customers);
+                ApiResponse<Customer> okRequest = new ApiResponse<>("success", customers);
                 return ResponseEntity.ok(okRequest);
             }
         } catch (Exception e) {
@@ -73,15 +69,11 @@ public class CustomerController {
             customer.setCreatedAt(date);
             customer.setUpdatedAt(date);
             if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>();
-                badRequest.setStatus("error");
-                badRequest.setData(new ApiResponse.Message("bad request"));
+                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
                 Customer savedCustomer = this.customerRepository.save(customer);
-                ApiResponse<Customer> okRequest = new ApiResponse<>();
-                okRequest.setStatus("success");
-                okRequest.setData(savedCustomer);
+                ApiResponse<Customer> okRequest = new ApiResponse<>("success", savedCustomer);
                 return ResponseEntity.status(HttpStatus.CREATED).body(okRequest);
             }
         } catch (Exception e) {
@@ -91,22 +83,44 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomerById(@PathVariable int id) {
-        Customer customerToDelete = getACustomer(id);
-        this.customerRepository.delete(customerToDelete);
-        return ResponseEntity.ok(customerToDelete);
+    public ResponseEntity<ApiResponse<Customer>> deleteCustomerById(@PathVariable int id) {
+        try {
+            Customer customerToDelete = getACustomer(id);
+            if (customerToDelete == null || !customerToDelete.getTickets().isEmpty()) {
+                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                this.customerRepository.delete(customerToDelete);
+                customerToDelete.setTickets(new ArrayList<>());
+                ApiResponse<Customer> okRequest = new ApiResponse<>("success", customerToDelete);
+                return ResponseEntity.status(HttpStatus.OK).body(okRequest);
+            }
+        } catch (Exception e) {
+            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
-        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<ApiResponse<Customer>> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
+        try {
+            Customer customerToUpdate = getACustomer(id);
+            if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            } else {
+                customerToUpdate.setName(customer.getName());
+                customerToUpdate.setEmail(customer.getEmail());
+                customerToUpdate.setPhone(customer.getPhone());
+                customerToUpdate.setUpdatedAtToCurrentTimeInGMTPlus1();
+                this.customerRepository.save(customerToUpdate);
+                ApiResponse<Customer> createdRequest = new ApiResponse<>("success", customerToUpdate);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+            }
+        } catch (Exception e) {
+            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
         }
-        Customer customerToUpdate = getACustomer(id);
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
     /**
