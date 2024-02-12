@@ -23,7 +23,7 @@ public class Screening {
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins"})
+    @JsonIgnore
     private Movie movie;
 
     @Column(nullable = false)
