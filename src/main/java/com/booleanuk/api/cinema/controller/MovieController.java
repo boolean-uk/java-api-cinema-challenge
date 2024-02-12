@@ -52,6 +52,10 @@ public class MovieController {
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
         Movie movieToUpdate = this.findMovieById(id);
+        // 400 if no fields are present in the put request
+        if (movie.getTitle() == null && movie.getRating() == null && movie.getDescription() == null && movie.getRuntimeMins() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update movie, please check all required fields are correct.");
+        }
         if (movie.getTitle() != null) {
             movieToUpdate.setTitle(movie.getTitle());
         }
