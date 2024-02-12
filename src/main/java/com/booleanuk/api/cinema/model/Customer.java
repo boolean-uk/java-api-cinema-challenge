@@ -37,6 +37,10 @@ public class Customer {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Ticket> tickets;
+
 
     public Customer(String name, String email, String phone){
         LocalDateTime currentDateTime = LocalDateTime.now(ZoneOffset.UTC);

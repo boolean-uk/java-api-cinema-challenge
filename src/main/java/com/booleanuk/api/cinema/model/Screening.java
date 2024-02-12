@@ -52,6 +52,9 @@ public class Screening {
     @JsonIncludeProperties(value = {"id","title", "rating", "runtimeMins", "description", "createdAt", "updatedAt"})
     private Movie movie;
 
+    @OneToMany(mappedBy = "screening", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Ticket> tickets;
 
     public Screening(int screenNumber, int capacity, OffsetDateTime startsAt){
         OffsetDateTime currentDateTime = OffsetDateTime.now(ZoneOffset.UTC);

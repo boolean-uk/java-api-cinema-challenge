@@ -7,12 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import com.booleanuk.api.cinema.helpers.CustomResponse;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/movies")
@@ -29,7 +28,7 @@ public class MovieController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomResponse> get(@PathVariable int id){
         if(!movieRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", "No movie with that id were found"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(id).get()), HttpStatus.OK);
     }
@@ -47,7 +46,7 @@ public class MovieController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CustomResponse> update(@RequestBody Movie movie, @PathVariable int id){
         if(!movieRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", "No movie with that id were found"), HttpStatus.NOT_FOUND);
         }
         Movie existingMovie = movieRepository
                 .findById(id).get();
@@ -66,7 +65,7 @@ public class MovieController {
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomResponse> delete(@PathVariable int id){
         if(!movieRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", "No movie with that id were found"), HttpStatus.NOT_FOUND);
         }
         Movie movie = movieRepository
                 .findById(id).get();
