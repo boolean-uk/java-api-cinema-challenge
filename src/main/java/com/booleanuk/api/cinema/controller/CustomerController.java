@@ -72,16 +72,36 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
 
-        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
-        }
-
+//        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+//            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+//        }
+        Customer previousCus = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
         Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate.setCreatedAt(customer.getCreatedAt());
+        if (customer.getName() == null) {
+            customerToUpdate.setName(previousCus.getName());
+        }
+        else {
+            customerToUpdate.setName(customer.getName());
+        }
+        if (customer.getEmail() == null) {
+            customerToUpdate.setEmail(previousCus.getEmail());
+        }
+        else {
+            customerToUpdate.setEmail(customer.getEmail());
+        }
+        if (customer.getPhone() == null) {
+            customerToUpdate.setPhone(previousCus.getPhone());
+        }
+        else {
+            customerToUpdate.setPhone(customer.getPhone());
+        }
+        if (customer.getUpdatedAt() == null) {
+            customerToUpdate.setCreatedAt(previousCus.getCreatedAt());
+        }
+        else {
+            customerToUpdate.setCreatedAt(customer.getCreatedAt());
+        }
         customerToUpdate.setUpdatedAt(customer.getUpdatedAt());
 
         return ResponseEntity.ok(new CustomResponse("Success", this.customerRepository.save(customerToUpdate)));

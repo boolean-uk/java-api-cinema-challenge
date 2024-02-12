@@ -79,18 +79,51 @@ public class MovieController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
 
-        if (movie.getTitle() == null || movie.getRating() == 0 || movie.getDescription() == null || movie.getRuntimeMins() == 0) {
-            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
-        }
+//        if (movie.getTitle() == null || movie.getRating() == 0 || movie.getDescription() == null || movie.getRuntimeMins() == 0) {
+//            CustomResponse errResponse = new CustomResponse("Error", new Error("Check if all fields are correct!"));
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errResponse);
+//        }
 
+        Movie prevMovie = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found!"));
         Movie movieToUpdate = this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found!"));
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-        movieToUpdate.setCreatedAt(movie.getCreatedAt());
+
+        if (movie.getTitle() == null) {
+            movieToUpdate.setTitle(prevMovie.getTitle());
+        }
+        else {
+            movieToUpdate.setTitle(movie.getTitle());
+        }
+        if (movie.getRating() == 0) {
+            movieToUpdate.setRating(prevMovie.getRating());
+        }
+        else {
+            movieToUpdate.setRating(movie.getRating());
+        }
+        if (movie.getDescription() == null) {
+            movieToUpdate.setDescription(prevMovie.getDescription());
+        }
+        else {
+            movieToUpdate.setDescription(movie.getDescription());
+        }
+        if (movie.getRuntimeMins() == 0) {
+            movieToUpdate.setRuntimeMins(prevMovie.getRuntimeMins());
+        }
+        else {
+            movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        }
+        if (movie.getCreatedAt() == null) {
+            movieToUpdate.setCreatedAt(prevMovie.getCreatedAt());
+        }
+        else {
+            movieToUpdate.setCreatedAt(movie.getCreatedAt());
+        }
         movieToUpdate.setUpdatedAt(movie.getUpdatedAt());
+        if (movie.getScreenings() == null) {
+            movieToUpdate.setScreenings(prevMovie.getScreenings());
+        }
+        else {
+            movieToUpdate.setScreenings(movie.getScreenings());
+        }
 
         CustomResponse res = new CustomResponse("success", this.movieRepository.save(movieToUpdate));
 
