@@ -39,6 +39,7 @@ public class Movie {
     private LocalDateTime updatedAt;
 
 
+
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
