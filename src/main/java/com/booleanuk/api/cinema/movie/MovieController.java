@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("movies")
@@ -19,9 +20,14 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie){
-        movie.setScreenings(new ArrayList<Screening>());
         movie.setCreatedAt(LocalDateTime.now());
         movie.setUpdatedAt(LocalDateTime.now());
+
+        for (Screening screening : movie.getScreenings()){
+            screening.setMovie(movie);
+            screening.setCreatedAt(LocalDateTime.now());
+            screening.setUpdatedAt(LocalDateTime.now());
+        }
 
         return new ResponseEntity<Movie>(repo.save(movie), HttpStatus.CREATED);
     }
@@ -40,10 +46,15 @@ public class MovieController {
     public ResponseEntity<Movie> update(@PathVariable int id, @RequestBody Movie movie){
         Movie toUpdate = getById(id);
 
-        toUpdate.setTitle(movie.getTitle());
-        toUpdate.setRating(movie.getRating());
-        toUpdate.setDescription(movie.getDescription());
-        toUpdate.setRuntimeMins(movie.getRuntimeMins());
+        Optional.ofNullable(movie.getTitle())
+                .ifPresent(title -> toUpdate.setTitle(title));
+        Optional.ofNullable(movie.getRating())
+                .ifPresent(rating -> toUpdate.setRating(rating));
+        Optional.ofNullable(movie.getDescription())
+                .ifPresent(description -> toUpdate.setDescription(description));
+        Optional.of(movie.getRuntimeMins())
+                .ifPresent(runtimeMins -> toUpdate.setRuntimeMins(runtimeMins));
+
         toUpdate.setUpdatedAt(LocalDateTime.now());
 
         return new ResponseEntity<Movie>(repo.save(toUpdate), HttpStatus.CREATED);

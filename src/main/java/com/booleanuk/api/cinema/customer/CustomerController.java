@@ -8,16 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
     @Autowired
     private CustomerRepository repo;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer customer){
@@ -42,11 +41,14 @@ public class CustomerController {
     public ResponseEntity<Customer> update(@PathVariable int id, @RequestBody Customer customer){
         Customer toUpdate = getById(id);
 
-        toUpdate.setName(customer.getName());
-        toUpdate.setEmail(customer.getEmail());
-        toUpdate.setPhone(customer.getPhone());
+        Optional.ofNullable(customer.getName())
+                .ifPresent(name -> toUpdate.setName(name));
+        Optional.ofNullable(customer.getEmail())
+                .ifPresent(email -> toUpdate.setEmail(email));
+        Optional.ofNullable(customer.getPhone())
+                .ifPresent(phone -> toUpdate.setPhone(phone));
+
         toUpdate.setUpdatedAt(LocalDateTime.now());
-        //TODO set tickets?
 
         return new ResponseEntity<Customer>(repo.save(toUpdate), HttpStatus.CREATED);
     }

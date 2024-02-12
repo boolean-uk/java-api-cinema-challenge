@@ -55,16 +55,5 @@ public class Screening {
         setScreenNumber(screenNumber);
         setCapacity(capacity);
         setStartsAt(LocalDateTime.parse(startsAt));
-        /*
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDateTime startsAtDateTime = LocalDateTime.parse(startsAt, formatter);
-            setStartsAt(startsAtDateTime);
-
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid format for startsAt. Please use 'yyyy-MM-dd HH:mm' format.", e);
-        }
-
-         */
     }
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -38,7 +39,7 @@ public class Movie {
     @Column
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 
@@ -51,5 +52,10 @@ public class Movie {
         setRating(rating);
         setDescription(description);
         setRuntimeMins(runtimeMins);
+    }
+
+    public Movie(String title, String rating, String description, int runtimeMins, ArrayList<Screening> screenings){
+        this(title, rating, description, runtimeMins);
+        this.screenings = screenings;
     }
 }
