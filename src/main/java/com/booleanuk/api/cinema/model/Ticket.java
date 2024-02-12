@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -18,6 +20,12 @@ public class Ticket {
 
     @Column(name = "num_seats")
     private int numSeats;
+
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @Column(name = "updated_at")
+    private String updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "customer_id,", nullable = false)

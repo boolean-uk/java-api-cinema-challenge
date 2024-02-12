@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -26,24 +27,30 @@ public class Movie {
     private String description;
 
     @Column(name = "runtime_mins")
-    private int runtime_mins;
+    private int runtimeMins;
 
-    @OneToMany(mappedBy = "movie")
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @Column(name = "updated_at")
+    private String updatedAt;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("screening")
     private List<Screening> screenings;
 
     public Movie(String title, String description, int runtime_mins) {
         this.title = title;
         this.description = description;
-        this.runtime_mins = runtime_mins;
+        this.runtimeMins = runtime_mins;
     }
 
     public Movie(String title, String description, int runtime_mins, Screening screening) {
-        this.title = title;
-        this.description = description;
-        this.runtime_mins = runtime_mins;
-        this.screenings.add(screening);
-    }
+            this.title = title;
+            this.description = description;
+            this.runtimeMins = runtime_mins;
+            this.screenings.add(screening);
+        }
 
     public Movie(int id) {
         this.id = id;

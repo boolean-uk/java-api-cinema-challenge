@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,8 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer customer) {
         customer.setTickets(new ArrayList<Ticket>());
+        customer.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        customer.setUpdatedAt(customer.getCreatedAt());
         return new ResponseEntity<Customer>(this.repository.save(customer), HttpStatus.CREATED);
     }
 
@@ -36,6 +40,7 @@ public class CustomerController {
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
+        customerToUpdate.setUpdatedAt(String.valueOf(LocalDateTime.now()));
 
         return new ResponseEntity<Customer>(this.repository.save(customerToUpdate), HttpStatus.CREATED);
     }

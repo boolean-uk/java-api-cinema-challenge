@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ticket/customers/{customerId}/screenings/{screeningId}")
+@RequestMapping("/customers/{customerId}/screenings/{screeningId}")
 public class TicketController {
     @Autowired
     TicketRepository ticketRepository;
@@ -26,11 +28,13 @@ public class TicketController {
     ScreeningRepository screeningRepository;
 
     @PostMapping
-    public ResponseEntity<Ticket> create(@PathVariable("screeningId") int screeningId, @PathVariable("customerId") int customerId, @RequestBody Ticket ticket) {
+    public ResponseEntity<Ticket> create(@PathVariable("customerId") int customerId, @PathVariable("screeningId") int screeningId,  @RequestBody Ticket ticket) {
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Customer customer= this.customerRepository.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         ticket.setScreening(screening);
         ticket.setCustomer(customer);
+        ticket.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        ticket.setUpdatedAt(customer.getCreatedAt());
         return new ResponseEntity<Ticket>(this.ticketRepository.save(ticket), HttpStatus.CREATED);
     }
     @GetMapping

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,14 +31,20 @@ public class Screening {
     @Column(name = "starts_at")
     private String startsAt;
 
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @Column(name = "updated_at")
+    private String updatedAt;
+
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
+
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"id", "title", "description", "runtime_mins"})
     private Movie movie;
-
-    @OneToMany(mappedBy = "screening")
-    @JsonIgnoreProperties("screening")
-    private List<Ticket> tickets;
 
     public Screening(int screen_number, int capacity, String starts_at) {
         this.screenNumber = screen_number;

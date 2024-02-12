@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -28,6 +29,12 @@ public class Customer {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @Column(name = "updated_at")
+    private String updatedAt;
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties("customer")
