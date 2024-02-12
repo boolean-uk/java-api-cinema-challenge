@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -56,4 +57,8 @@ public class Screening {
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "createdAt", "updatedAt"})
     private Movie movie;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "screening", fetch = FetchType.EAGER)
+    private List<Ticket> tickets;
 }

@@ -1,7 +1,13 @@
 package com.booleanuk.api.cinema.extension.controller;
 
 import com.booleanuk.api.cinema.extension.model.Movie;
+import com.booleanuk.api.cinema.extension.model.MovieDTO;
+import com.booleanuk.api.cinema.extension.model.MovieDTOMapper;
+import com.booleanuk.api.cinema.extension.model.Screening;
 import com.booleanuk.api.cinema.extension.repository.MovieRepository;
+import com.booleanuk.api.cinema.extension.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.extension.response.CustomResponse;
+import com.booleanuk.api.cinema.extension.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,67 +16,92 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
+    @Autowired
+    private ScreeningRepository screeningRepository;
 
-    @GetMapping
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    private final MovieDTOMapper movieDTOMapper;
+
+    public MovieController(MovieDTOMapper movieDTOMapper) {
+        this.movieDTOMapper = movieDTOMapper;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable("id") int id) {
-        Movie movie = movieRepository
-                .findById((long) id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        return ResponseEntity.ok(movie);
+    @GetMapping
+    public ResponseEntity<CustomResponse> getAllMovies() {
+        CustomResponse customResponse = new CustomResponse("success", movieRepository.findAll()
+                .stream()
+                .map(movieDTOMapper));
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        checkIfMovieIsValid(movie);
-        Movie newMovie = movieRepository.save(movie);
-        return ResponseEntity.ok(newMovie);
+    public ResponseEntity<CustomResponse> createMovie(@RequestBody Movie movie) {
+        checkIfValidMovie(movie);
+
+        movieRepository.save(movie);
+
+        for(Screening screening : movie.getScreenings()) {
+            screening.setMovie(movie);
+            screeningRepository.save(screening);
+        }
+
+        CustomResponse customResponse = new CustomResponse("success", movieRepository.findById(movie.getId()).stream()
+                .map(movieDTOMapper));
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
     @PutMapping("{id}")
-    public Movie updateMovie(@PathVariable("id") int id, @RequestBody Movie movie) {
-        checkIfMovieIsValid(movie);
-        Movie movieToUpdate = movieRepository
-                .findById((long) id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        if (movieToUpdate != null) {
-            movieToUpdate.setTitle(movie.getTitle());
-            movieToUpdate.setRating(movie.getRating());
-            movieToUpdate.setDescription(movie.getDescription());
-            movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-            movieRepository.save(movieToUpdate);
+    public ResponseEntity<CustomResponse> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie) {
+        if(!movieRepository.existsById(id)) {
+            return new ResponseEntity<>(new CustomResponse("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
-        return movieToUpdate;
+
+        checkIfValidMovie(movie);
+
+        Movie movieToUpdate = movieRepository
+                .findById((long) id).get();
+        movieToUpdate.setTitle(movie.getTitle());
+        movieToUpdate.setRating(movie.getRating());
+        movieToUpdate.setDescription(movie.getDescription());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        movieRepository.save(movieToUpdate);
+
+        CustomResponse customResponse = new CustomResponse("success", movieRepository.findById(movieToUpdate.getId()).stream()
+                .map(movieDTOMapper));
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
-    public Movie deleteMovie(@PathVariable("id") int id) {
-        Movie movieToDelete = movieRepository
-                .findById((long) id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        if (movieToDelete != null) {
-            movieRepository.delete(movieToDelete);
-            movieToDelete.setScreenings(new ArrayList<>(movieToDelete.getScreenings()));
+    public ResponseEntity<CustomResponse> deleteMovie(@PathVariable("id") Long id) {
+        if(!movieRepository.existsById(id)) {
+            return new ResponseEntity<>(new CustomResponse("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
-        return movieToDelete;
+
+        Movie movieToDelete = movieRepository
+                .findById((long) id).get();
+        movieRepository.delete(movieToDelete);
+        movieToDelete.setScreenings(new ArrayList<>(movieToDelete.getScreenings()));
+
+        CustomResponse customResponse = new CustomResponse("success", movieToDelete);
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
-    private void checkIfMovieIsValid(Movie movie) {
+    public ResponseEntity<CustomResponse> checkIfValidMovie(@RequestBody Movie movie) {
         if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required");
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Title is required")), HttpStatus.BAD_REQUEST);
         } else if (movie.getRating() == null || movie.getRating().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating is required");
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Rating is required")), HttpStatus.BAD_REQUEST);
         } else if (movie.getDescription() == null || movie.getDescription().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description is required");
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Description is required")), HttpStatus.BAD_REQUEST);
         } else if (movie.getRuntimeMins() == null || movie.getRuntimeMins() == 0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Runtime is required");
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Runtime is required")), HttpStatus.BAD_REQUEST);
         }
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.extension.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -53,8 +55,7 @@ public class Movie {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    @JsonIgnore
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
-    //@JsonIgnoreProperties(value = {"movie"})
-    private List<Screening> screenings;
+    @JsonIgnoreProperties(value = {"movie"})
+    private List<Screening> screenings = new ArrayList<>();
 }
