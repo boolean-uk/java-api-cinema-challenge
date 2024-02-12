@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "customers")
+@JsonIgnoreProperties("tickets")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

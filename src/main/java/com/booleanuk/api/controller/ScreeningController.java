@@ -24,18 +24,25 @@ public class ScreeningController {
     @GetMapping("/{movie_id}/screenings")
     public List<Screening> getAllScreenings(@PathVariable int movie_id) {
         checkIfMovieExists(movie_id);
-        return this.screeningRepository.findAll();
+
+        List<Screening> allSpecifiedScreenings = new ArrayList<>();
+
+        for (Screening screening : this.screeningRepository.findAll()) {
+            if (screening.getMovie().getId() == movie_id) {
+                allSpecifiedScreenings.add(screening);
+            }
+        }
+        return allSpecifiedScreenings;
     }
 
     @PostMapping("/{movie_id}/screenings")
     public ResponseEntity<Screening> createScreening(@PathVariable int movie_id,
                                                      @RequestBody Screening screening) {
         checkAllScreeningFields(screening);
-        Screening createdScreening = this.screeningRepository.save(screening);
         Movie tempMovie = getMovieWithOrFound(movie_id);
-        createdScreening.setMovie(tempMovie);
-        createdScreening.setTickets(new ArrayList<>());
-        return new ResponseEntity<>(createdScreening, HttpStatus.CREATED);
+        screening.setMovie(tempMovie);
+        screening.setTickets(new ArrayList<>());
+        return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{movie_id}/screenings/{id}")

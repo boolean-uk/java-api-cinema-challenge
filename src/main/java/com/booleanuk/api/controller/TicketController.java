@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,16 @@ public class TicketController {
                                       @PathVariable int screening_id) {
         checkIfCustomerExists(customer_id);
         checkIfScreeningExists(screening_id);
-        return this.ticketRepository.findAll();
+
+        List<Ticket> allSpecifiedTickets = new ArrayList<>();
+
+        for (Ticket ticket : this.ticketRepository.findAll()) {
+            if (ticket.getCustomer().getId() == customer_id &&
+                    ticket.getScreening().getId() == screening_id) {
+                allSpecifiedTickets.add(ticket);
+            }
+        }
+        return allSpecifiedTickets;
     }
 
     @PostMapping("/{customer_id}/screenings/{screening_id}")
