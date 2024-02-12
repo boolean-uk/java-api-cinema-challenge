@@ -37,7 +37,6 @@ public class Screening {
     private int capacity;
 
     @OneToMany(mappedBy = "screening")
-    @JsonIncludeProperties(value = {})
     private List<Ticket> tickets;
 
     @CreationTimestamp

@@ -33,8 +33,7 @@ public class Movie {
     @Column
     private int runtimeMins;
 
-    @OneToMany(mappedBy = "movie")
-    @JsonIncludeProperties(value = {})
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
     private List<Screening> screenings;
 
     @CreationTimestamp
@@ -43,11 +42,11 @@ public class Movie {
     @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
-    public Movie(String title, String rating, String description, int runtimeMins) {//, List<Screening> screenings) {
+    public Movie(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        //this.screenings = screenings;
+        this.screenings = screenings;
     }
 }

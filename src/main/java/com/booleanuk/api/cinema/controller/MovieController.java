@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.dto.MovieDto;
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.response.ApiException;
 import com.booleanuk.api.cinema.response.ApiSuccessResponse;
@@ -30,8 +31,16 @@ public class MovieController {
         if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() < 0) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "bad request");
         }
-        Movie createdMovie = this.repository.save(movie);
-        createdMovie.setScreenings(new ArrayList<>());
+        Movie createdMovie;
+        if (movie.getScreenings() == null || movie.getScreenings().isEmpty()) {
+            createdMovie = this.repository.save(movie);
+            createdMovie.setScreenings(new ArrayList<>());
+        } else {
+            for (Screening screening : movie.getScreenings()) {
+                screening.setMovie(movie);
+            }
+            createdMovie = this.repository.save(movie);
+        }
         return new ResponseEntity<>(new ApiSuccessResponse<>(this.translateToDto(createdMovie)), HttpStatus.CREATED);
     }
 

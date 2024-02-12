@@ -31,7 +31,6 @@ public class Customer {
     private String phone;
 
     @OneToMany(mappedBy = "customer")
-    @JsonIncludeProperties(value = {})
     private List<Ticket> tickets;
 
     @CreationTimestamp
