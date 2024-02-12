@@ -26,10 +26,10 @@ public class Screening {
     private Integer screenNumber;
 
     @Column
-    private LocalDateTime startsAt;
+    private Integer capacity;
 
     @Column
-    private Integer capacity;
+    private LocalDateTime startsAt;
 
     //TODO: fix so ouput when get request is correct
   //  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
