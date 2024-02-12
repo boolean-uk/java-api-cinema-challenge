@@ -28,6 +28,9 @@ public class MovieController {
 
 
         areMovieValid(movie);
+        if(movie.getScreenings() == null) {
+            movie.setScreenings(new ArrayList<>());
+        }
         return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
 
 

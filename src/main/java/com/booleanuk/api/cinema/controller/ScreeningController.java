@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,9 @@ public class ScreeningController {
         Movie movie = this.getAMovie(id);
         Screening newScreening = new Screening(screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), movie);
         areScreeningValid(newScreening);
+        if(newScreening.getTickets() == null) {
+            newScreening.setTickets(new ArrayList<>());
+        }
         movie.setUpdatedAt(DateCreater.getCurrentDate());
         movie.getScreenings().add(screening);
         return new ResponseEntity<>(this.screeningRepository.save(newScreening), HttpStatus.CREATED);
