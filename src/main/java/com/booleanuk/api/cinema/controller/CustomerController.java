@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controller;
 
 
 import com.booleanuk.api.cinema.helpers.CustomResponse;
+import com.booleanuk.api.cinema.helpers.ErrorResponse;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class CustomerController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomResponse> getById(@PathVariable int id){
         if(!customerRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("No customer with that id were found")), HttpStatus.NOT_FOUND);
         }
         Customer customer = customerRepository.findById(id).get();
         CustomResponse response = new CustomResponse("success", customer);
@@ -39,8 +40,7 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CustomResponse>  createCustomer(@RequestBody Customer customer){
         if(customer.getEmail() == null || customer.getName() == null || customer.getPhone() == null){
-            return new ResponseEntity<>(new CustomResponse("error", "Could not create customer, please check all required fields are correct"), HttpStatus.BAD_REQUEST);
-            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create customer, please check all required fields are correct");
+            return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("Could not create customer, please check all required fields are correct")), HttpStatus.BAD_REQUEST);
         }
         customerRepository.save(customer);
         CustomResponse response = new CustomResponse("success", customer);
@@ -50,7 +50,7 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> updateCustomer(@PathVariable int id, @RequestBody Customer customer){
         if(!customerRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("No customer with that id were found")), HttpStatus.NOT_FOUND);
         }
         Customer customer1 = customerRepository.findById(id).get();
         customer1.setName(customer.getName());
@@ -59,7 +59,7 @@ public class CustomerController {
         customer1.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
         if(customer1.getName() == null || customer1.getPhone() == null || customer1.getEmail() == null){
-            return new ResponseEntity<>(new CustomResponse("error", "Could not update customer, please check all required fields are correct"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("Could not update customer, please check all required fields are correct")), HttpStatus.NOT_FOUND);
         }
         customerRepository.save(customer1);
         CustomResponse response = new CustomResponse("success", customer1);
@@ -69,7 +69,7 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomResponse> delete(@PathVariable int id){
         if(!customerRepository.existsById(id)){
-            return new ResponseEntity<>(new CustomResponse("error", "No customer with that id were found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("No customer with that id were found")), HttpStatus.NOT_FOUND);
         }
         Customer customer = customerRepository
                 .findById(id).get();
