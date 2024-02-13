@@ -1,17 +1,18 @@
 package com.booleanuk.api.cinema.model;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 @Table(name = "screenings")
@@ -25,26 +26,36 @@ public class Screening {
     private int screenNumber;
 
     @Column
+    private LocalDateTime startsAt;
+
+    @Column
     private int capacity;
 
     @Column
-    private Date startsAt;
+    private LocalDateTime createdAt;
 
+    @Column
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins"})
+    @JsonIgnoreProperties("movie")
     private Movie movie;
 
 
-    public Screening(int screenNumber, int capacity, Date startsAt) {
+    public Screening(int screenNumber, LocalDateTime startsAt, int capacity) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
+
     public Screening(Integer id) {
         this.id = id;
     }
 
-
+    public void updateScreening() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

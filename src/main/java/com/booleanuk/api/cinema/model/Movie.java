@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -33,8 +34,15 @@ public class Movie {
     @Column
     private int runtimeMins;
 
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+
     @OneToMany(mappedBy = "movie")
-    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins"})
+    @JsonIncludeProperties(value = {"id", "title", "rating", "description", "runtimeMins", "createdAt", "updatedAt"})
     private List<Screening> screenings;
 
 
@@ -43,10 +51,17 @@ public class Movie {
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Movie(Integer id) {
         this.id = id;
     }
+
+    public void updateMovie() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
 }
