@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,4 +50,5 @@ public class Ticket {
     public Ticket(int numSeats) {
         this.numSeats = numSeats;
     }
+
 }

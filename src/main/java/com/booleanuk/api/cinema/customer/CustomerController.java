@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("customers")
@@ -17,10 +19,26 @@ public class CustomerController {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private CustomerService customerService;
+
+//    public ResponseEntity<ApiResponse<List<CustomerDTO>>> getAllCustomers() {
+//        List<Customer> customers = this.customerRepository.findAll();
+//        List<CustomerDTO> customerDTOs = customers.stream()
+//                .map(customerService::convertToDTO)
+//                .collect(Collectors.toList());
+//
+//        ApiResponse<List<CustomerDTO>> res = new ApiResponse<>("success", customerDTOs);
+//        return new ResponseEntity<>(res, HttpStatus.OK);
+//    }
     @GetMapping
     public ResponseEntity<CustomerListResponse>getAllCustomers(){
         CustomerListResponse customerListResponse = new CustomerListResponse();
-        customerListResponse.set(this.customerRepository.findAll());
+        List<Customer> customers = this.customerRepository.findAll();
+        List<CustomerDTO> customerDTOs = customers.stream()
+                .map(customerService::convertToDTO)
+                .toList();
+        customerListResponse.set(customerDTOs);
         return new ResponseEntity<>(customerListResponse, HttpStatus.OK);
     }
     
