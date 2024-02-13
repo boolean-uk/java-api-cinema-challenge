@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonPropertyOrder({"status", "data"})
-public class Response<T> {
+public abstract class Response<T> {
 
     @JsonProperty
     private String status;

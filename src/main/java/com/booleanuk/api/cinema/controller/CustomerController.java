@@ -4,8 +4,7 @@ import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
-import com.booleanuk.api.cinema.response.BadRequestResponse;
-import com.booleanuk.api.cinema.response.NotFoundResponse;
+import com.booleanuk.api.cinema.response.ErrorResponse;
 import com.booleanuk.api.cinema.response.Response;
 import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,23 +26,22 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<Response<List<Customer>>> getAllCustomers() {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(this.customerRepository.findAll()));
-
     }
 
     @PostMapping
-    public ResponseEntity<Response> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response<?>> createCustomer(@RequestBody Customer customer) {
         if(containsNull(customer)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestResponse());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("bad request"));
         }
         Response<Customer> response = new SuccessResponse<>(customerRepository.save(customer));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response> deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<Response<?>> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = findCustomer(id);
         if(customerToDelete == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("not found"));
         }
 
         for(Ticket ticket: customerToDelete.getTickets()) {
@@ -54,12 +52,11 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(customerToDelete));
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<Response> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<Response<?>> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
         Customer customerToUpdate = findCustomer(id);
         if(customerToUpdate == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("not found"));
         }
 
         if(customer.getName() != null) {

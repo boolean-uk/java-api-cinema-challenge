@@ -61,11 +61,11 @@ public class Screening {
     public void preUpdate() {
         updatedAt = OffsetDateTime.now();
     }
+
     public Screening(int screenNumber, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
     }
-
 
     public void setStartsAt(String startsAt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
