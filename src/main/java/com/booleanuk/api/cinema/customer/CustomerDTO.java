@@ -17,6 +17,4 @@ public class CustomerDTO {
     private String phone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
 }

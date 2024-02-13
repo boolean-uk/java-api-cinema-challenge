@@ -48,10 +48,11 @@ public class Screening {
     @ManyToOne
     @JoinColumn(name ="movie_id", nullable = false)
     @JsonIncludeProperties(value = {"title", "rating", "description", "runtimeMins"})
+    @JsonIgnoreProperties("movie")
     private Movie movie;
 
     @OneToMany(mappedBy = "screening")
-    @JsonIgnoreProperties("screening")
+    @JsonIgnoreProperties(value = "screening", allowSetters = true)
     private List<Ticket> tickets;
 
     public Screening(int screenNumber, LocalDateTime startsAt, int capacity) {

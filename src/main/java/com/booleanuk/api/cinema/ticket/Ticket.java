@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.ticket;
 
 import com.booleanuk.api.cinema.customer.Customer;
 import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,12 +40,14 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name ="screening_id", nullable = false)
-    @JsonIncludeProperties(value = {"movie_id", "startsAt", "capacity"})
+    @JsonIncludeProperties(value = {"startsAt", "capacity"})
+    @JsonIgnoreProperties("tickets")
     private Screening screening;
 
     @ManyToOne
     @JoinColumn(name ="customer_id", nullable = false)
     @JsonIncludeProperties(value = {"name", "email", "phone"})
+    @JsonIgnoreProperties("tickets")
     private Customer customer;
 
     public Ticket(int numSeats) {

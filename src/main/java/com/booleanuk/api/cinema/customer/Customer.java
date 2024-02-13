@@ -41,7 +41,7 @@ public class Customer {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("customer")
+    @JsonIgnoreProperties(value = "customer", allowSetters = true)
     private List<Ticket> tickets;
 
     public Customer(String name, String email, String phone) {

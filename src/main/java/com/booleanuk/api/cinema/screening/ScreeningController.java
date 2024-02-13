@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("movies/{id}/screenings")
 public class ScreeningController {
@@ -43,6 +45,7 @@ public class ScreeningController {
             return notFound();
         }
         screening.setMovie(movieToAddScreeningFor);
+        screening.setTickets(new ArrayList<>());
         Screening createdScreening = screeningRepository.save(screening);
 
         ScreeningResponse response = new ScreeningResponse();

@@ -45,7 +45,7 @@ public class Movie {
 
 
     @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties("movie")
+    @JsonIgnoreProperties(value = "movie", allowSetters = true)
     private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, Integer runtimeMins) {

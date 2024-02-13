@@ -41,6 +41,7 @@ public class MovieController {
         if(!(movie.getScreenings() == null)){
             for(Screening screening : movie.getScreenings()){
                 screening.setMovie(createdMovie);
+                screening.setTickets(new ArrayList<>());
                 if(isInvalidScreeningRequest(screening)){
                     return badRequest();
                 }
