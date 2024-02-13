@@ -1,0 +1,5 @@
+(D) Finish CustomerController ApiResponse implementations
+(D) Refactor Bad Request ApiResponse to a helper method as it's generic for all bad requests.
+(D) Write DOCS for methods to act as notes looking back
+(D) Refactor code
+(D) Implement helper method to check for capacity when booking a ticket
