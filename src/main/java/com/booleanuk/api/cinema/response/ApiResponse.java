@@ -47,8 +47,6 @@ public class ApiResponse<T> {
         public Message(String message) {
             this.message = message;
         }
-
-        // Getter and setter for message
     }
 
 }

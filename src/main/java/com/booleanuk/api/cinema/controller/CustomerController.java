@@ -146,6 +146,8 @@ public class CustomerController {
             ticket.setUpdatedAt(date);
             if (getACustomer(customerId) == null || getAScreening(screeningId) == null) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
+            } else if (invalidSeatsRemaining(ticket, screeningId)) {
+                return HelperUtils.badRequest(new ApiResponse.Message("Not enough seats remaining at the selected screening!"));
             } else {
                 Customer tempCustomer = getACustomer(customerId);
                 Screening tempScreening = getAScreening(screeningId);
@@ -192,4 +194,17 @@ public class CustomerController {
     private Screening getAScreening(int id) {
         return this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
     }
+
+    private boolean invalidSeatsRemaining(Ticket t, int screeningId) {
+        return t.getNumSeats() > remainingSeatsAtScreening(getAScreening(screeningId));
+    }
+
+    private int remainingSeatsAtScreening(Screening s) {
+        int occupiedSeats = 0;
+        for (Ticket ticket : s.getTickets()) {
+            occupiedSeats += ticket.getNumSeats();
+        }
+        return s.getCapacity() - occupiedSeats;
+    }
+
 }
