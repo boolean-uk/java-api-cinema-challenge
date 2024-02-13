@@ -24,7 +24,7 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"title", "description", "runtimeMins"})
     private Movie movie;
@@ -44,7 +44,7 @@ public class Screening {
     @Column
     private String updatedAt;
 
-    @OneToMany(mappedBy = "screening")
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("screening")
     private List<Ticket> tickets;
 

@@ -1,11 +1,12 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.ticket.Ticket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,27 +21,82 @@ public class CustomerController {
     private CustomerRepository repo;
 
     @PostMapping
-    public ResponseEntity<Customer> create(@RequestBody Customer customer){
+    public ResponseEntity<Response<?>> create(@RequestBody Customer customer){
+        if (customer.getName() == null ||
+                customer.getEmail() == null ||
+                customer.getPhone() == null){
+            ErrorResponse badRequest = new ErrorResponse();
+            badRequest.set("bad request");
+
+            return new ResponseEntity<>(badRequest, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Integer.parseInt(customer.getPhone());
+        } catch (NumberFormatException e){
+            ErrorResponse badRequest = new ErrorResponse();
+            badRequest.set("bad request");
+
+            return new ResponseEntity<>(badRequest, HttpStatus.BAD_REQUEST);
+        }
+
         customer.setTickets(new ArrayList<Ticket>());
         customer.setCreatedAt(nowFormatted());
         customer.setUpdatedAt(nowFormatted());
+        repo.save(customer);
 
-        return new ResponseEntity<Customer>(repo.save(customer), HttpStatus.CREATED);
+        Response<Customer> customerResponse = new Response<>();
+        customerResponse.set(customer);
+
+        return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Customer> getAll(){
-        return repo.findAll();
+    public ResponseEntity<Response<List<Customer>>> getAll(){
+        Response<List<Customer>> customerListResponse = new Response<>();
+        customerListResponse.set(repo.findAll());
+
+        return ResponseEntity.ok(customerListResponse);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Customer> getOne(@PathVariable int id){
-        return ResponseEntity.ok(getById(id));
+    public ResponseEntity<Response<?>> getOne(@PathVariable int id){
+        Customer customer = getById(id);
+
+        if (customer == null){
+            ErrorResponse notFound = new ErrorResponse();
+            notFound.set("not found");
+
+            return new ResponseEntity<>(notFound, HttpStatus.NOT_FOUND);
+        }
+
+        Response<Customer> customerResponse = new Response<>();
+        customerResponse.set(customer);
+
+        return ResponseEntity.ok(customerResponse);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Customer> update(@PathVariable int id, @RequestBody Customer customer){
+    public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody Customer customer){
+        if (customer.getPhone() != null){
+            try {
+                Integer.parseInt(customer.getPhone());
+            } catch (NumberFormatException e){
+                ErrorResponse badRequest = new ErrorResponse();
+                badRequest.set("bad request");
+
+                return new ResponseEntity<>(badRequest, HttpStatus.BAD_REQUEST);
+            }
+        }
+
         Customer toUpdate = getById(id);
+
+        if (toUpdate == null){
+            ErrorResponse notFound = new ErrorResponse();
+            notFound.set("not found");
+
+            return new ResponseEntity<>(notFound, HttpStatus.NOT_FOUND);
+        }
 
         Optional.ofNullable(customer.getName())
                 .ifPresent(name -> toUpdate.setName(name));
@@ -50,21 +106,35 @@ public class CustomerController {
                 .ifPresent(phone -> toUpdate.setPhone(phone));
 
         toUpdate.setUpdatedAt(nowFormatted());
+        repo.save(toUpdate);
 
-        return new ResponseEntity<Customer>(repo.save(toUpdate), HttpStatus.CREATED);
+        Response<Customer> customerResponse = new Response<>();
+        customerResponse.set(toUpdate);
+
+        return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Customer> delete(@PathVariable int id){
+    public ResponseEntity<Response<?>> delete(@PathVariable int id){
         Customer toDelete = getById(id);
+
+        if (toDelete == null){
+            ErrorResponse notFound = new ErrorResponse();
+            notFound.set("not found");
+
+            return new ResponseEntity<>(notFound, HttpStatus.NOT_FOUND);
+        }
+
         repo.delete(toDelete);
         toDelete.setTickets(new ArrayList<Ticket>());
+        Response<Customer> customerResponse = new Response<>();
+        customerResponse.set(toDelete);
 
-        return ResponseEntity.ok(toDelete);
+        return ResponseEntity.ok(customerResponse);
     }
 
     private Customer getById(int id){
-        return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return repo.findById(id).orElse(null);
     }
 
     private String nowFormatted(){
