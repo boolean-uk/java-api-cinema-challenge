@@ -28,9 +28,18 @@ public class TicketController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    @GetMapping("/tickets")
+    public ResponseEntity<ResponseTemplate> getAllTickets() {
+        List<Ticket> allSpecifiedTickets = this.ticketRepository.findAll();
+        if (allSpecifiedTickets.isEmpty()) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new SuccessResponse(allSpecifiedTickets), HttpStatus.OK);
+    }
+
     @GetMapping("/{customer_id}/screenings/{screening_id}")
-    public ResponseEntity<ResponseTemplate> getAllTickets(@PathVariable int customer_id,
-                                                          @PathVariable int screening_id) {
+    public ResponseEntity<ResponseTemplate> getAllSpecifiedTickets(@PathVariable int customer_id,
+                                                                   @PathVariable int screening_id) {
         if (this.doesCustomerIDNotExist(customer_id) ||
                 this.doesScreeningIDNotExist(screening_id)) {
             return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
@@ -41,6 +50,9 @@ public class TicketController {
                     ticket.getScreening().getId() == screening_id) {
                 allSpecifiedTickets.add(ticket);
             }
+        }
+        if (allSpecifiedTickets.isEmpty()) {
+            return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(new SuccessResponse(allSpecifiedTickets), HttpStatus.OK);
     }

@@ -24,8 +24,14 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @GetMapping("/screenings")
+    public ResponseEntity<ResponseTemplate> getAllScreenings() {
+        List<Screening> allSpecifiedScreenings = this.screeningRepository.findAll();
+        return new ResponseEntity<>(new SuccessResponse(allSpecifiedScreenings), HttpStatus.OK);
+    }
+
     @GetMapping("/{movie_id}/screenings")
-    public ResponseEntity<ResponseTemplate> getAllScreenings(@PathVariable int movie_id) {
+    public ResponseEntity<ResponseTemplate> getAllScreeningsForMovie(@PathVariable int movie_id) {
         if (this.doesMovieIDNotExist(movie_id)) {
             return new ResponseEntity<>(new NotFoundResponse(), HttpStatus.NOT_FOUND);
         }

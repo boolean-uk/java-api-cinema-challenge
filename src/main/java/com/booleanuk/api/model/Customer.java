@@ -1,13 +1,12 @@
 package com.booleanuk.api.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+
+import java.time.*;
 import java.util.List;
 
 @NoArgsConstructor
@@ -32,11 +31,11 @@ public class Customer {
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    private OffsetDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties("customer")
@@ -44,13 +43,13 @@ public class Customer {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = OffsetDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     public Customer(String name, String email, String phone) {
@@ -61,5 +60,12 @@ public class Customer {
 
     public Customer(int id) {
         this.id = id;
+    }
+
+    public ZonedDateTime getCreatedAt() {
+        return this.updatedAt.withZoneSameInstant(ZoneId.systemDefault());
+    }
+    public ZonedDateTime getUpdatedAt() {
+        return this.updatedAt.withZoneSameInstant(ZoneId.systemDefault());
     }
 }

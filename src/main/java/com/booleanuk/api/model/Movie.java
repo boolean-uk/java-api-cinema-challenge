@@ -1,14 +1,12 @@
 package com.booleanuk.api.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+
+import java.time.*;
 import java.util.List;
 
 @NoArgsConstructor
@@ -36,11 +34,11 @@ public class Movie {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @Column
-    private OffsetDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
@@ -48,13 +46,13 @@ public class Movie {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = OffsetDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     public Movie(String title, String rating, String description, int runTimeMins) {
@@ -66,5 +64,12 @@ public class Movie {
 
     public Movie(int id) {
         this.id = id;
+    }
+
+    public ZonedDateTime getCreatedAt() {
+        return this.updatedAt.withZoneSameInstant(ZoneId.systemDefault());
+    }
+    public ZonedDateTime getUpdatedAt() {
+        return this.updatedAt.withZoneSameInstant(ZoneId.systemDefault());
     }
 }
