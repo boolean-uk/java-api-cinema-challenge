@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.controllers;
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
+import com.booleanuk.api.cinema.repositories.TicketRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,23 +15,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+@Slf4j
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
     private final CustomerRepository customerRepository;
+    private final TicketRepository ticketRepository;
 
     // @Autowired Prefer constructor injection to field injection. Done automatically by Spring
-    public CustomerController(CustomerRepository customerRepository) {
+    public CustomerController(CustomerRepository customerRepository, TicketRepository ticketRepository) {
         this.customerRepository = customerRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @PostMapping
     public ResponseEntity<Response<?>> add(@RequestBody Customer customer) {
         if (lacksRequiredFields(customer) || !isValidObject(customer)) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Response.success(this.customerRepository.save(customer)));
+            return ResponseEntity.badRequest().body(Response.BAD_REQUEST);
         }
-        return ResponseEntity.badRequest().body(Response.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Response.success(this.customerRepository.save(customer)));
     }
 
     @GetMapping
@@ -73,6 +78,11 @@ public class CustomerController {
         }
 
         Customer customerToDelete = this.customerRepository.findById(id).get();
+        // Remove tickets belonging to the customer
+        if (!customerToDelete.getTickets().isEmpty()) {
+            ticketRepository.deleteAll(customerToDelete.getTickets());
+        }
+
         try {
             this.customerRepository.delete(customerToDelete);
         } catch (DataIntegrityViolationException e) {
@@ -80,7 +90,6 @@ public class CustomerController {
         }
 
         return ResponseEntity.ok(Response.success(customerToDelete));
-        // TODO Deleting customer should delete all tickets for that customer
     }
 
     private boolean lacksRequiredFields(Customer customer) {

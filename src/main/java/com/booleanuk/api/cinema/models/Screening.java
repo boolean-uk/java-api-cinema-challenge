@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,4 +30,8 @@ public class Screening {
     private ZonedDateTime createdAt;
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
+    @JsonIgnore
+    @OneToMany(mappedBy = "screening")
+    @ToString.Exclude
+    private List<Ticket> tickets;
 }

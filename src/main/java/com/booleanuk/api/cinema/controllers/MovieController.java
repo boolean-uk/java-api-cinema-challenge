@@ -1,12 +1,10 @@
 package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.enums.Rating;
-import com.booleanuk.api.cinema.models.Movie;
-import com.booleanuk.api.cinema.models.MovieDTO;
-import com.booleanuk.api.cinema.models.Response;
-import com.booleanuk.api.cinema.models.Screening;
+import com.booleanuk.api.cinema.models.*;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import com.booleanuk.api.cinema.repositories.TicketRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -24,10 +22,12 @@ import java.util.stream.Stream;
 public class MovieController {
     private final MovieRepository movieRepository;
     private final ScreeningRepository screeningRepository;
+    private final TicketRepository ticketRepository;
 
-    public MovieController(MovieRepository movieRepository, ScreeningRepository screeningRepository) {
+    public MovieController(MovieRepository movieRepository, ScreeningRepository screeningRepository, TicketRepository ticketRepository) {
         this.movieRepository = movieRepository;
         this.screeningRepository = screeningRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @PostMapping
@@ -81,6 +81,14 @@ public class MovieController {
         }
 
         Movie movieToDelete = this.movieRepository.findById(id).get();
+        if (!movieToDelete.getScreenings().isEmpty()) {
+            for (Screening screening : movieToDelete.getScreenings()) {
+                if (!screening.getTickets().isEmpty()) {
+                    ticketRepository.deleteAll(screening.getTickets());
+                }
+                screeningRepository.delete(screening);
+            }
+        }
         try {
             this.movieRepository.delete(movieToDelete);
         } catch (DataIntegrityViolationException e) {
@@ -88,7 +96,6 @@ public class MovieController {
         }
 
         return ResponseEntity.ok(Response.success(MovieDTO.fromMovie(movieToDelete)));
-        // TODO Deleting a movie should delete all screenings and tickets
     }
 
     private boolean lacksRequiredFields(Movie movie) {

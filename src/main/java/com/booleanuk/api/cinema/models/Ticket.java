@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ticket {
