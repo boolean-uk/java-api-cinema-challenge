@@ -6,13 +6,13 @@ import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.ErrorResponse;
 import com.booleanuk.api.cinema.response.Response;
 import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -31,45 +31,88 @@ public class TicketController {
 
     @GetMapping
     public ResponseEntity<Response> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
-        // Check if customer and screening with given ids exist, return 404 Not found if they don't
-        this.findCustomer(customerId);
-        this.findScreening(screeningId);
+        // 404 Not found if no customer with given ID
+        if (this.getCustomer(customerId) == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer with that ID found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        // 404 Not found if no screening with given ID
+        if (this.getScreening(screeningId) == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No screening with that ID found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        // Makes list of all tickets with given customerId and screeningId
         List<Ticket> tickets = this.ticketRepository.findAll().stream().filter(ticket ->
                 ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId).toList();
-        return ResponseEntity.ok(new SuccessResponse(tickets));
+
+        // Response with the list of tickets
+        SuccessResponse response = new SuccessResponse();
+        response.set(tickets);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Response> bookTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
-        ticket.setCustomer(findCustomer(customerId));
-        ticket.setScreening(findScreening(screeningId));
-        this.checkCapacityOfScreening(screeningId, ticket.getNumSeats());
+    public ResponseEntity<Response> bookTicket(
+            @PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
+        // 404 Not found if no customer with given ID
+        Customer customer = this.getCustomer(customerId);
+        if (customer == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer with that ID found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        ticket.setCustomer(customer);
+
+        // 404 Not found if no screening with given ID
+        Screening screening = this.getScreening(screeningId);
+        if (screening == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No screening with that ID found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        ticket.setScreening(screening);
+
+        // 400 Bad request if capacity is smaller than requested amount of seats
+        Response capacityResponse = this.checkCapacityOfScreening(screening, ticket.getNumSeats());
+        if (capacityResponse.getClass().equals(ErrorResponse.class)) {
+            return new ResponseEntity<>(capacityResponse, HttpStatus.BAD_REQUEST);
+        }
+
         ticket.setCreatedAt(ZonedDateTime.now());
         ticket.setUpdatedAt(ZonedDateTime.now());
-        return new ResponseEntity<>(new SuccessResponse(this.ticketRepository.save(ticket)), HttpStatus.CREATED);
+
+        // Response with the booked ticket
+        SuccessResponse response = new SuccessResponse();
+        response.set(this.ticketRepository.save(ticket));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Checks if customerId exists or throws 404
-    private Customer findCustomer(int customerId) {
-        return this.customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id found."));
+    // Finds customer by ID
+    private Customer getCustomer(int customerId) {
+        return this.customerRepository.findById(customerId).orElse(null);
     }
 
-    // Checks if screeningId exists or throws 404
-    private Screening findScreening(int screeningId) {
-        return this.screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id found."));
+    // Finds screening by ID
+    private Screening getScreening(int screeningId) {
+        return this.screeningRepository.findById(screeningId).orElse(null);
     }
 
-    // Check capacity for screening, return 400 Bad request if numSeats are too large
-    private void checkCapacityOfScreening(int screeningId, int numSeats) {
-        Screening screening = this.screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id found."));
+    // Check capacity of screening, returns ErrorResponse if numSeats are too large
+    private Response checkCapacityOfScreening(Screening screening, int numSeats) {
         int maxCapacity = screening.getCapacity();
-        int ticketsSold = this.ticketRepository.findAll().stream().filter(ticket -> ticket.getScreening().getId() == screeningId).mapToInt(Ticket::getNumSeats).sum();
-        // Throws exception if number of available seats is smaller than the requested amount
+        int ticketsSold = this.ticketRepository.findAll().stream()
+                .filter(ticket -> ticket.getScreening() == screening)
+                .mapToInt(Ticket::getNumSeats).sum();
+        // Bad request error if number of available seats is smaller than the requested amount
         if (numSeats > (maxCapacity - ticketsSold)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number of seats are too large.");
+            ErrorResponse error = new ErrorResponse();
+            error.set("Number of seats are too large.");
+            return error;
         }
+        return new SuccessResponse();
     }
 }

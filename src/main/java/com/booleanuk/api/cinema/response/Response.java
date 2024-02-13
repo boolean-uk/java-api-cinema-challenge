@@ -1,16 +1,14 @@
 package com.booleanuk.api.cinema.response;
 
-
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class Response {
-    String status;
-    Object data;
+    protected String status;
+    protected Object data;
 
-    public Response(Object data) {
+    public void set(Object data) {
+        this.status = "success";
         this.data = data;
     }
 

@@ -4,11 +4,13 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -24,14 +26,29 @@ public class MovieController {
     private ScreeningRepository screeningRepository;
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        this.checkHasRequiredFields(movie);
+    public ResponseEntity<Response> createMovie(@RequestBody Movie movie) {
+        // 400 Bad request if a field not present
+        if (movie.getTitle() == null || movie.getRating() == null ||
+                movie.getDescription() == null || movie.getRuntimeMins() <= 0) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create a new movie, please check all fields are correct.");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
         movie.setCreatedAt(ZonedDateTime.now());
         movie.setUpdatedAt(ZonedDateTime.now());
+
+        // Create screenings
         Movie saved = this.movieRepository.save(movie);
         if(movie.getScreenings() != null) {
             for (Screening screening : movie.getScreenings()) {
-                checkScreeningHasRequiredFields(screening);
+                // 400 Bad request if not all fields present in screening
+                if (screening.getScreenNumber() <= 0 || screening.getCapacity() <= 0 || screening.getStartsAt() == null) {
+                    ErrorResponse error = new ErrorResponse();
+                    error.set("Could not create a screening for the specified movie, " +
+                            "please check all required fields are correct.");
+                    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+                }
                 screening.setMovie(saved);
                 screening.setCreatedAt(ZonedDateTime.now());
                 screening.setUpdatedAt(ZonedDateTime.now());
@@ -41,21 +58,41 @@ public class MovieController {
         else {
             movie.setScreenings(new ArrayList<>());
         }
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+
+        // Response with the created movie
+        SuccessResponse response = new SuccessResponse();
+        response.set(saved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Movie> getAllMovies() {
-        return this.movieRepository.findAll();
+    public ResponseEntity<Response> getAllMovies() {
+        List<Movie> movies = this.movieRepository.findAll();
+        // Response with list of movies
+        SuccessResponse response = new SuccessResponse();
+        response.set(movies);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
-        Movie movieToUpdate = this.findMovieById(id);
-        // 400 if no fields are present in the put request
-        if (movie.getTitle() == null && movie.getRating() == null && movie.getDescription() == null && movie.getRuntimeMins() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update movie, please check all required fields are correct.");
+    public ResponseEntity<Response> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+        // 404 Not found if no movie with given ID
+        Movie movieToUpdate = this.getMovieById(id);
+        if (movieToUpdate == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No movie with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
+
+        // 400 Bad request if no fields are present in the put request
+        if (movie.getTitle() == null && movie.getRating() == null &&
+                movie.getDescription() == null && movie.getRuntimeMins() <= 0) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not update movie, please check all required fields are correct.");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        // Update field only if present
         if (movie.getTitle() != null) {
             movieToUpdate.setTitle(movie.getTitle());
         }
@@ -68,37 +105,41 @@ public class MovieController {
         if (movie.getRuntimeMins() > 0) {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         }
+
+        // Update updatedAt
         movieToUpdate.setUpdatedAt(ZonedDateTime.now());
-        return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+
+        // Response with the updated movie
+        SuccessResponse response = new SuccessResponse();
+        response.set(this.movieRepository.save(movieToUpdate));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
-        Movie movieToDelete = this.findMovieById(id);
+    public ResponseEntity<Response> deleteMovie(@PathVariable int id) {
+        // 404 Not found if no movie with given ID
+        Movie movieToDelete = this.getMovieById(id);
+        if (movieToDelete == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("No movie with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        // Delete all related screenings
         for (Screening screening : movieToDelete.getScreenings()) {
             screeningRepository.delete(screening);
         }
         this.movieRepository.delete(movieToDelete);
-        return ResponseEntity.ok(movieToDelete);
+
+        // Response with deleted movie
+        SuccessResponse response = new SuccessResponse();
+        response.set(movieToDelete);
+        return ResponseEntity.ok(response);
     }
 
     // Method used in updateMovie() and deleteMovie() to find a movie by the id
-    private Movie findMovieById(int id) {
-        return this.movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movies with that id were found."));
+    private Movie getMovieById(int id) {
+        return this.movieRepository.findById(id).orElse(null);
     }
 
-    // Method to check if all required fields are contained in the createMovie request, used in createMovie()
-    private void checkHasRequiredFields(Movie movie) {
-        if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new movie, please check all required fields are correct.");
-        }
-    }
-
-    // Method to check if all required fields are contained in screening
-    private void checkScreeningHasRequiredFields(Screening screening) {
-        if (screening.getScreenNumber() <= 0 || screening.getCapacity() <= 0 || screening.getStartsAt() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a screening for the specified movie, please check all required fields are correct.");
-        }
-    }
 }
