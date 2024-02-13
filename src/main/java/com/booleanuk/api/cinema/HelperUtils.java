@@ -40,11 +40,11 @@ public class HelperUtils {
 
     public static <T> ResponseEntity<ApiResponse<?>> createdRequest(T data) {
         ApiResponse<T> createdRequest = new ApiResponse<>("success", data);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createdRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
 
     public static <T> ResponseEntity<ApiResponse<?>> okRequest(T data) {
         ApiResponse<T> okRequest = new ApiResponse<>("success", data);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(okRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(okRequest);
     }
 }

@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+@JsonPropertyOrder({"id", "name", "email", "phone", "createdAt", "updatedAt", "tickets"})
 @NoArgsConstructor
 @Getter
 @Setter

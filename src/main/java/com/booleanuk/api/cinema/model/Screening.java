@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.List;
 
+@JsonPropertyOrder({"id", "movie", "screenNumber", "capacity", "startsAt", "createdAt", "updatedAt", "tickets"})
 @NoArgsConstructor
 @Getter
 @Setter
