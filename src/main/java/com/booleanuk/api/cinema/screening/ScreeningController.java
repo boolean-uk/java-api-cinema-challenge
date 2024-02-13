@@ -38,7 +38,7 @@ public class ScreeningController {
             return new ResponseEntity<>(new ErrorResponse(new Error("Movie not found")), HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new ScreeningListResponse(movie.getScreeningList()), HttpStatus.OK);
+        return new ResponseEntity<>(new ScreeningListResponse(movie.getScreenings()), HttpStatus.OK);
     }
 
     @PostMapping("{id}/screenings")
@@ -51,7 +51,8 @@ public class ScreeningController {
         }
         screening.setCreatedAt(currentTime);
         screening.setUpdatedAt(currentTime);
-        screening.setMovie(screening.getMovie());
+        screening.setMovie(movie);
+        this.screeningRepository.save(screening);
         return new ResponseEntity<>(new ScreeningResponse(screening), HttpStatus.OK);
     }
 
