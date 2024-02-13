@@ -1,11 +1,9 @@
 package com.booleanuk.api.cinema.extension.controller;
 
-import com.booleanuk.api.cinema.extension.model.Movie;
-import com.booleanuk.api.cinema.extension.model.MovieDTO;
-import com.booleanuk.api.cinema.extension.model.MovieDTOMapper;
-import com.booleanuk.api.cinema.extension.model.Screening;
+import com.booleanuk.api.cinema.extension.model.*;
 import com.booleanuk.api.cinema.extension.repository.MovieRepository;
 import com.booleanuk.api.cinema.extension.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.extension.repository.TicketRepository;
 import com.booleanuk.api.cinema.extension.response.CustomResponse;
 import com.booleanuk.api.cinema.extension.response.Error;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +24,8 @@ public class MovieController {
     private MovieRepository movieRepository;
     @Autowired
     private ScreeningRepository screeningRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     private final MovieDTOMapper movieDTOMapper;
 
@@ -68,6 +69,7 @@ public class MovieController {
         movieToUpdate.setRating(movie.getRating() != null ? movie.getRating() : movieToUpdate.getRating());
         movieToUpdate.setDescription(movie.getDescription() != null ? movie.getDescription() : movieToUpdate.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins() != null ? movie.getRuntimeMins() : movieToUpdate.getRuntimeMins());
+
         movieRepository.save(movieToUpdate);
 
         CustomResponse customResponse = new CustomResponse("success", movieRepository.findById(movieToUpdate.getId()).stream()
@@ -83,10 +85,24 @@ public class MovieController {
 
         Movie movieToDelete = movieRepository
                 .findById((long) id).get();
-        movieRepository.delete(movieToDelete);
-        movieToDelete.setScreenings(new ArrayList<>(movieToDelete.getScreenings()));
 
-        CustomResponse customResponse = new CustomResponse("success", movieToDelete);
+        for (Ticket ticket : ticketRepository.findAll()) {
+            if (Objects.equals(ticket.getScreening().getMovie().getId(), id)) {
+                ticketRepository.delete(ticket);
+            }
+        }
+
+        for (Screening screening : screeningRepository.findAll()) {
+            if (Objects.equals(screening.getMovie().getId(), id)) {
+                screeningRepository.delete(screening);
+            }
+        }
+
+        CustomResponse customResponse = new CustomResponse("success", movieRepository.findById(movieToDelete.getId()).stream()
+                .map(movieDTOMapper));
+
+        movieRepository.delete(movieToDelete);
+
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
