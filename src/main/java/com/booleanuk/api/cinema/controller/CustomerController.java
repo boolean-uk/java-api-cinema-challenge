@@ -4,7 +4,7 @@ import com.booleanuk.api.cinema.dto.*;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.response.Response;
-import com.booleanuk.api.cinema.response.ApiException;
+import com.booleanuk.api.cinema.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
