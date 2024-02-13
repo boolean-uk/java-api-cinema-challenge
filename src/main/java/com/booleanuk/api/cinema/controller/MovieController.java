@@ -111,12 +111,9 @@ public class MovieController {
         else {
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         }
-        if (movie.getCreatedAt() == null) {
-            movieToUpdate.setCreatedAt(prevMovie.getCreatedAt());
-        }
-        else {
-            movieToUpdate.setCreatedAt(movie.getCreatedAt());
-        }
+//        if (movie.getCreatedAt() != null) {
+//            movieToUpdate.setCreatedAt(movie.getCreatedAt());
+//        }
         movieToUpdate.setUpdatedAt(movie.getUpdatedAt());
         if (movie.getScreenings() == null) {
             movieToUpdate.setScreenings(prevMovie.getScreenings());

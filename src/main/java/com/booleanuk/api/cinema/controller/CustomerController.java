@@ -96,12 +96,12 @@ public class CustomerController {
         else {
             customerToUpdate.setPhone(customer.getPhone());
         }
-        if (customer.getUpdatedAt() == null) {
-            customerToUpdate.setCreatedAt(previousCus.getCreatedAt());
-        }
-        else {
-            customerToUpdate.setCreatedAt(customer.getCreatedAt());
-        }
+//        if (customer.getCreatedAt() == null) {
+//            customerToUpdate.setCreatedAt(previousCus.getCreatedAt());
+//        }
+//        else {
+//            customerToUpdate.setCreatedAt(customer.getCreatedAt());
+//        }
         customerToUpdate.setUpdatedAt(customer.getUpdatedAt());
 
         return ResponseEntity.ok(new CustomResponse("Success", this.customerRepository.save(customerToUpdate)));
