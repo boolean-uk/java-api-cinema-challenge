@@ -18,7 +18,6 @@ VALUES
   ('Emily Brown', 'emily.brown@example.com', '+1555666777', NOW(), NOW()),
   ('David Wilson', 'david.wilson@example.com', '+1444555666', NOW(), NOW());
 
-
 -- Insert dummy screenings for "The Batman"
 INSERT INTO screenings
 	(movie_id, screen_number, starts_at, capacity, created_at, updated_at)

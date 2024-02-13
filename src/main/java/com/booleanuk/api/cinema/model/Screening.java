@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "screenings")
-public class Screening {
+public class Screening extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -31,22 +31,16 @@ public class Screening {
     private Date startsAt;
     @Column(name = "capacity")
     private int capacity;
-    @Column(name = "created_at")
-    private Date createdAt;
-    @Column(name = "updated_at")
-    private Date updatedAt;
 
     @OneToMany(mappedBy = "screening")
     @JsonIgnoreProperties("screening")
     private List<Ticket> tickets;
 
-    public Screening(Movie movie, int screenNumber, Date startsAt, int capacity, Date createdAt, Date updatedAt) {
+    public Screening(Movie movie, int screenNumber, Date startsAt, int capacity) {
         this.movie = movie;
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Screening(int id) {

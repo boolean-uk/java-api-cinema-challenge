@@ -31,9 +31,6 @@ public class ScreeningController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> createScreening(@RequestBody Screening screening) {
         try {
-            Date date = new Date();
-            screening.setCreatedAt(date);
-            screening.setUpdatedAt(date);
             if (HelperUtils.invalidScreeningFields(screening)) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {

@@ -59,9 +59,6 @@ public class MovieController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> createMovie(@RequestBody Movie movie) {
         try {
-            Date date = new Date();
-            movie.setCreatedAt(date);
-            movie.setUpdatedAt(date);
             if (HelperUtils.invalidMovieFields(movie)) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
@@ -157,9 +154,6 @@ public class MovieController {
      */
     @PostMapping("/{id}/screenings")
     public ResponseEntity<ApiResponse<?>> createScreening(@PathVariable int id, @RequestBody Screening screening) {
-        Date date = new Date();
-        screening.setCreatedAt(date);
-        screening.setUpdatedAt(date);
         if (HelperUtils.invalidScreeningFields(screening)) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
         } else {

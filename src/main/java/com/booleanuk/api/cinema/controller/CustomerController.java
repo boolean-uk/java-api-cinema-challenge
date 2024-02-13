@@ -64,9 +64,6 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> createCustomer(@RequestBody Customer customer) {
         try {
-            Date date = new Date();
-            customer.setCreatedAt(date);
-            customer.setUpdatedAt(date);
             if (HelperUtils.invalidCustomerFields(customer)) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
@@ -120,7 +117,6 @@ public class CustomerController {
                 customerToUpdate.setName(customer.getName());
                 customerToUpdate.setEmail(customer.getEmail());
                 customerToUpdate.setPhone(customer.getPhone());
-                customerToUpdate.setUpdatedAtToCurrentTimeInGMTPlus1();
                 this.customerRepository.save(customerToUpdate);
                 return HelperUtils.createdRequest(customerToUpdate);
             }
@@ -141,9 +137,6 @@ public class CustomerController {
     @PostMapping("/{customerId}/screenings/{screeningId}")
     public ResponseEntity<ApiResponse<?>> createTicket(@PathVariable int customerId, @RequestBody Ticket ticket, @PathVariable int screeningId) {
         try {
-            Date date = new Date();
-            ticket.setCreatedAt(date);
-            ticket.setUpdatedAt(date);
             if (getACustomer(customerId) == null || getAScreening(screeningId) == null) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else if (invalidSeatsRemaining(ticket, screeningId)) {
@@ -180,7 +173,6 @@ public class CustomerController {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
         }
     }
-
 
     /**
      * Local Helper method(s)
