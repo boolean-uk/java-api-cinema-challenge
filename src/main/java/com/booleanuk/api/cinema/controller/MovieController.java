@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controller;
 
 
 import com.booleanuk.api.cinema.helpers.ErrorResponse;
+import com.booleanuk.api.cinema.helpers.MovieDTOMapper;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -28,9 +29,16 @@ public class MovieController {
     @Autowired
     TicketRepository ticketRepository;
 
+    private final MovieDTOMapper movieDTOMapper;
+
+    public MovieController(MovieDTOMapper movieDTOMapper) {
+        this.movieDTOMapper = movieDTOMapper;
+    }
+
     @GetMapping
     public ResponseEntity<CustomResponse> getAll(){
-        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findAll()), HttpStatus.OK);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findAll()
+                .stream().map(movieDTOMapper)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +46,7 @@ public class MovieController {
         if(!movieRepository.existsById(id)){
             return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("No movie with that id were found")), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(id).get()), HttpStatus.OK);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(id).stream().map(movieDTOMapper)), HttpStatus.OK);
     }
 
     @PostMapping
@@ -53,7 +61,7 @@ public class MovieController {
             s.setMovie(movie);
             screeningRepository.save(s);
         }
-        return new ResponseEntity<>(new CustomResponse("success", movie), HttpStatus.CREATED);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(movie.getId()).stream().map(movieDTOMapper)), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -74,7 +82,8 @@ public class MovieController {
         if(existingMovie.getTitle() == null || existingMovie.getRating() == null || existingMovie.getRuntimeMins() == 0 || existingMovie.getDescription() == null){
             return new ResponseEntity<>(new CustomResponse("error", new ErrorResponse("Could not update movie, please check all required fields are correct")), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new CustomResponse("success", movieRepository.save(existingMovie)), HttpStatus.CREATED);
+        movieRepository.save(existingMovie);
+        return new ResponseEntity<>(new CustomResponse("success", movieRepository.findById(existingMovie.getId()).stream().map(movieDTOMapper)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -97,7 +106,9 @@ public class MovieController {
                 screeningRepository.delete(screeningRepository.findAll().get(i));
             }
         }
+
+        CustomResponse response = new CustomResponse("success", movieRepository.findById(id).stream().map(movieDTOMapper));
         movieRepository.delete(movie);
-        return new ResponseEntity<>(new CustomResponse("success", movie), HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
