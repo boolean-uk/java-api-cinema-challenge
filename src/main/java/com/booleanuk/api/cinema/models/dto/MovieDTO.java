@@ -1,5 +1,6 @@
-package com.booleanuk.api.cinema.models;
+package com.booleanuk.api.cinema.models.dto;
 
+import com.booleanuk.api.cinema.models.Movie;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

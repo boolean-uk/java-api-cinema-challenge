@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.models;
+package com.booleanuk.api.cinema.models.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

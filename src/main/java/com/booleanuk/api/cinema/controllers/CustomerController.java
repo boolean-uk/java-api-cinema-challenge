@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
-import com.booleanuk.api.cinema.models.Response;
+import com.booleanuk.api.cinema.models.responses.Response;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
 import com.booleanuk.api.cinema.repositories.TicketRepository;
 import lombok.extern.slf4j.Slf4j;

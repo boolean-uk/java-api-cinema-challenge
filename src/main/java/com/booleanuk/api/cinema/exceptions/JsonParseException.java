@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.exceptions;
 
-import com.booleanuk.api.cinema.models.Response;
+import com.booleanuk.api.cinema.models.responses.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

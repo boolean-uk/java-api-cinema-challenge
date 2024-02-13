@@ -2,6 +2,8 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.enums.Rating;
 import com.booleanuk.api.cinema.models.*;
+import com.booleanuk.api.cinema.models.dto.MovieDTO;
+import com.booleanuk.api.cinema.models.responses.Response;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import com.booleanuk.api.cinema.repositories.TicketRepository;
