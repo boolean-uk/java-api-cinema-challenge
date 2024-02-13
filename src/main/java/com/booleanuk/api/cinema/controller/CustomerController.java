@@ -8,7 +8,6 @@ import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.ApiResponse;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
