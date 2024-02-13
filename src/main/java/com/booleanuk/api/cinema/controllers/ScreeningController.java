@@ -5,6 +5,10 @@ import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
+import com.booleanuk.api.cinema.responses.ScreeningListResponse;
+import com.booleanuk.api.cinema.responses.ScreeningResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,34 +30,55 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     private LocalDateTime today;
-    private DateTimeFormatter pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(Locale.UK);
 
     @GetMapping
-    public List<Screening> findAll(@PathVariable int id){
+    public ResponseEntity<Response<?>> findAll(@PathVariable int id){
         Movie tempMovie = findTheMovie(id);
-        return tempMovie.getScreenings();
+        if (tempMovie == null){
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        ScreeningListResponse screeningListResponse = new ScreeningListResponse();
+        screeningListResponse.set(tempMovie.getScreenings());
+        return ResponseEntity.ok(screeningListResponse);
     }
 
 
     @PostMapping
-    public ResponseEntity<Screening> addScreening(@PathVariable int id,@RequestBody Screening screening){
+    public ResponseEntity<Response<?>> addScreening(@PathVariable int id, @RequestBody Screening screening){
         today = LocalDateTime.now();
 
         Movie tempMovie = findTheMovie(id);
 
+        if (tempMovie == null){
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("not found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        if (screening.getScreenNumber() < 1 ||
+                screening.getCapacity() < 1 ||
+                screening.getStartsAt() == null){
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("bad request");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
         screening.setMovie(tempMovie);
-        screening.setCreatedAt(today.format(pattern));
+        screening.setCreatedAt(String.valueOf(today));
 
+        ScreeningResponse screeningResponse = new ScreeningResponse();
+        screeningResponse.set(this.screeningRepository.save(screening));
 
-       return new ResponseEntity<Screening>(this.screeningRepository.save(screening),
-               HttpStatus.CREATED);
+       return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
     }
 
 
 
     private Movie findTheMovie(int id){
         return this.movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElse(null);
     }
 
 }

@@ -31,7 +31,7 @@ public class Customer {
     @Column
     private String updatedAt;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("customer")
     private List<Ticket> tickets;
 

@@ -37,7 +37,7 @@ public class Screening {
     @JsonIgnoreProperties("screenings")
     private Movie movie;
 
-    @OneToMany(mappedBy = "screening")
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("screening")
     private List<Ticket> tickets;
 
