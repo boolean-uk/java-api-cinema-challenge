@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,22 +30,22 @@ public class Customer {
 	@Column
 	private String phone;
 	@Column(nullable = false)
-	private LocalDateTime createdAt;
+	private OffsetDateTime createdAt;
 	@Column(nullable = false)
-	private LocalDateTime updatedAt;
+	private OffsetDateTime updatedAt;
 	@OneToMany(mappedBy = "customer")
 	@JsonIgnore
 	private List<Ticket> tickets;
 	@PrePersist
 	public void prePersist() {
-		LocalDateTime now = LocalDateTime.now();
+		OffsetDateTime now = OffsetDateTime.now();
 		this.createdAt = now;
 		this.updatedAt = now;
 	}
 
 	@PreUpdate
 	public void preUpdate() {
-		this.updatedAt = LocalDateTime.now();
+		this.updatedAt = OffsetDateTime.now();
 	}
 	public Customer(int id) {
 		this.id = id;

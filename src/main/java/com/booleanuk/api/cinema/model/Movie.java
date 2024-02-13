@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -41,20 +43,24 @@ public class Movie {
 	private List<Screening> screenings;
 
 	@Column(nullable = false)
-	private LocalDateTime createdAt;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX")
+
+	private OffsetDateTime createdAt;
 	@Column(nullable = false)
-	private LocalDateTime updatedAt;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX")
+
+	private OffsetDateTime updatedAt;
 
 	@PrePersist
 	public void prePersist() {
-		LocalDateTime now = LocalDateTime.now();
+		OffsetDateTime now = OffsetDateTime.now();
 		this.createdAt = now;
 		this.updatedAt = now;
 	}
 
 	@PreUpdate
 	public void preUpdate() {
-		this.updatedAt = LocalDateTime.now();
+		this.updatedAt = OffsetDateTime.now();
 	}
 
 	public Movie(int id) {

@@ -1,9 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.model.CustomResponse;
-import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.Screening;
-import com.booleanuk.api.cinema.model.Ticket;
+import com.booleanuk.api.cinema.model.*;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
@@ -13,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,9 +31,11 @@ public class CustomerController {
 
 		return new CustomResponse<>("success", customerRepository.findAll());
 	}
+	DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSxxx");
 
 	@PostMapping
-	public ResponseEntity<CustomResponse<?>> create(@RequestBody Customer customer) {
+	public ResponseEntity<CustomResponse<?>> create(@RequestBody CustomerDTO customerDTO) {
+		Customer customer = new Customer(customerDTO.getName(),customerDTO.getEmail(),customerDTO.getPhone());
 		if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
 			CustomResponse<Object> errorResponse = new CustomResponse<>("error", Collections.singletonMap("message", "bad request"));
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -43,12 +43,13 @@ public class CustomerController {
 		Customer newCustomer = new Customer(customer.getName(), customer.getEmail(), customer.getPhone());
 		Customer savedCustomer = customerRepository.save(newCustomer);
 
-		CustomResponse<Customer> response = new CustomResponse<>("success", savedCustomer);
+		CustomResponse<CustomerDTO> response = new CustomResponse<>("success", toDTO(savedCustomer));
 		return ResponseEntity.ok(response);
 	}
 
+
 	@PostMapping("{customer_id}/screenings/{screening_id}")
-	public ResponseEntity<CustomResponse<?>> createTicket(@PathVariable int customer_id, @PathVariable int screening_id, @RequestBody Ticket ticket) {
+	public ResponseEntity<CustomResponse<?>> createTicket(@PathVariable int customer_id, @PathVariable int screening_id, @RequestBody TicketDTO ticketDTO) {
 		Screening screening = screeningRepository.findById(screening_id).orElse(null);
 		if(screening==null){
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
@@ -59,9 +60,10 @@ public class CustomerController {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
 
 		}
+		Ticket ticket = new Ticket(screening,customer, ticketDTO.getNumSeats());
 		Ticket newTicket = new Ticket(screening, customer, ticket.getNumSeats());
-
-		return new ResponseEntity<>(new CustomResponse<>("success",ticketRepository.save(newTicket)), HttpStatus.CREATED);
+		ticketRepository.save(newTicket);
+		return new ResponseEntity<>(new CustomResponse<>("success",toDTO(newTicket)), HttpStatus.CREATED);
 	}
 
 	@GetMapping("{customer_id}/screenings/{screening_id}")
@@ -85,16 +87,17 @@ public class CustomerController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<CustomResponse<?>> update(@PathVariable int id, @RequestBody Customer customer) {
+	public ResponseEntity<CustomResponse<?>> update(@PathVariable int id, @RequestBody CustomerDTO customerDTO) {
+		Customer customer = new Customer(customerDTO.getName(),customerDTO.getEmail(),customerDTO.getPhone());
 		Customer newCustomer = customerRepository.findById(id).orElse(null);
 		if (newCustomer == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
-
 		}
 		newCustomer.setName(customer.getName());
 		newCustomer.setEmail(customer.getEmail());
 		newCustomer.setPhone(customer.getPhone());
-		return new ResponseEntity<>(new CustomResponse<>("success", customerRepository.save(newCustomer)), HttpStatus.CREATED);
+		customerRepository.save(newCustomer);
+		return new ResponseEntity<>(new CustomResponse<>("success",toDTO(newCustomer)), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("{id}")
@@ -105,8 +108,28 @@ public class CustomerController {
 
 		}
 		customerRepository.delete(customer);
-		return ResponseEntity.ok(new CustomResponse<>("success", customer));
+		return ResponseEntity.ok(new CustomResponse<>("success", toDTO(customer)));
 
 	}
+	private CustomerDTO toDTO(Customer customer) {
+		return new CustomerDTO(
+				customer.getId(),
+				customer.getName(),
+				customer.getEmail(),
+				customer.getPhone(),
+				customer.getCreatedAt().format(outputFormatter),
+				customer.getUpdatedAt().format(outputFormatter),
+				customer.getTickets()
+		);
+	}
+	private TicketDTO toDTO(Ticket ticket){
+		return new TicketDTO(
+				ticket.getId(),
+				ticket.getNumSeats(),
+				ticket.getCreatedAt().format(outputFormatter),
+				ticket.getUpdatedAt().format(outputFormatter)
+		);
+	}
+
 
 }

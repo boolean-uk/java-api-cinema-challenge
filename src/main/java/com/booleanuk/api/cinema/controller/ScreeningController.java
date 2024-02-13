@@ -28,7 +28,6 @@ public class ScreeningController {
 
 	@PostMapping
 	public ResponseEntity<Screening> create(@RequestBody Screening screening) {
-		System.out.println("we got here \n\n\n\n\n\n");
 		Movie movie = movieRepository.findById(screening.getMovie().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
 		Screening newScreening = new Screening(movie, screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity());
 		return new ResponseEntity<>(screeningRepository.save(newScreening), HttpStatus.CREATED);

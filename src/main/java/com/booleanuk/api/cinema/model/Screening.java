@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Getter
@@ -21,7 +19,6 @@ import java.util.List;
 @Entity
 @Table(name = "screenings")
 public class Screening {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -36,34 +33,46 @@ public class Screening {
 	private int screenNumber;
 
 	@Column
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX")
 	private OffsetDateTime startsAt;
 
 	@Column
 	private int capacity;
 
 	@Column(nullable = false)
-	private LocalDateTime createdAt;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX")
+	private OffsetDateTime createdAt;
 
 	@Column(nullable = false)
-	private LocalDateTime updatedAt;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX")
+	private OffsetDateTime updatedAt;
 
 
 	@OneToMany(mappedBy = "screening")
-	//@JsonIgnoreProperties(value = "screening")
 	@JsonIgnore
 	private List<Ticket> tickets;
+
+	public Screening(Movie movie, int screenNumber, String startsAt, int capacity) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
+
+		this.movie = movie;
+		this.screenNumber = screenNumber;
+		this.startsAt = OffsetDateTime.parse(startsAt,formatter);
+		this.capacity = capacity;
+	}
+
 	@PrePersist
 	public void prePersist() {
-		LocalDateTime now = LocalDateTime.now();
+		OffsetDateTime now = OffsetDateTime.now();
 		this.createdAt = now;
 		this.updatedAt = now;
 	}
 
 	@PreUpdate
 	public void preUpdate() {
-		this.updatedAt = LocalDateTime.now();
+		this.updatedAt = OffsetDateTime.now();
 	}
+
 	public Screening(int id) {
 		this.id = id;
 	}
@@ -74,4 +83,5 @@ public class Screening {
 		this.startsAt = startsAt;
 		this.capacity = capacity;
 	}
+
 }
