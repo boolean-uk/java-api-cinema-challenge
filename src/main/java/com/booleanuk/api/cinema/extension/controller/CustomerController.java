@@ -56,9 +56,9 @@ public class CustomerController {
 
         Customer customerToUpdate = customerRepository
                 .findById(id).get();
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
+        customerToUpdate.setName(customer.getName() != null ? customer.getName() : customerToUpdate.getName());
+        customerToUpdate.setEmail(customer.getEmail() != null ? customer.getEmail() : customerToUpdate.getEmail());
+        customerToUpdate.setPhone(customer.getPhone() != null ? customer.getPhone() : customerToUpdate.getPhone());
         customerRepository.save(customerToUpdate);
 
         CustomResponse customResponse = new CustomResponse("success", customerToUpdate);

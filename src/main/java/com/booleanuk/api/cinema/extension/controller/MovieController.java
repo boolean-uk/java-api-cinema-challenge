@@ -62,14 +62,12 @@ public class MovieController {
             return new ResponseEntity<>(new CustomResponse("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
 
-        checkIfValidMovie(movie);
-
         Movie movieToUpdate = movieRepository
                 .findById((long) id).get();
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        movieToUpdate.setTitle(movie.getTitle() != null ? movie.getTitle() : movieToUpdate.getTitle());
+        movieToUpdate.setRating(movie.getRating() != null ? movie.getRating() : movieToUpdate.getRating());
+        movieToUpdate.setDescription(movie.getDescription() != null ? movie.getDescription() : movieToUpdate.getDescription());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins() != null ? movie.getRuntimeMins() : movieToUpdate.getRuntimeMins());
         movieRepository.save(movieToUpdate);
 
         CustomResponse customResponse = new CustomResponse("success", movieRepository.findById(movieToUpdate.getId()).stream()
