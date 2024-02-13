@@ -39,18 +39,17 @@ public class CustomerController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<Customer>> getAllCustomers() {
+    public ResponseEntity<ApiResponse<?>> getAllCustomers() {
         try {
             List<Customer> customers = this.customerRepository.findAll();
             if (customers.isEmpty()) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 ApiResponse<Customer> okRequest = new ApiResponse<>("success", customers);
                 return ResponseEntity.ok(okRequest);
             }
         } catch (Exception e) {
-            return null;
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -64,22 +63,19 @@ public class CustomerController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Customer>> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<ApiResponse<?>> createCustomer(@RequestBody Customer customer) {
         try {
             Date date = new Date();
             customer.setCreatedAt(date);
             customer.setUpdatedAt(date);
             if (HelperUtils.invalidCustomerFields(customer)) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 Customer savedCustomer = this.customerRepository.save(customer);
-                ApiResponse<Customer> okRequest = new ApiResponse<>("success", savedCustomer);
-                return ResponseEntity.status(HttpStatus.CREATED).body(okRequest);
+                return HelperUtils.createdRequest(savedCustomer);
             }
         } catch (Exception e) {
-            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request caused exception thrown"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
 
     }
@@ -93,12 +89,11 @@ public class CustomerController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Customer>> deleteCustomerById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<?>> deleteCustomerById(@PathVariable int id) {
         try {
             Customer customerToDelete = getACustomer(id);
             if (customerToDelete == null || !customerToDelete.getTickets().isEmpty()) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 this.customerRepository.delete(customerToDelete);
                 customerToDelete.setTickets(new ArrayList<>());
@@ -106,8 +101,7 @@ public class CustomerController {
                 return ResponseEntity.status(HttpStatus.OK).body(okRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -120,12 +114,11 @@ public class CustomerController {
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Customer>> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
+    public ResponseEntity<ApiResponse<?>> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
         try {
             Customer customerToUpdate = getACustomer(id);
             if (HelperUtils.invalidCustomerFields(customer)) {
-                ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 customerToUpdate.setName(customer.getName());
                 customerToUpdate.setEmail(customer.getEmail());
@@ -136,8 +129,7 @@ public class CustomerController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -151,14 +143,13 @@ public class CustomerController {
      * @return
      */
     @PostMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<ApiResponse<Ticket>> createTicket(@PathVariable int customerId, @RequestBody Ticket ticket, @PathVariable int screeningId) {
+    public ResponseEntity<ApiResponse<?>> createTicket(@PathVariable int customerId, @RequestBody Ticket ticket, @PathVariable int screeningId) {
         try {
             Date date = new Date();
             ticket.setCreatedAt(date);
             ticket.setUpdatedAt(date);
             if (getACustomer(customerId) == null || getAScreening(screeningId) == null) {
-                ApiResponse<Ticket> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 Customer tempCustomer = getACustomer(customerId);
                 Screening tempScreening = getAScreening(screeningId);
@@ -170,13 +161,12 @@ public class CustomerController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Ticket> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
     @GetMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<ApiResponse<List<Ticket>>> getAllTicketsByCustomerId(@PathVariable int customerId, @PathVariable int screeningId) {
+    public ResponseEntity<ApiResponse<?>> getAllTicketsByCustomerId(@PathVariable int customerId, @PathVariable int screeningId) {
         try {
             List<Ticket> tempTicketList = new ArrayList<>();
             for(Ticket ticket : ticketRepository.findAll()) {
@@ -185,15 +175,13 @@ public class CustomerController {
                 }
             }
             if (tempTicketList.isEmpty()) {
-                ApiResponse<List<Ticket>> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 ApiResponse<List<Ticket>> okRequest = new ApiResponse<>("success", tempTicketList);
                 return ResponseEntity.status(HttpStatus.OK).body(okRequest);
             }
         } catch (Exception e) {
-            ApiResponse<List<Ticket>> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
         }
     }
 

@@ -3,6 +3,9 @@ package com.booleanuk.api.cinema;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
+import com.booleanuk.api.cinema.response.ApiResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class HelperUtils {
     /**
@@ -28,5 +31,20 @@ public class HelperUtils {
         return  c.getName() == null ||
                 c.getEmail() == null ||
                 c.getPhone() == null;
+    }
+
+    public static <T> ResponseEntity<ApiResponse<?>> badRequest(T data) {
+        ApiResponse<T> badRequest = new ApiResponse<>("error", data);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<?>> createdRequest(T data) {
+        ApiResponse<T> createdRequest = new ApiResponse<>("success", data);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createdRequest);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<?>> okRequest(T data) {
+        ApiResponse<T> okRequest = new ApiResponse<>("success", data);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(okRequest);
     }
 }

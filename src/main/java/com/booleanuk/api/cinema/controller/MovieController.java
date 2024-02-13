@@ -34,18 +34,17 @@ public class MovieController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<Movie>> getAllMovies() {
+    public ResponseEntity<ApiResponse<?>> getAllMovies() {
         try {
             List<Movie> movies = this.movieRepository.findAll();
             if (movies.isEmpty()) {
-                ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 ApiResponse<Movie> okRequest = new ApiResponse<>("success", movies);
                 return ResponseEntity.ok(okRequest);
             }
         } catch (Exception e) {
-            return null;
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -59,22 +58,20 @@ public class MovieController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Movie>> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<ApiResponse<?>> createMovie(@RequestBody Movie movie) {
         try {
             Date date = new Date();
             movie.setCreatedAt(date);
             movie.setUpdatedAt(date);
             if (HelperUtils.invalidMovieFields(movie)) {
-                ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 Movie savedMovie = this.movieRepository.save(movie);
                 ApiResponse<Movie> createdRequest = new ApiResponse<>("success", savedMovie);
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request caused exception thrown"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -87,12 +84,11 @@ public class MovieController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Movie>> deleteMovieById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<?>> deleteMovieById(@PathVariable int id) {
         try {
             Movie movieToDelete = getAMovie(id);
             if (movieToDelete == null || !movieToDelete.getScreenings().isEmpty()) {
-                ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 this.movieRepository.delete(movieToDelete);
                 movieToDelete.setScreenings(new ArrayList<>());
@@ -100,8 +96,7 @@ public class MovieController {
                 return ResponseEntity.status(HttpStatus.OK).body(okRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
@@ -114,12 +109,11 @@ public class MovieController {
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Movie>> updateMovieById(@PathVariable int id, @RequestBody Movie movie) {
+    public ResponseEntity<ApiResponse<?>> updateMovieById(@PathVariable int id, @RequestBody Movie movie) {
         try {
             Movie movieToUpdate = getAMovie(id);
             if (HelperUtils.invalidMovieFields(movie)) {
-                ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 movieToUpdate.setTitle(movie.getTitle());
                 movieToUpdate.setRating(movie.getRating());
@@ -131,8 +125,7 @@ public class MovieController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception"));
         }
     }
 
@@ -151,10 +144,10 @@ public class MovieController {
                 ApiResponse<?> okRequest = new ApiResponse<>("success", screenings);
                 return ResponseEntity.status(HttpStatus.OK).body(okRequest);
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>("error", new ApiResponse.Message("This movie has no screenings yet!")));
+                return HelperUtils.badRequest(new ApiResponse.Message("This movie has no scheduled screenings yet!"));
             }
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>("error", new ApiResponse.Message("No movie with such ID!")));
+            return HelperUtils.badRequest(new ApiResponse.Message("No movie with such ID!"));
         }
     }
 
@@ -168,13 +161,12 @@ public class MovieController {
      * @return
      */
     @PostMapping("/{id}/screenings")
-    public ResponseEntity<ApiResponse<Screening>> createScreening(@PathVariable int id, @RequestBody Screening screening) {
+    public ResponseEntity<ApiResponse<?>> createScreening(@PathVariable int id, @RequestBody Screening screening) {
         Date date = new Date();
         screening.setCreatedAt(date);
         screening.setUpdatedAt(date);
         if (HelperUtils.invalidScreeningFields(screening)) {
-            ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
         } else {
             Optional<Movie> optionalMovie = movieRepository.findById(id);
             optionalMovie.ifPresent(screening::setMovie);

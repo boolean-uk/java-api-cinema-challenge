@@ -29,14 +29,13 @@ public class ScreeningController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Screening>> createScreening(@RequestBody Screening screening) {
+    public ResponseEntity<ApiResponse<?>> createScreening(@RequestBody Screening screening) {
         try {
             Date date = new Date();
             screening.setCreatedAt(date);
             screening.setUpdatedAt(date);
             if (HelperUtils.invalidScreeningFields(screening)) {
-                ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+                return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
                 Movie tempMovie = getAMovie(screening.getMovie().getId());
                 screening.setMovie(tempMovie);
@@ -45,8 +44,7 @@ public class ScreeningController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
             }
         } catch (Exception e) {
-            ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
+            return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
     }
 
