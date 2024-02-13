@@ -26,7 +26,7 @@ public class MovieController {
     private LocalDateTime today;
 
     @GetMapping
-    public ResponseEntity<MovieListResponse> findAll(){
+    public ResponseEntity<Response<?>> findAll(){
         MovieListResponse movieListResponse = new MovieListResponse();
         movieListResponse.set(this.movieRepository.findAll());
         return ResponseEntity.ok(movieListResponse);
