@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.HelperUtils;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -33,7 +34,7 @@ public class ScreeningController {
             Date date = new Date();
             screening.setCreatedAt(date);
             screening.setUpdatedAt(date);
-            if (screening.getMovie() == null || screening.getScreenNumber() < 1 || screening.getCapacity() < 1 || screening.getStartsAt() == null) {
+            if (HelperUtils.invalidScreeningFields(screening)) {
                 ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
@@ -50,14 +51,10 @@ public class ScreeningController {
     }
 
     /**
-     * Helper method(s)
+     * Local Helper method(s)
      * @param id
      * @return
      */
-    private Screening getAScreening(int id) {
-        return this.screeningRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-    }
-
     private Movie getAMovie(int id) {
         return this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
     }

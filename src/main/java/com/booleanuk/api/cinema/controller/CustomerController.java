@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.HelperUtils;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
@@ -69,7 +70,7 @@ public class CustomerController {
             Date date = new Date();
             customer.setCreatedAt(date);
             customer.setUpdatedAt(date);
-            if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            if (HelperUtils.invalidCustomerFields(customer)) {
                 ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
@@ -107,7 +108,7 @@ public class CustomerController {
     public ResponseEntity<ApiResponse<Customer>> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
         try {
             Customer customerToUpdate = getACustomer(id);
-            if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            if (HelperUtils.invalidCustomerFields(customer)) {
                 ApiResponse<Customer> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
@@ -183,7 +184,7 @@ public class CustomerController {
 
 
     /**
-     * Helper method
+     * Local Helper method(s)
      * @param id
      * @return
      */

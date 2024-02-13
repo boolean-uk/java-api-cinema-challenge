@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.model.Customer;
+import com.booleanuk.api.cinema.HelperUtils;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -47,7 +47,7 @@ public class MovieController {
             Date date = new Date();
             movie.setCreatedAt(date);
             movie.setUpdatedAt(date);
-            if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMinutes() == 0) {
+            if (HelperUtils.invalidMovieFields(movie)) {
                 ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
@@ -84,7 +84,7 @@ public class MovieController {
     public ResponseEntity<ApiResponse<Movie>> updateMovieById(@PathVariable int id, @RequestBody Movie movie) {
         try {
             Movie movieToUpdate = getAMovie(id);
-            if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMinutes() == 0) {
+            if (HelperUtils.invalidMovieFields(movie)) {
                 ApiResponse<Movie> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
             } else {
@@ -130,7 +130,7 @@ public class MovieController {
         Date date = new Date();
         screening.setCreatedAt(date);
         screening.setUpdatedAt(date);
-        if (screening.getMovie() == null || screening.getScreenNumber() < 1 || screening.getCapacity() < 1 || screening.getStartsAt() == null) {
+        if (HelperUtils.invalidScreeningFields(screening)) {
             ApiResponse<Screening> badRequest = new ApiResponse<>("error", new ApiResponse.Message("bad request"));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest);
         } else {
@@ -151,4 +151,6 @@ public class MovieController {
     private Movie getAMovie(int id) {
         return this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
     }
+
+
 }
