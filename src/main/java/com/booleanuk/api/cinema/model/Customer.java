@@ -2,14 +2,12 @@ package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -31,4 +29,8 @@ public class Customer {
     private ZonedDateTime createdAt = ZonedDateTime.now();
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
+
+    @OneToMany(mappedBy = "customer")
+    @ToString.Exclude
+    private List<Ticket> tickets;
 }

@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
+import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.response.CustomerListResponse;
 import com.booleanuk.api.cinema.response.CustomerResponse;
 import com.booleanuk.api.cinema.response.ErrorResponse;
@@ -20,6 +22,8 @@ import java.util.List;
 public class CustomerController {
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @GetMapping
     public ResponseEntity<CustomerListResponse> getAllCustomer(){
@@ -72,6 +76,11 @@ public class CustomerController {
             ErrorResponse error = new ErrorResponse();
             error.set("No customer with that id found.");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        if (!customer1.getTickets().isEmpty()){
+            for (Ticket ticket : customer1.getTickets()){
+                this.ticketRepository.delete(ticket);
+            }
         }
         this.customerRepository.delete(customer1);
         CustomerResponse customerResponse = new CustomerResponse();
