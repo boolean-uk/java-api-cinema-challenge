@@ -23,6 +23,9 @@ public class Movie {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "rating")
+    String rating;
+
     @Column(name = "description")
     private String description;
 

@@ -5,6 +5,8 @@ import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +29,35 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @PostMapping
-    public ResponseEntity<Screening> create(@PathVariable int movieId, @RequestBody Screening screening) {
-        Movie movie = this.movieRepository.findById(movieId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Response<?>> create(@PathVariable int movieId, @RequestBody Screening screening) {
+        Movie movie = this.movieRepository.findById(movieId).orElse(null);
+        if(movie == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("movie not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
         screening.setMovie(movie);
         screening.setTickets(new ArrayList<>());
         screening.setStartsAt(screening.getStartsAt());
         screening.setCreatedAt(String.valueOf(LocalDateTime.now()));
         screening.setUpdatedAt(screening.getCreatedAt());
-        return new ResponseEntity<Screening>(this.screeningRepository.save(screening), HttpStatus.CREATED);
+        Response<Screening> screeningResponse = new Response<>();
+        screeningResponse.set(this.screeningRepository.save(screening));
+        return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Screening> getAll(@PathVariable int movieId) {
-        Movie movie = this.movieRepository.findById(movieId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return movie.getScreenings();
+    public ResponseEntity<Response<?>> getAll(@PathVariable int movieId) {
+        Movie movie = this.movieRepository.findById(movieId).orElse(null);
+        if(movie == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("movie not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        Response<List<Screening>> screeningResponse = new Response<>();
+        screeningResponse.set(movie.getScreenings());
+        return ResponseEntity.ok(screeningResponse);
     }
 
 }
