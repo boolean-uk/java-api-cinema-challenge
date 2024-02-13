@@ -1,12 +1,16 @@
 package com.booleanuk.api.cinema.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -30,29 +34,25 @@ public class Movie {
     @Column
     private String updatedAt;
 
-    @OneToMany(mappedBy = "movie")
-    @JsonIgnore
-    private List<Screening> screenings;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonIgnore
+    private List<Screening> screenings = new ArrayList<>();
 
     public Movie(String title, String rating, String description, Integer runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        String datetimeNow = LocalDateTime.now().toString();
-        this.createdAt = datetimeNow;
-        this.updatedAt = datetimeNow;
+        this.screenings = new ArrayList<>();
     }
 
     public Movie(String title, String rating, String description, Integer runtimeMins, List<Screening> screenings) {
         this.title = title;
         this.rating = rating;
         this.description = description;
+        this.screenings = new ArrayList<>();
         this.runtimeMins = runtimeMins;
         this.screenings = screenings;
-        String datetimeNow = LocalDateTime.now().toString();
-        this.createdAt = datetimeNow;
-        this.updatedAt = datetimeNow;
     }
 
     public Movie(int id) {
@@ -115,7 +115,14 @@ public class Movie {
         return updatedAt;
     }
 
+
+    public void setTime() {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.createdAt = timestamp;
+        this.updatedAt = timestamp;
+    }
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDateTime.now().toString();
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.updatedAt = timestamp;
     }
 }

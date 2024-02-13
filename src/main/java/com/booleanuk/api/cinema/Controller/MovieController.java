@@ -4,12 +4,16 @@ import com.booleanuk.api.cinema.Model.Movie;
 import com.booleanuk.api.cinema.Model.Screening;
 import com.booleanuk.api.cinema.Repository.MovieRepository;
 import com.booleanuk.api.cinema.Repository.ScreeningRepository;
+import com.booleanuk.api.cinema.Response.Error;
+import com.booleanuk.api.cinema.Response.Response;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,77 +27,80 @@ public class MovieController {
     private ScreeningRepository screeningRepository;
 
     @GetMapping
-    public List<Movie> getAll() {
-        return this.repository.findAll();
+    public ResponseEntity<Object> getAll() {
+        List<Movie> all = this.repository.findAll();
+        return new ResponseEntity<Object>(new Response("success", all), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getById(@PathVariable int id) {
-        Movie movie = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        return ResponseEntity.ok(movie);
+    public ResponseEntity<Object> getById(@PathVariable int id) {
+        if (this.repository.findById(id).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
+        }
+        Movie movie = this.repository.findById(id).get();
+        return new ResponseEntity<Object>(new Response("success", movie), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody Movie request) {
-        validate(request);
-        Movie movie = new Movie(
-                request.getTitle(),
-                request.getRating(),
-                request.getDescription(),
-                request.getRuntimeMins(),
-                request.getScreenings());
 
-        for (Screening tempScreening : request.getScreenings()){
-            Screening screening = new Screening(
-                    movie,
-                    tempScreening.getScreenNumber(),
-                    tempScreening.getStartsAt(),
-                    tempScreening.getCapacity()
-                    );
-            this.screeningRepository.save(screening);
+        if (request.getTitle() == null ||
+                request.getRating() == null ||
+                request.getDescription() == null ||
+                request.getRuntimeMins() == null) {
+            return new ResponseEntity<Object>(new Response("error", new Error("bad request")), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<Object>(this.repository.save(movie), HttpStatus.CREATED);
+
+        Movie movie = new Movie(request.getTitle(), request.getRating(), request.getDescription(), request.getRuntimeMins(), new ArrayList<>());
+        movie.setTime();
+
+        this.repository.save(movie);
+
+
+        if (request.getScreenings() != null){
+
+            for (Screening screening : request.getScreenings()) {
+                screening.setMovie(movie);
+                screening.setTime();
+            }
+            List<Screening> screenings = this.screeningRepository.saveAll(request.getScreenings());
+        }
+
+        movie.setScreenings(request.getScreenings());
+
+        return new ResponseEntity<Object>(new Response("success", movie), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> update(@PathVariable int id, @RequestBody Movie request) {
-        validate(request);
-        Movie movie = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+    public ResponseEntity<Object> update(@PathVariable int id, @RequestBody Movie request) {
+        if (this.repository.findById(id).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
+        }
+        if (request.getTitle() == null ||
+                request.getRating() == null ||
+                request.getDescription() == null ||
+                request.getRuntimeMins() == null) {
+            return new ResponseEntity<Object>(new Response("error", new Error("bad request")), HttpStatus.BAD_REQUEST);
+        }
+
+        Movie movie = this.repository.findById(id).get();
 
         movie.setTitle(request.getTitle());
         movie.setRating(request.getRating());
         movie.setDescription(request.getDescription());
         movie.setRuntimeMins(request.getRuntimeMins());
         movie.updateUpdatedAt();
-        return new ResponseEntity<Movie>(this.repository.save(movie), HttpStatus.CREATED);
+        movie = this.repository.save(movie);
+        return new ResponseEntity<Object>(new Response("success", movie), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> delete(@PathVariable int id) {
-        Movie movie = this.repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        this.repository.delete(movie);
-        return ResponseEntity.ok(movie);
-    }
-
-    public void validate(Movie Movie) {
-        if (Movie.getTitle() == null ||
-                Movie.getRating() == null ||
-                Movie.getDescription() == null ||
-                Movie.getRuntimeMins() == null ||
-                Movie.getScreenings() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create/update Movie, please check all required fields are correct.");
+    public ResponseEntity<Object> delete(@PathVariable int id) {
+        if (this.repository.findById(id).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
+        Movie movie = this.repository.findById(id).get();
+        this.repository.delete(movie);
+        return new ResponseEntity<Object>(new Response("success", movie), HttpStatus.OK);
     }
-
-
-    /* TODO:
-        - getScreenings returns null. feil matching variabel navn?
-        - I controller diriger flowen av programmet med if statements, om onject by id er funnet, om noe er null.
-        - Return response objects som matcher spec. Legg til ErrorResponse og.
-        - Alle func i controller b;re reurnere Object og ikke spesifikee objekter som movie.
-     */
-
 }

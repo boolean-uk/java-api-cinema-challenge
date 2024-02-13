@@ -1,13 +1,11 @@
 package com.booleanuk.api.cinema.Response;
 
-import com.booleanuk.api.cinema.Model.Ticket;
-
-public class TicketResponse {
+public class Response {
     private String status;
 
-    private Ticket data;
+    private Object data;
 
-    public TicketResponse(String status, Ticket data) {
+    public Response(String status, Object data) {
         this.status = status;
         this.data = data;
     }
@@ -20,11 +18,11 @@ public class TicketResponse {
         this.status = status;
     }
 
-    public Ticket getData() {
+    public Object getData() {
         return data;
     }
 
-    public void setData(Ticket data) {
+    public void setData(Object data) {
         this.data = data;
     }
 }

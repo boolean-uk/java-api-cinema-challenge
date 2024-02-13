@@ -1,14 +1,13 @@
 package com.booleanuk.api.cinema.Response;
 
-import com.booleanuk.api.cinema.Model.Movie;
+import java.util.List;
 
-public class MovieResponse {
-
+public class Responses {
     private String status;
 
-    private Movie data;
+    private List<Object> data;
 
-    public MovieResponse(String status, Movie data) {
+    public Responses(String status, List<Object> data) {
         this.status = status;
         this.data = data;
     }
@@ -21,11 +20,11 @@ public class MovieResponse {
         this.status = status;
     }
 
-    public Movie getData() {
+    public List<Object> getData() {
         return data;
     }
 
-    public void setData(Movie data) {
+    public void setData(List<Object> data) {
         this.data = data;
     }
 }

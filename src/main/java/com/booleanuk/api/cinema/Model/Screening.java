@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @NoArgsConstructor
@@ -41,9 +43,6 @@ public class Screening {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        String datetimeNow = LocalDateTime.now().toString();
-        this.createdAt = datetimeNow;
-        this.updatedAt = datetimeNow;
     }
 
     public Screening(Movie movie, Integer screenNumber, String startsAt, Integer capacity) {
@@ -51,9 +50,6 @@ public class Screening {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        String datetimeNow = LocalDateTime.now().toString();
-        this.createdAt = datetimeNow;
-        this.updatedAt = datetimeNow;
     }
 
     public Screening(int id) {
@@ -108,7 +104,14 @@ public class Screening {
         return updatedAt;
     }
 
+
+    public void setTime() {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.createdAt = timestamp;
+        this.updatedAt = timestamp;
+    }
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDateTime.now().toString();
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.updatedAt = timestamp;
     }
 }

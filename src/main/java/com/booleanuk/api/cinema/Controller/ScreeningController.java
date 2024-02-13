@@ -6,6 +6,8 @@ import com.booleanuk.api.cinema.Model.Screening;
 import com.booleanuk.api.cinema.Model.Ticket;
 import com.booleanuk.api.cinema.Repository.MovieRepository;
 import com.booleanuk.api.cinema.Repository.ScreeningRepository;
+import com.booleanuk.api.cinema.Response.Error;
+import com.booleanuk.api.cinema.Response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,28 +26,27 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping
-    public List<Screening> getAll() {
-        return this.repository.findAll();
+    public ResponseEntity<Object> getAll() {
+        List<Screening> all = this.repository.findAll();
+        return new ResponseEntity<Object>(new Response("success", all), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Screening> create(
+    public ResponseEntity<Object> create(
             @PathVariable (name= "id") Integer movieId,
-            @RequestBody Screening request) {
-
-        validate(request);
-
-        Movie movie = this.movieRepository.findById(movieId).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-
-        Screening screening = new Screening(movie, request.getScreenNumber(), request.getStartsAt(), request.getCapacity());
-        return new ResponseEntity<Screening>(this.repository.save(screening), HttpStatus.CREATED);
-    }
-
-    public void validate(Screening screening) {
+            @RequestBody Screening screening) {
         if (screening.getScreenNumber() == null || screening.getStartsAt() == null || screening.getCapacity() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Could not create/update Ticket, please check all required fields are correct.");
+            return new ResponseEntity<Object>(new Response("error", new Error("bad request")), HttpStatus.BAD_REQUEST);
         }
+        if (this.movieRepository.findById(movieId).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
+        }
+        Movie movie = this.movieRepository.findById(movieId).get();
+
+        screening.setTime();
+        screening.setMovie(movie);
+        screening = this.repository.save(screening);
+
+        return new ResponseEntity<Object>(new Response("success", screening), HttpStatus.CREATED);
     }
 }

@@ -1,9 +1,12 @@
 package com.booleanuk.api.cinema.Controller;
 
 import com.booleanuk.api.cinema.Model.Customer;
+import com.booleanuk.api.cinema.Model.Movie;
 import com.booleanuk.api.cinema.Model.Screening;
 import com.booleanuk.api.cinema.Repository.CustomerRepository;
 import com.booleanuk.api.cinema.Repository.CustomerRepository;
+import com.booleanuk.api.cinema.Response.Error;
+import com.booleanuk.api.cinema.Response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,51 +25,48 @@ public class CustomerController {
 
 
     @GetMapping
-    public List<Customer> getAll() {
-        return this.repository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getById(@PathVariable int id) {
-        Customer customer = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        return ResponseEntity.ok(customer);
+    public ResponseEntity<Object> getAll() {
+        List<Customer> all = this.repository.findAll();
+        return new ResponseEntity<Object>(new Response("success", all), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> create(@RequestBody Customer request) {
-
-        validate(request);
-        Customer customer = new Customer(request.getName(), request.getEmail(), request.getPhone());
-        return new ResponseEntity<Customer>(this.repository.save(customer), HttpStatus.CREATED);
+    public ResponseEntity<Object> create(@RequestBody Customer customer) {
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            return new ResponseEntity<Object>(new Response("error", new Error("bad request")), HttpStatus.BAD_REQUEST);
+        }
+        customer.setTime();
+        customer = this.repository.save(customer);
+        return new ResponseEntity<Object>(new Response("success", customer), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> update(@PathVariable int id, @RequestBody Customer request) {
-        validate(request);
-        Customer customer = this.repository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+    public ResponseEntity<Object> update(@PathVariable int id, @RequestBody Customer request) {
+        if (this.repository.findById(id).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
+        }
+        if (request.getName() == null ||
+                request.getEmail() == null ||
+                request.getPhone() == null) {
+            return new ResponseEntity<Object>(new Response("error", new Error("bad request")), HttpStatus.BAD_REQUEST);
+        }
+        Customer customer = this.repository.findById(id).get();
 
         customer.setName(request.getName());
         customer.setEmail(request.getEmail());
         customer.setPhone(request.getPhone());
         customer.updateUpdatedAt();
-        return new ResponseEntity<Customer>(this.repository.save(customer), HttpStatus.CREATED);
+        customer = this.repository.save(customer);
+        return new ResponseEntity<Object>(new Response("success", customer), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> delete(@PathVariable int id) {
-        Customer customer = this.repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
-        this.repository.delete(customer);
-        return ResponseEntity.ok(customer);
-    }
-
-    public void validate(Customer Customer) {
-        if (Customer.getName() == null || Customer.getEmail() == null || Customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create/update Customer, please check all required fields are correct.");
+    public ResponseEntity<Object> delete(@PathVariable int id) {
+        if (this.repository.findById(id).isEmpty()) {
+            return new ResponseEntity<Object>(new Response("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
+        Customer customer = this.repository.findById(id).get();
+        this.repository.delete(customer);
+        return new ResponseEntity<Object>(new Response("success", customer), HttpStatus.OK);
     }
-
-
 }

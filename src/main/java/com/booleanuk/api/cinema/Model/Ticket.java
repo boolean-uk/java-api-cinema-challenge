@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor
 @Entity
@@ -43,9 +45,6 @@ public class Ticket {
         this.customer = customer;
         this.screening = screening;
         this.numSeats = numSeats;
-        String datetimeNow = LocalDateTime.now().toString();
-        this.createdAt = datetimeNow;
-        this.updatedAt = datetimeNow;
     }
 
     public Ticket(int id) {
@@ -92,7 +91,14 @@ public class Ticket {
         return updatedAt;
     }
 
+
+    public void setTime() {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.createdAt = timestamp;
+        this.updatedAt = timestamp;
+    }
     public void updateUpdatedAt() {
-        this.updatedAt = LocalDateTime.now().toString();
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.updatedAt = timestamp;
     }
 }
