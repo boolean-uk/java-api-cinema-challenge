@@ -5,10 +5,8 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
-import com.booleanuk.api.cinema.response.ErrorResponse;
-import com.booleanuk.api.cinema.response.MovieListResponse;
-import com.booleanuk.api.cinema.response.MovieResponse;
-import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +27,8 @@ public class MovieController {
     private MovieRepository movieRepository;
     @Autowired
     private ScreeningRepository screeningRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @GetMapping
     public ResponseEntity<MovieListResponse> getAllMovies(){
@@ -88,6 +88,14 @@ public class MovieController {
             ErrorResponse error = new ErrorResponse();
             error.set("No movie with that id found.");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        if (!movie1.getScreenings().isEmpty()) {
+            for (Screening screening : movie1.getScreenings()) {
+                if (!screening.getTickets().isEmpty()) {
+                    this.ticketRepository.deleteAll(screening.getTickets());
+                }
+                this.screeningRepository.delete(screening);
+            }
         }
         this.movieRepository.delete(movie1);
         MovieResponse movieResponse = new MovieResponse();

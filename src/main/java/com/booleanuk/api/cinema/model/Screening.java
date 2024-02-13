@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @ToString
@@ -37,4 +38,8 @@ public class Screening {
     @JsonIgnore
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @ToString.Exclude
+    private List<Ticket> tickets;
 }
