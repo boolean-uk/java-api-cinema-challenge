@@ -2,7 +2,6 @@ package com.booleanuk.api.cinema.movie;
 
 import com.booleanuk.api.cinema.screening.Screening;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,9 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -43,7 +42,11 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnore
-    private List<Screening> screeningList;
+    private List<Screening> screenings;
+
+    public Movie() {
+        this.screenings = new ArrayList<>();
+    }
 
     public Movie(String title, String rating, String description, int runTimeMins) {
         this.title = title;

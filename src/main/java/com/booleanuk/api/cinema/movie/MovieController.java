@@ -3,6 +3,8 @@ package com.booleanuk.api.cinema.movie;
 import com.booleanuk.api.cinema.response.*;
 
 import com.booleanuk.api.cinema.response.Error;
+import com.booleanuk.api.cinema.screening.Screening;
+import com.booleanuk.api.cinema.screening.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ public class MovieController {
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private ScreeningRepository screeningRepository;
 
     @GetMapping
     public ResponseEntity<Response> getAll() {
@@ -37,11 +42,16 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Response> createMovie(@RequestBody Movie movie) {
-        //String regex= "/^[a-zA-Z\\s]*$/";
 
         if(movie.getTitle().isEmpty() || movie.getDescription().isEmpty() || movie.getRating().isEmpty()){
             return new ResponseEntity<>(new ErrorResponse(new Error("Bad Request")), HttpStatus.BAD_REQUEST);
         }
+
+//        System.out.println(movie.getScreenings());
+//        for (Screening s : movie.getScreenings()){
+//            s.setMovie(movie);
+//            screeningRepository.save(s);
+//        }
 
         movie.setCreatedAt(currentTime);
         movie.setUpdatedAt(currentTime);
