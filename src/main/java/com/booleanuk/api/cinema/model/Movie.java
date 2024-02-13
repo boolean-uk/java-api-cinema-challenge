@@ -33,7 +33,7 @@ public class Movie {
     private String description;
 
     @Column
-    private int runtimeMins;
+    private Integer runtimeMins;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -44,7 +44,7 @@ public class Movie {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties(value = {"movie"})
+    @JsonIgnoreProperties(value = {"movie"},  allowSetters = true)
     private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, int runtimeMins) {

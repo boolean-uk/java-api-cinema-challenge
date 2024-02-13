@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -23,26 +24,22 @@ public class Screening {
     private int id;
 
     @Column
-    private int screenNumber;
+    private Integer screenNumber;
 
     @Column(name = "starts_at")
     private LocalDateTime startsAt;
 
     @Column
-    private int capacity;
-
-//    @Column(name = "created_at")
-//    @CreationTimestamp
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "updated_at")
-//    @UpdateTimestamp
-//    private LocalDateTime updatedAt;
+    private Integer capacity;
 
     @ManyToOne
     @JsonIgnoreProperties (value = "screening")
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties(value = {"screening"},  allowSetters = true)
+    private List<Ticket> tickets;
 
     public Screening(int screenNumber, LocalDateTime startsAt, int capacity) {
         this.screenNumber = screenNumber;
