@@ -63,6 +63,16 @@ public class MovieController {
             return new ResponseEntity<>(new CustomResponse("error", new Error("not found")), HttpStatus.NOT_FOUND);
         }
 
+        if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Title is required")), HttpStatus.BAD_REQUEST);
+        } else if (movie.getRating() == null || movie.getRating().isEmpty()) {
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Rating is required")), HttpStatus.BAD_REQUEST);
+        } else if (movie.getDescription() == null || movie.getDescription().isEmpty()) {
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Description is required")), HttpStatus.BAD_REQUEST);
+        } else if (movie.getRuntimeMins() == null || movie.getRuntimeMins() == 0){
+            return new ResponseEntity<>(new CustomResponse("error", new Error("Runtime is required")), HttpStatus.BAD_REQUEST);
+        }
+
         Movie movieToUpdate = movieRepository
                 .findById((long) id).get();
         movieToUpdate.setTitle(movie.getTitle() != null ? movie.getTitle() : movieToUpdate.getTitle());
