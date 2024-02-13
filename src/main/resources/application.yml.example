@@ -1,3 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://<DB_URL>:5432/<DB_NAME>
+    username: <USERNAME>
+    password: <PASSWORD>
+    hikari:
+      maximum-pool-size: 3
+
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: false # Make sure hibernate runs before loading the data.sql file
+    hibernate:
+      ddl-auto: create-drop # Drop and create new database before and after running spring
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: embedded # Load initial data from the data.sql file
+
+
 server:
   port: 4000
   error:
@@ -5,19 +27,3 @@ server:
     include-binding-errors: always
     include-stacktrace: never
     include-exception: false
-
-spring:
-  datasource:
-    url: jdbc:postgresql://DATABASE_URL
-    username: DATABASE_USERNAME
-    password: DATABASE_PASSWORD
-    max-active: 3
-    max-idle: 3
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: true
