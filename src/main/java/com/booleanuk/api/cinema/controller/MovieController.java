@@ -40,7 +40,7 @@ public class MovieController {
 
 	@PostMapping
 	public ResponseEntity<CustomResponse<?>> create(@RequestBody MovieDTO movieDTO) {
-		Movie movie= new Movie(movieDTO.getTitle(),movieDTO.getRating(),movieDTO.getDescription(),movieDTO.getRuntimeMins());
+		Movie movie = new Movie(movieDTO.getTitle(), movieDTO.getRating(), movieDTO.getDescription(), movieDTO.getRuntimeMins());
 		if (movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() == 0) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "bad request")), HttpStatus.BAD_REQUEST);
 		}
@@ -57,7 +57,6 @@ public class MovieController {
 		}
 		return new ResponseEntity<>(new CustomResponse<>("success", toDTO(newMovie)), HttpStatus.CREATED);
 	}
-
 
 
 	@PostMapping("{id}/screenings")
@@ -88,7 +87,6 @@ public class MovieController {
 		Movie movie = movieRepository.findById(id).orElse(null);
 		if (movie == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
-
 		}
 		List<Screening> screenings = screeningRepository.findAllByMovie(movie);
 		List<ScreeningDTO> screeningsDTO = new ArrayList<>();
@@ -101,7 +99,7 @@ public class MovieController {
 
 	@PutMapping("{id}")
 	public ResponseEntity<CustomResponse<?>> update(@PathVariable int id, @RequestBody MovieDTO movieDTO) {
-		Movie movie= new Movie(movieDTO.getTitle(),movieDTO.getRating(),movieDTO.getDescription(),movieDTO.getRuntimeMins());
+		Movie movie = new Movie(movieDTO.getTitle(), movieDTO.getRating(), movieDTO.getDescription(), movieDTO.getRuntimeMins());
 		Movie newMovie = movieRepository.findById(id).orElse(null);
 		if (newMovie == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
@@ -120,7 +118,7 @@ public class MovieController {
 			newMovie.setRating(movie.getRating());
 		}
 		movieRepository.save(newMovie);
-		return new ResponseEntity<>(new CustomResponse<>("success",toDTO(newMovie)), HttpStatus.CREATED);
+		return new ResponseEntity<>(new CustomResponse<>("success", toDTO(newMovie)), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("{id}")
@@ -151,17 +149,19 @@ public class MovieController {
 				screening.getUpdatedAt().format(outputFormatter),
 				null);
 	}
-	private MovieDTO toDTO(Movie movie)
-	{        return new MovieDTO(
-			movie.getId(),
-			movie.getTitle(),
-			movie.getRating(),
-			movie.getDescription(),
-			movie.getRuntimeMins(),
-			null,
-			movie.getCreatedAt().format(outputFormatter),
-			movie.getUpdatedAt().format(outputFormatter)
-	);}
+
+	private MovieDTO toDTO(Movie movie) {
+		return new MovieDTO(
+				movie.getId(),
+				movie.getTitle(),
+				movie.getRating(),
+				movie.getDescription(),
+				movie.getRuntimeMins(),
+				null,
+				movie.getCreatedAt().format(outputFormatter),
+				movie.getUpdatedAt().format(outputFormatter)
+		);
+	}
 
 
 }

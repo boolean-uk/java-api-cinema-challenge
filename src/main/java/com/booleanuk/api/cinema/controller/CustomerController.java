@@ -31,11 +31,12 @@ public class CustomerController {
 
 		return new CustomResponse<>("success", customerRepository.findAll());
 	}
+
 	DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSxxx");
 
 	@PostMapping
 	public ResponseEntity<CustomResponse<?>> create(@RequestBody CustomerDTO customerDTO) {
-		Customer customer = new Customer(customerDTO.getName(),customerDTO.getEmail(),customerDTO.getPhone());
+		Customer customer = new Customer(customerDTO.getName(), customerDTO.getEmail(), customerDTO.getPhone());
 		if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
 			CustomResponse<Object> errorResponse = new CustomResponse<>("error", Collections.singletonMap("message", "bad request"));
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -44,26 +45,26 @@ public class CustomerController {
 		Customer savedCustomer = customerRepository.save(newCustomer);
 
 		CustomResponse<CustomerDTO> response = new CustomResponse<>("success", toDTO(savedCustomer));
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 
 	@PostMapping("{customer_id}/screenings/{screening_id}")
 	public ResponseEntity<CustomResponse<?>> createTicket(@PathVariable int customer_id, @PathVariable int screening_id, @RequestBody TicketDTO ticketDTO) {
 		Screening screening = screeningRepository.findById(screening_id).orElse(null);
-		if(screening==null){
+		if (screening == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
 
 		}
 		Customer customer = customerRepository.findById(customer_id).orElse(null);
-		if(customer==null){
+		if (customer == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
 
 		}
-		Ticket ticket = new Ticket(screening,customer, ticketDTO.getNumSeats());
+		Ticket ticket = new Ticket(screening, customer, ticketDTO.getNumSeats());
 		Ticket newTicket = new Ticket(screening, customer, ticket.getNumSeats());
 		ticketRepository.save(newTicket);
-		return new ResponseEntity<>(new CustomResponse<>("success",toDTO(newTicket)), HttpStatus.CREATED);
+		return new ResponseEntity<>(new CustomResponse<>("success", toDTO(newTicket)), HttpStatus.CREATED);
 	}
 
 	@GetMapping("{customer_id}/screenings/{screening_id}")
@@ -88,16 +89,25 @@ public class CustomerController {
 
 	@PutMapping("{id}")
 	public ResponseEntity<CustomResponse<?>> update(@PathVariable int id, @RequestBody CustomerDTO customerDTO) {
-		Customer customer = new Customer(customerDTO.getName(),customerDTO.getEmail(),customerDTO.getPhone());
+		Customer customer = new Customer(customerDTO.getName(), customerDTO.getEmail(), customerDTO.getPhone());
+		if (customer.getName() == null && customer.getEmail() == null && customer.getPhone() == null) {
+			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "bad request")), HttpStatus.BAD_REQUEST);
+		}
 		Customer newCustomer = customerRepository.findById(id).orElse(null);
 		if (newCustomer == null) {
 			return new ResponseEntity<>(new CustomResponse<>("error", Collections.singletonMap("message", "not found")), HttpStatus.NOT_FOUND);
 		}
-		newCustomer.setName(customer.getName());
-		newCustomer.setEmail(customer.getEmail());
-		newCustomer.setPhone(customer.getPhone());
+		if (customer.getName() != null) {
+			newCustomer.setName(customer.getName());
+		}
+		if (customer.getEmail() != null) {
+			newCustomer.setEmail(customer.getEmail());
+		}
+		if (customer.getPhone() != null) {
+			newCustomer.setPhone(customer.getPhone());
+		}
 		customerRepository.save(newCustomer);
-		return new ResponseEntity<>(new CustomResponse<>("success",toDTO(newCustomer)), HttpStatus.CREATED);
+		return new ResponseEntity<>(new CustomResponse<>("success", toDTO(newCustomer)), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("{id}")
@@ -111,6 +121,7 @@ public class CustomerController {
 		return ResponseEntity.ok(new CustomResponse<>("success", toDTO(customer)));
 
 	}
+
 	private CustomerDTO toDTO(Customer customer) {
 		return new CustomerDTO(
 				customer.getId(),
@@ -122,7 +133,8 @@ public class CustomerController {
 				customer.getTickets()
 		);
 	}
-	private TicketDTO toDTO(Ticket ticket){
+
+	private TicketDTO toDTO(Ticket ticket) {
 		return new TicketDTO(
 				ticket.getId(),
 				ticket.getNumSeats(),
