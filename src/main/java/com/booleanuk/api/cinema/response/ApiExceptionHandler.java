@@ -10,8 +10,9 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleCustomApiException(ApiException ex) {
-        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(new ErrorResponseMessage(ex.getMessage()));
-        return new ResponseEntity<>(apiErrorResponse, ex.getHttpStatus());
+    public ResponseEntity<ErrorResponse> handleCustomApiException(ApiException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.set(ex.getMessage());
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 }
