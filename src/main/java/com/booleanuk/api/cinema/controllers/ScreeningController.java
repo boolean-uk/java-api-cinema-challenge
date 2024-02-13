@@ -5,6 +5,7 @@ import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,10 @@ import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("movies/{id}/screenings")
+@AllArgsConstructor
 public class ScreeningController {
     private final ScreeningRepository screeningRepository;
     private final MovieRepository movieRepository;
-
-    public ScreeningController(ScreeningRepository screeningRepository, MovieRepository movieRepository) {
-        this.screeningRepository = screeningRepository;
-        this.movieRepository = movieRepository;
-    }
 
     @PostMapping
     public ResponseEntity<Response<?>> add(@PathVariable int id, @RequestBody Screening screening) {

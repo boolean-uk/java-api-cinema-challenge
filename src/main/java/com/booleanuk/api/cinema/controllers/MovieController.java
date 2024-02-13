@@ -5,6 +5,7 @@ import com.booleanuk.api.cinema.models.*;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
 import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import com.booleanuk.api.cinema.repositories.TicketRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,16 +20,11 @@ import java.util.stream.Stream;
 @Slf4j
 @RestController
 @RequestMapping("movies")
+@AllArgsConstructor
 public class MovieController {
     private final MovieRepository movieRepository;
     private final ScreeningRepository screeningRepository;
     private final TicketRepository ticketRepository;
-
-    public MovieController(MovieRepository movieRepository, ScreeningRepository screeningRepository, TicketRepository ticketRepository) {
-        this.movieRepository = movieRepository;
-        this.screeningRepository = screeningRepository;
-        this.ticketRepository = ticketRepository;
-    }
 
     @PostMapping
     public ResponseEntity<Response<?>> add(@RequestBody Movie movie) {
