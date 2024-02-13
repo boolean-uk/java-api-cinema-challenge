@@ -43,7 +43,7 @@ public class Screening {
 
 
     @OneToMany(mappedBy = "screening")
-    @JsonIgnoreProperties("screening")
+    @JsonIgnoreProperties(value = {"screening"}, allowSetters = true)
     private List<Ticket> tickets;
 
     public Screening(int screenNumber, String startsAt, int capacity, String createdAt, String updatedAt, Movie movie) {
@@ -53,5 +53,10 @@ public class Screening {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.movie = movie;
+    }
+
+
+    public Screening(int id) {
+        this.id = id;
     }
 }

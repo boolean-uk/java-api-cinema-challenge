@@ -24,10 +24,10 @@ public class ErrorResponse {
 
 
     public ErrorResponse(
-            HttpStatus httpStatus,
+            String status,
             String message
     ) {
-        this.status = httpStatus.name();
+        this.status = status;
         this.data = new HashMap<>();
         this.data.put("message", message);
     }

@@ -5,12 +5,11 @@ import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
+import com.booleanuk.api.cinema.util.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,24 +22,29 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<SuccessResponse<?>> createCustomer(@RequestBody Customer customer) {
         customer.setCreatedAt(DateCreater.getCurrentDate());
         customer.setUpdatedAt(DateCreater.getCurrentDate());
         this.areCustomerValid(customer);
         if(customer.getTickets() == null) {
             customer.setTickets(new ArrayList<>());
+
         }
-        return ResponseEntity.ok(this.customerRepository.save(customer));
-    }
+        this.customerRepository.save(customer);
+        SuccessResponse<Customer> successResponse = new SuccessResponse<>(customer);
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);    }
 
 
     @GetMapping
-    public List<Customer> getCustomers() {
-        return this.customerRepository.findAll();
+    public ResponseEntity<SuccessResponse<List<Customer>>> getCustomers() {
+
+        List<Customer> data = this.customerRepository.findAll();
+        SuccessResponse<List<Customer>> successResponse = new SuccessResponse<>(data);
+        return ResponseEntity.ok(successResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
+    public ResponseEntity<SuccessResponse<?>> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
         Customer customerToUpdate = this.getACustomer(id);
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
@@ -48,14 +52,19 @@ public class CustomerController {
         customerToUpdate.setPhone(customer.getPhone());
 
         this.areCustomerValid(customerToUpdate);
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+
+        SuccessResponse<Customer> successResponse = new SuccessResponse<>(customerToUpdate);
+        this.customerRepository.save(customerToUpdate);
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable (name = "id") int id) {
+    public ResponseEntity<SuccessResponse<?>> deleteCustomer(@PathVariable (name = "id") int id) {
         Customer customerToDelete = this.getACustomer(id);
+
         this.customerRepository.delete(customerToDelete);
-        return new ResponseEntity<>(customerToDelete, HttpStatus.OK);
+        SuccessResponse<Customer> successResponse = new SuccessResponse<>(customerToDelete);
+        return ResponseEntity.ok(successResponse);
     }
 
     private Customer getACustomer(int id) {

@@ -36,8 +36,9 @@ public class Customer {
     @Column
     private String updatedAt;
 
-    @OneToMany(mappedBy = "customer")
-    @JsonIgnoreProperties("customer")
+    //Needed Fetch Eager to not get json lazy error on delete of Customer, if you know a better way to do it i would like to know :D
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = {"customer"}, allowSetters = true)
     private List<Ticket> tickets;
 
 
@@ -47,5 +48,9 @@ public class Customer {
         this.phone = phone;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Customer(int id) {
+        this.id = id;
     }
 }

@@ -11,6 +11,7 @@ import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
+import com.booleanuk.api.cinema.util.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpCookie;
@@ -34,7 +35,7 @@ public class TicketController {
     private CustomerRepository customerRepository;
 
     @PostMapping
-    public ResponseEntity<Ticket> createTicket(@PathVariable (name = "customerId") int customerId, @PathVariable (name = "screeningId") int screeningId, @RequestBody Ticket ticket) {
+    public ResponseEntity<SuccessResponse<?>> createTicket(@PathVariable (name = "customerId") int customerId, @PathVariable (name = "screeningId") int screeningId, @RequestBody Ticket ticket) {
 
         Customer customer = getACustomer(customerId);
         Screening screening = getAScreening(screeningId);
@@ -42,14 +43,14 @@ public class TicketController {
 
 
         Ticket newTicket = new Ticket(ticket.getNumSeats(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), customer, screening);
+        this.ticketRepository.save(newTicket);
+        SuccessResponse<Ticket> successResponse = new SuccessResponse<>(newTicket);
 
-
-        return new ResponseEntity<>(this.ticketRepository.save(newTicket), HttpStatus.CREATED);
-    }
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);    }
 
 
     @GetMapping
-    public List<Ticket> getTickets(@PathVariable (name = "customerId") int customerId, @PathVariable (name = "screeningId") int screeningId) {
+    public ResponseEntity<SuccessResponse<?>> getTickets(@PathVariable (name = "customerId") int customerId, @PathVariable (name = "screeningId") int screeningId) {
 
         Customer customer = getACustomer(customerId);
         Screening screening = getAScreening(screeningId);
@@ -62,9 +63,10 @@ public class TicketController {
             }
         }
 
+        SuccessResponse<List<Ticket>> successResponse = new SuccessResponse<>(ticketList);
 
 
-        return ticketList;
+        return ResponseEntity.ok(successResponse);
     }
 
     private Screening getAScreening(int id) {

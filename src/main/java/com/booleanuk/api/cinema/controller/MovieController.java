@@ -2,10 +2,13 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.exceptions.CustomDataNotFoundException;
 import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
+import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
+import com.booleanuk.api.cinema.util.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,28 +24,53 @@ public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        movie.setCreatedAt(DateCreater.getCurrentDate());
-        movie.setUpdatedAt(DateCreater.getCurrentDate());
+    public ResponseEntity<SuccessResponse<?>> createMovie(@RequestBody Movie movie) {
+
+        Movie postMovie = new Movie(movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins(), movie.getCreatedAt(), movie.getUpdatedAt());
+        postMovie.setCreatedAt(DateCreater.getCurrentDate());
+        postMovie.setUpdatedAt(DateCreater.getCurrentDate());
 
 
-        areMovieValid(movie);
-        if(movie.getScreenings() == null) {
-            movie.setScreenings(new ArrayList<>());
+        areMovieValid(postMovie);
+        this.movieRepository.save(postMovie);
+        postMovie.setScreenings(new ArrayList<>());
+        if (movie.getScreenings() != null) {
+            for (Screening screening : movie.getScreenings()) {
+                if (screening.getTickets() == null) {
+                    screening.setTickets(new ArrayList<>());
+                }
+
+                Screening newScreening = new Screening(screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), postMovie);
+                this.screeningRepository.save(newScreening);
+                postMovie.getScreenings().add(newScreening);
+
+
+            }
         }
-        return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
 
+
+
+        SuccessResponse<Movie> successResponse = new SuccessResponse<>(postMovie);
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 
     }
 
     @GetMapping
-    public List<Movie> getMovies() {
-        return this.movieRepository.findAll();
+    public ResponseEntity<SuccessResponse<?>> getMovies() {
+
+        List<Movie> movies = this.movieRepository.findAll();
+        SuccessResponse<List<Movie>> successResponse = new SuccessResponse<>(movies);
+        return ResponseEntity.ok(successResponse);
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable (name = "id") int id, @RequestBody Movie movie) {
+    public ResponseEntity<SuccessResponse<?>> updateMovie(@PathVariable (name = "id") int id, @RequestBody Movie movie) {
 
         Movie movieToBeUpdated = this.getAMovie(id);
         areMovieValid(movieToBeUpdated);
@@ -54,15 +82,18 @@ public class MovieController {
         movieToBeUpdated.setRuntimeMins(movie.getRuntimeMins());
         movieToBeUpdated.setTitle(movie.getTitle());
 
-        return new ResponseEntity<>(this.movieRepository.save(movieToBeUpdated), HttpStatus.CREATED);
-    }
+        SuccessResponse<Movie> successResponse = new SuccessResponse<>(movieToBeUpdated);
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable (name = "id") int id) {
+    public ResponseEntity<SuccessResponse<?>> deleteMovie(@PathVariable (name = "id") int id) {
         Movie movieToBeDeleted = getAMovie(id);
         movieToBeDeleted.setScreenings(new ArrayList<>());
         this.movieRepository.delete(movieToBeDeleted);
-        return new ResponseEntity<>(movieToBeDeleted, HttpStatus.OK);
+        SuccessResponse<Movie> successResponse = new SuccessResponse<>(movieToBeDeleted);
+
+        return ResponseEntity.ok(successResponse);
     }
 
 

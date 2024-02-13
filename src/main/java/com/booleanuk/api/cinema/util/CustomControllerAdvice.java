@@ -19,10 +19,13 @@ class CustomControllerAdvice {
     public ResponseEntity<ErrorResponse> handleCustomDataNotFoundExceptions(Exception e) {
         HttpStatus status = HttpStatus.NOT_FOUND; // 404
 
+        String error = "error";
+        String message = "not found";
+
         return new ResponseEntity<>(
                 new ErrorResponse(
-                        status,
-                        e.getMessage()
+                        error,
+                        message
                 ),
                 status
         );
@@ -32,10 +35,14 @@ class CustomControllerAdvice {
     public ResponseEntity<ErrorResponse> handleCustomParameterConstraintExceptions(Exception e) {
         HttpStatus status = HttpStatus.BAD_REQUEST; // 400
 
+        String error = "error";
+        String message = "bad request";
+
+
         return new ResponseEntity<>(
                 new ErrorResponse(
-                        status,
-                        e.getMessage()
+                        error,
+                        message
                 ),
                 status
         );
@@ -50,7 +57,7 @@ class CustomControllerAdvice {
 
         return new ResponseEntity<>(
                 new ErrorResponse(
-                        status,
+                        status.name(),
                         customErrorException.getMessage()
                 ),
                 status
@@ -65,7 +72,7 @@ class CustomControllerAdvice {
 
         return new ResponseEntity<>(
                 new ErrorResponse(
-                        status,
+                        status.name(),
                         e.getMessage()
                 ),
                 status

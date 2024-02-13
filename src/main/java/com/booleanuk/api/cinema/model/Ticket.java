@@ -47,9 +47,3 @@ public class Ticket {
     }
 }
 
-
-/*
-@ManyToOne
-@JoinColumns({
-        @JoinColumn(name = "customer_id", nullable = false, referencedColumnName = "id"),
-        @JoinColumn(name = "screening_id", nullable = false, referencedColumnName = "id")})*/

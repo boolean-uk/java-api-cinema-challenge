@@ -2,11 +2,13 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.exceptions.CustomDataNotFoundException;
 import com.booleanuk.api.cinema.exceptions.CustomParameterConstraintException;
+import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.util.DateCreater;
+import com.booleanuk.api.cinema.util.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @PostMapping
-    public ResponseEntity<Screening> createScreening(@PathVariable (name = "id") int id, @RequestBody Screening screening) {
+    public ResponseEntity<SuccessResponse<?>> createScreening(@PathVariable (name = "id") int id, @RequestBody Screening screening) {
         Movie movie = this.getAMovie(id);
         Screening newScreening = new Screening(screening.getScreenNumber(), screening.getStartsAt(), screening.getCapacity(), DateCreater.getCurrentDate(), DateCreater.getCurrentDate(), movie);
         areScreeningValid(newScreening);
@@ -35,14 +37,21 @@ public class ScreeningController {
             newScreening.setTickets(new ArrayList<>());
         }
         movie.setUpdatedAt(DateCreater.getCurrentDate());
-        movie.getScreenings().add(screening);
-        return new ResponseEntity<>(this.screeningRepository.save(newScreening), HttpStatus.CREATED);
-    }
+        movie.getScreenings().add(newScreening);
+
+
+
+
+        SuccessResponse<Screening> successResponse = new SuccessResponse<>(screening);
+        this.screeningRepository.save(newScreening);
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);    }
 
     @GetMapping
-    public List<Screening> getScreenings(@PathVariable (name = "id") int id) {
+    public ResponseEntity<SuccessResponse<?>> getScreenings(@PathVariable (name = "id") int id) {
         Movie movie = this.getAMovie(id);
-        return movie.getScreenings();
+        SuccessResponse<List<Screening>> successResponse = new SuccessResponse<>(movie.getScreenings());
+
+        return ResponseEntity.ok(successResponse);
     }
 
 

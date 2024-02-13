@@ -15,5 +15,7 @@ public class DateCreater {
     }
 
 
-
+    public static void main(String[] args) {
+        System.out.println(getCurrentDate());
+    }
 }
