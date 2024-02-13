@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
 
-@Builder
 @Entity
 @Getter
 @Setter

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @RestController
@@ -24,7 +25,7 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Response<?>> add(@RequestBody Customer customer) {
-        if (isValidObject(customer)) {
+        if (lacksRequiredFields(customer) || !isValidObject(customer)) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Response.success(this.customerRepository.save(customer)));
         }
@@ -53,12 +54,12 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.NOT_FOUND);
         }
 
-        // TODO If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
-
         Customer customerToUpdate = this.customerRepository.findById(id).get();
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
+        // Update customer object with new values
+        // If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
+        customerToUpdate.setName(customer.getName() != null ? customer.getName() : customerToUpdate.getName());
+        customerToUpdate.setEmail(customer.getEmail() != null ? customer.getEmail() : customerToUpdate.getEmail());
+        customerToUpdate.setPhone(customer.getPhone() != null ? customer.getPhone() : customerToUpdate.getPhone());
         customerToUpdate.setUpdatedAt(ZonedDateTime.now());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -82,12 +83,13 @@ public class CustomerController {
         // TODO Deleting customer should delete all tickets for that customer
     }
 
+    private boolean lacksRequiredFields(Customer customer) {
+        return Stream.of(customer.getName(), customer.getEmail(), customer.getPhone())
+                .anyMatch(Objects::isNull);
+    }
+
     private boolean isValidObject(Customer customer) {
-        if (Stream.of(customer.getName(), customer.getEmail(), customer.getPhone())
-                .anyMatch(field -> field == null || field.isBlank())) {
-            return false;
-        }
-        // TODO Validate email, phone, etc
+        // TODO Validate email, phonenumber, etc if needed
         return true;
     }
 }

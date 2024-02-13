@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.enums.Rating;
 import com.booleanuk.api.cinema.models.Movie;
+import com.booleanuk.api.cinema.models.MovieDTO;
 import com.booleanuk.api.cinema.models.Response;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
@@ -31,8 +32,8 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Response<?>> add(@RequestBody Movie movie) {
-        // Check if movie is valid
-        if (!isValidObject(movie)) {
+        // Check if movie is valid and contains all required fields
+        if (lacksRequiredFields(movie) || !Rating.isValidRating(movie.getRating())) {
             return ResponseEntity.badRequest().body(Response.BAD_REQUEST);
         }
         // Save movie to DB
@@ -42,39 +43,35 @@ public class MovieController {
         for (Screening screenings : movie.getScreenings()) {
             screenings.setMovie(movie);
         }
-        List<Screening> screenings = screeningRepository.saveAll(movie.getScreenings());
-        // Set screenings to the movie object we return
-        // Return the movie with screenings
-        movie.setScreenings(screenings);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(movie));
-        // TODO Dont return the screenings. Use DTO
+        screeningRepository.saveAll(movie.getScreenings());
+        // Return MovieDTO object (without screenings according to spec)
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Response.success(MovieDTO.fromMovie(movie)));
     }
 
     @GetMapping
-    public Response<List<Movie>> getAll() {
-        return Response.success(this.movieRepository.findAll());
+    public Response<List<MovieDTO>> getAll() {
+        return Response.success(MovieDTO.fromMovieList(this.movieRepository.findAll()));
     }
 
     @PutMapping("{id}")
     public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody Movie movie) {
-        if (!isValidObject(movie)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.BAD_REQUEST);
+        if (!Rating.isValidRating(movie.getRating())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.BAD_REQUEST);
         }
         if (this.movieRepository.findById(id).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.NOT_FOUND);
         }
 
-        // TODO If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
-
         Movie movieToUpdate = this.movieRepository.findById(id).get();
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        movieToUpdate.setTitle(movie.getTitle() != null ? movie.getTitle() : movieToUpdate.getTitle());
+        movieToUpdate.setRating(movie.getRating() != null ? movie.getRating() : movieToUpdate.getRating());
+        movieToUpdate.setDescription(movie.getDescription() != null ? movie.getDescription() : movieToUpdate.getDescription());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins() != null ? movie.getRuntimeMins() : movieToUpdate.getRuntimeMins());
         movieToUpdate.setUpdatedAt(ZonedDateTime.now());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Response.success(this.movieRepository.save(movieToUpdate)));
+                .body(Response.success(MovieDTO.fromMovie(this.movieRepository.save(movieToUpdate))));
     }
 
     @DeleteMapping("{id}")
@@ -90,15 +87,12 @@ public class MovieController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error("violation of foreign key constraint"));
         }
 
-        return ResponseEntity.ok(Response.success(movieToDelete));
+        return ResponseEntity.ok(Response.success(MovieDTO.fromMovie(movieToDelete)));
         // TODO Deleting a movie should delete all screenings and tickets
     }
 
-    private boolean isValidObject(Movie movie) {
-        if (Stream.of(movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins(), movie.getScreenings())
-                .anyMatch(Objects::isNull)) {
-            return false;
-        }
-        return Rating.isValidRating(movie.getRating());
+    private boolean lacksRequiredFields(Movie movie) {
+        return Stream.of(movie.getTitle(), movie.getRating(), movie.getDescription(), movie.getRuntimeMins(), movie.getScreenings())
+                .anyMatch(Objects::isNull);
     }
 }
