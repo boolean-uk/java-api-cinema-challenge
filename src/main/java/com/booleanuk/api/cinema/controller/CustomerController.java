@@ -45,8 +45,7 @@ public class CustomerController {
             if (customers.isEmpty()) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
-                ApiResponse<Customer> okRequest = new ApiResponse<>("success", customers);
-                return ResponseEntity.ok(okRequest);
+                return HelperUtils.okRequest(customers);
             }
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
@@ -77,7 +76,6 @@ public class CustomerController {
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
         }
-
     }
 
     /**
@@ -97,8 +95,7 @@ public class CustomerController {
             } else {
                 this.customerRepository.delete(customerToDelete);
                 customerToDelete.setTickets(new ArrayList<>());
-                ApiResponse<Customer> okRequest = new ApiResponse<>("success", customerToDelete);
-                return ResponseEntity.status(HttpStatus.OK).body(okRequest);
+                return HelperUtils.okRequest(customerToDelete);
             }
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
@@ -125,8 +122,7 @@ public class CustomerController {
                 customerToUpdate.setPhone(customer.getPhone());
                 customerToUpdate.setUpdatedAtToCurrentTimeInGMTPlus1();
                 this.customerRepository.save(customerToUpdate);
-                ApiResponse<Customer> createdRequest = new ApiResponse<>("success", customerToUpdate);
-                return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+                return HelperUtils.createdRequest(customerToUpdate);
             }
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
@@ -157,8 +153,7 @@ public class CustomerController {
                 ticket.setScreening(tempScreening);
                 ticket.setNumSeats(ticket.getNumSeats());
                 Ticket savedTicket = this.ticketRepository.save(ticket);
-                ApiResponse<Ticket> createdRequest = new ApiResponse<>("success", savedTicket);
-                return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+                return HelperUtils.createdRequest(savedTicket);
             }
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request caused by exception!"));
@@ -177,8 +172,7 @@ public class CustomerController {
             if (tempTicketList.isEmpty()) {
                 return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
             } else {
-                ApiResponse<List<Ticket>> okRequest = new ApiResponse<>("success", tempTicketList);
-                return ResponseEntity.status(HttpStatus.OK).body(okRequest);
+                return HelperUtils.okRequest(tempTicketList);
             }
         } catch (Exception e) {
             return HelperUtils.badRequest(new ApiResponse.Message("bad request"));
