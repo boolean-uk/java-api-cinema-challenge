@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.movie;
 
+import com.booleanuk.api.cinema.ApiResponse;
+import com.booleanuk.api.cinema.ErrorResponse;
 import com.booleanuk.api.cinema.screening.Screening;
 import com.booleanuk.api.cinema.screening.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @RestController
@@ -21,71 +22,110 @@ public class MovieController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
-
     @GetMapping
-    public List<Movie> getAllMovies(){
-        return this.movieRepository.findAll();
+    public ResponseEntity<MovieListResponse> getAllMovies(){
+        MovieListResponse movieListResponse = new MovieListResponse();
+        movieListResponse.set(this.movieRepository.findAll());
+        return new ResponseEntity<>(movieListResponse, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<ApiResponse<?>> createMovie(@RequestBody Movie movie) {
 
         if (isInvalidRequest(movie)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the movie, please check all required fields are correct");
+            return badRequest();
         }
+
         Movie createdMovie = this.movieRepository.save(movie);
-//        createdMovie.setScreenings(new ArrayList<>());
-        return new ResponseEntity<>(createdMovie, HttpStatus.CREATED);
+
+        if(!(movie.getScreenings() == null)){
+            for(Screening screening : movie.getScreenings()){
+                screening.setMovie(createdMovie);
+                if(isInvalidScreeningRequest(screening)){
+                    return badRequest();
+                }
+                this.screeningRepository.save(screening);
+            }
+        }
+        else{
+            movie.setScreenings(new ArrayList<>());
+        }
+
+        MovieResponse response = new MovieResponse();
+        response.set(createdMovie);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<?>> deleteMovie(@PathVariable int id) {
         Movie movieToDelete = this.getAMovie(id);
+
+        if(movieToDelete == null){
+            return notFound();
+        }
+
+        List<Screening> screenings = movieToDelete.getScreenings();
+
+        for (Screening screening : screenings) {
+            this.screeningRepository.delete(screening);
+        }
+
+        movieToDelete.setScreenings(new ArrayList<>());
         this.movieRepository.delete(movieToDelete);
-//        movieToDelete.setScreenings(new ArrayList<Screening>());
-        return ResponseEntity.ok(movieToDelete);
+
+        MovieResponse response = new MovieResponse();
+        response.set(movieToDelete);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovieById(@PathVariable int id, @RequestBody Movie movie){
-
+    public ResponseEntity<ApiResponse<?>> UpdateMovieById(@PathVariable int id, @RequestBody Movie movie){
 
         if (isInvalidRequest(movie)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the movie, please check all required fields are correct");
+            return badRequest();
         }
 
         Movie movieToUpdate = this.getAMovie(id);
+
+        if(movieToUpdate == null){
+            return notFound();
+        }
+
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-        movieToUpdate.setUpdatedAt(LocalDateTime.now());
-        return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+        this.movieRepository.save(movieToUpdate);
+
+        MovieResponse response = new MovieResponse();
+        response.set(movieToUpdate);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
-    //SCREENINGS
-
-//    @GetMapping("/{id}/screenings")
-//    public List<Screening> getScreenings(@PathVariable int id ){
-//        Movie movieToCheckScreeningsFor = getAMovie(id);
-//        return movieToCheckScreeningsFor.getScreenings();
-//    }
-
-    @PostMapping("/{id}/screenings")
-    public ResponseEntity<Screening> getScreenings(@PathVariable int id, @RequestBody Screening screening){
-        Movie movieToAddScreeningFor = getAMovie(id);
-        Screening createdScreening = screeningRepository.save(screening);
-        createdScreening.setMovie(movieToAddScreeningFor);
-        return new ResponseEntity<>(createdScreening, HttpStatus.CREATED);
-    }
-
 
     private Movie getAMovie(int id){
-        return this.movieRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id were found"));
+        return this.movieRepository.findById(id).orElse(null);
     }
 
     private boolean isInvalidRequest(Movie movie){
         return movie.getTitle() == null || movie.getRating() == null || movie.getDescription() == null || movie.getRuntimeMins() == null;
+    }
+
+    private boolean isInvalidScreeningRequest(Screening screening){
+        return screening.getScreenNumber() == 0 || screening.getCapacity() == 0 || screening.getStartsAt() == null;
+    }
+
+    private ResponseEntity<ApiResponse<?>> badRequest(){
+        ErrorResponse error = new ErrorResponse();
+        error.set("Could not create movie, please check all required fields are correct");
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    private ResponseEntity<ApiResponse<?>> notFound(){
+        ErrorResponse error = new ErrorResponse();
+        error.set("No movie with that id were found");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
 }

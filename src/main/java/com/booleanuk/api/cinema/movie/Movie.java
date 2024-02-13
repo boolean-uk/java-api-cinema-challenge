@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,20 +33,22 @@ public class Movie {
     private String description;
 
     @Column
-    private String runtimeMins;
+    private Integer runtimeMins;
 
     @Column
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 
-//    @OneToMany(mappedBy = "movie")
-//    @JsonIgnoreProperties("movie")
-//    private List<Screening> screenings;
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties("movie")
+    private List<Screening> screenings;
 
-    public Movie(String title, String rating, String description, String runtimeMins) {
+    public Movie(String title, String rating, String description, Integer runtimeMins) {
         this.title = title;
         this.rating = rating;
         this.description = description;
