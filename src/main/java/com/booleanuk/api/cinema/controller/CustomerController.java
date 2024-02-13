@@ -29,21 +29,21 @@ public class CustomerController {
         return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable int id) {
-        return ResponseEntity.ok(this.getACustomer(id));
+    @GetMapping("/{customer_id}")
+    public ResponseEntity<Customer> getCustomerByCustomer_Id(@PathVariable int customer_customer_id) {
+        return ResponseEntity.ok(this.getACustomer(customer_customer_id));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
-        Customer customerToDelete = this.getACustomer(id);
+    @DeleteMapping("/{customer_id}")
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable int customer_customer_id) {
+        Customer customerToDelete = this.getACustomer(customer_customer_id);
         this.customerRepository.delete(customerToDelete);
         return ResponseEntity.ok(customerToDelete);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
-        Customer customerToUpdate = this.getACustomer(id);
+    @PutMapping("/{customer_id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable int customer_id, @RequestBody Customer customer) {
+        Customer customerToUpdate = this.getACustomer(customer_id);
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
@@ -51,8 +51,8 @@ public class CustomerController {
         return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
-    private Customer getACustomer(int id) {
-        return this.customerRepository.findById(id)
+    private Customer getACustomer(int customer_id) {
+        return this.customerRepository.findById(customer_id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
     }
 }

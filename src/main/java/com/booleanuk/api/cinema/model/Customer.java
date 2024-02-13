@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int customer_id;
     @Column(name = "name")
     private String name;
     @Column(name = "email")
@@ -27,14 +27,14 @@ public class Customer {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    public Customer(int id) { this.id = id; }
+    public Customer(int customer_id) { this.customer_id = customer_id; }
 
-    public int getId() {
-        return id;
+    public int getCustomer_id() {
+        return customer_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setCustomer_id(int id) {
+        this.customer_id = customer_id;
     }
 
     public String getName() {
