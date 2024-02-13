@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class ErrorResponse extends Response<HashMap<String, String>>{
 
-    public ErrorResponse(String data) {
-        super("error", new HashMap<>(){{put("message", data);}});
+    public ErrorResponse(String message) {
+        super("error", new HashMap<>(){{put("message", message);}});
     }
 }
