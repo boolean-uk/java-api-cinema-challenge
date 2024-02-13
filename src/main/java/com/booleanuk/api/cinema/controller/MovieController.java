@@ -25,6 +25,14 @@ public class MovieController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    /**
+     * Logic: Use ApiResponse Class (and nested Message Class) to construct a JSON object,
+     * that references a Generic Type 'T', which in this case is any of the Models.
+     * The method checks if any instances of Movie exists on the server.
+     * If false, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If true, instantiate an ApiResponse and wrap it around the body of a List of Movies.
+     * @return
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<Movie>> getAllMovies() {
         try {
@@ -41,6 +49,15 @@ public class MovieController {
         }
     }
 
+    /**
+     * Logic: Capture a snapshot of the instantiation time of Movie (since accurate precision of creation
+     * is irrelevant, doing it at the top of the method body is ok). The method checks if any of the
+     * payload criteria (i.e. malformed/illogical member variables) are missing.
+     * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Movie.
+     * @param movie
+     * @return
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<Movie>> createMovie(@RequestBody Movie movie) {
         try {
@@ -61,6 +78,14 @@ public class MovieController {
         }
     }
 
+    /**
+     * Logic: Fetch the instance to delete by using local helper method, and verify the fetched value
+     * is not null AND does not hold any screenings.
+     * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Movie.
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Movie>> deleteMovieById(@PathVariable int id) {
         try {
@@ -80,6 +105,14 @@ public class MovieController {
         }
     }
 
+    /**
+     * Logic: Fetch the instance of Movie to update using the Pathvariable. Use static helper method
+     * to verify if any of the payload criteria (i.e. malformed/illogical member variables) are missing.
+     * Conduct the update if payload is correct.
+     * @param id
+     * @param movie
+     * @return
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Movie>> updateMovieById(@PathVariable int id, @RequestBody Movie movie) {
         try {
@@ -125,6 +158,15 @@ public class MovieController {
         }
     }
 
+    /**
+     * Logic: Capture a snapshot of the instantiation time of Screening (since accurate precision of creation
+     * is irrelevant, doing it at the top of the method body is ok). The method checks if any of the
+     * payload criteria (i.e. malformed/illogical member variables) are missing.
+     * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Screening.
+     * @param screening
+     * @return
+     */
     @PostMapping("/{id}/screenings")
     public ResponseEntity<ApiResponse<Screening>> createScreening(@PathVariable int id, @RequestBody Screening screening) {
         Date date = new Date();
@@ -142,7 +184,6 @@ public class MovieController {
         }
     }
 
-
     /**
      * Helper method
      * @param id
@@ -151,6 +192,4 @@ public class MovieController {
     private Movie getAMovie(int id) {
         return this.movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
     }
-
-
 }

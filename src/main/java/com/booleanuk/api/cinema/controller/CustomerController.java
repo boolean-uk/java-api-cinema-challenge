@@ -57,7 +57,7 @@ public class CustomerController {
     /**
      * Logic: Capture a snapshot of the instantiation time of Customer (since accurate precision of creation
      * is irrelevant, doing it at the top of the method body is ok). The method checks if any of the
-     * payload criteria are missing.
+     * payload criteria (i.e. malformed/illogical member variables) are missing.
      * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
      * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Customer.
      * @param customer
@@ -84,6 +84,14 @@ public class CustomerController {
 
     }
 
+    /**
+     * Logic: Fetch the instance to delete by using local helper method, and verify the fetched value
+     * is not null AND does not hold any tickets.
+     * If true, instantiate an ApiResponse and wrap it around the body of a Message instance.
+     * If false, instantiate an ApiResponse and wrap it around the body of the single instance of Customer.
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Customer>> deleteCustomerById(@PathVariable int id) {
         try {
@@ -103,6 +111,14 @@ public class CustomerController {
         }
     }
 
+    /**
+     * Logic: Fetch the instance of Customer to update using the Pathvariable. Use static helper method
+     * to verify if any of the payload criteria (i.e. malformed/illogical member variables) are missing.
+     * Conduct the update if payload is correct.
+     * @param id
+     * @param customer
+     * @return
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Customer>> updateCustomerById(@PathVariable int id, @RequestBody Customer customer) {
         try {
