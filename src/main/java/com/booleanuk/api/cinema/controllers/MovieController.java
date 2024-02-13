@@ -47,6 +47,7 @@ public class MovieController {
         // Return the movie with screenings
         movie.setScreenings(screenings);
         return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(movie));
+        // TODO Dont return the screenings. Use DTO
     }
 
     @GetMapping
@@ -62,6 +63,8 @@ public class MovieController {
         if (this.movieRepository.findById(id).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.NOT_FOUND);
         }
+
+        // TODO If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
 
         Movie movieToUpdate = this.movieRepository.findById(id).get();
         movieToUpdate.setTitle(movie.getTitle());
@@ -88,6 +91,7 @@ public class MovieController {
         }
 
         return ResponseEntity.ok(Response.success(movieToDelete));
+        // TODO Deleting a movie should delete all screenings and tickets
     }
 
     private boolean isValidObject(Movie movie) {

@@ -17,9 +17,9 @@ public class Response<T> {
         return new Response<>("error", new ErrorMessage(message));
     }
 
-    public static final Response<ErrorMessage> BAD_REQUEST = new Response<>("error", new ErrorMessage("bad request"));
+    public static final Response<ErrorMessage> BAD_REQUEST = error("bad request");
 
-    public static final Response<ErrorMessage> NOT_FOUND = new Response<>("error", new ErrorMessage("not found"));
+    public static final Response<ErrorMessage> NOT_FOUND = error("not found");
 
     @Data
     @AllArgsConstructor

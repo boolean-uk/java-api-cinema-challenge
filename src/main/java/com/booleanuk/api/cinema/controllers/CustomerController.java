@@ -53,6 +53,8 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.NOT_FOUND);
         }
 
+        // TODO If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
+
         Customer customerToUpdate = this.customerRepository.findById(id).get();
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
@@ -77,6 +79,7 @@ public class CustomerController {
         }
 
         return ResponseEntity.ok(Response.success(customerToDelete));
+        // TODO Deleting customer should delete all tickets for that customer
     }
 
     private boolean isValidObject(Customer customer) {
