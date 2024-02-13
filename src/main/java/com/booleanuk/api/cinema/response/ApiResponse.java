@@ -12,10 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-// Use TicketController to test how this ResponseStuff works
-// Using Generic Class such that I can specify different controller classes to be used
-// ***Refer to @GetMapping("tickets/responsetest") in TicketController!!***
-
 public class ApiResponse<T> {
 
     private String status;

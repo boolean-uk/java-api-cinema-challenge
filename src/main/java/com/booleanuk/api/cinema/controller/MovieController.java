@@ -140,7 +140,6 @@ public class MovieController {
             ApiResponse<Screening> createdRequest = new ApiResponse<>("success", savedScreening);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
         }
-
     }
 
 
