@@ -7,6 +7,10 @@ import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.TicketListResponse;
+import com.booleanuk.api.cinema.response.TicketResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,41 +29,58 @@ public class TicketController {
     ScreeningRepository screeningRepository;
 
     @GetMapping("customers/{customerID}/screenings/{screeningID}")
-    public ResponseEntity<?> getAllTicket(@PathVariable int customerID, @PathVariable int screeningID){
+    public ResponseEntity<Response<?>> getAllTicket(@PathVariable int customerID, @PathVariable int screeningID){
         Customer customer = this.customerRepository.findById(customerID).orElse(null);
         if (customer == null) {
-            return new ResponseEntity<>("Customer could not be found", HttpStatus.NOT_FOUND);
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-
         Screening screening = this.screeningRepository.findById(screeningID).orElse(null);
         if (screening == null) {
-            return new ResponseEntity<>("Screening could not be found", HttpStatus.NOT_FOUND);
+            ErrorResponse error = new ErrorResponse();
+            error.set("No screening with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         List<Ticket> tickets = this.ticketRepository.findByCustomerIdAndScreeningId(customerID, screeningID);
         if (tickets.isEmpty()) {
-            return new ResponseEntity<>("No tickets found for this customer and screening", HttpStatus.NOT_FOUND);
+            ErrorResponse error = new ErrorResponse();
+            error.set("No ticket found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-
-        return ResponseEntity.ok(tickets);
+        TicketListResponse ticketListResponse = new TicketListResponse();
+        ticketListResponse.set(tickets);
+        return ResponseEntity.ok(ticketListResponse);
     }
 
     @PostMapping("customers/{customerID}/screenings/{screeningID}")
-    public ResponseEntity<?> addTicket(@PathVariable int customerID, @PathVariable int screeningID, @RequestBody Ticket ticket){
+    public ResponseEntity<Response<?>> addTicket(@PathVariable int customerID, @PathVariable int screeningID, @RequestBody Ticket ticket){
         Customer customer = this.customerRepository.findById(customerID).orElse(null);
         if (customer == null) {
-            return new ResponseEntity<>("Customer could not be found", HttpStatus.NOT_FOUND);
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         Screening screening = this.screeningRepository.findById(screeningID).orElse(null);
         if (screening == null) {
-            return new ResponseEntity<>("Screening could not be found", HttpStatus.NOT_FOUND);
+            ErrorResponse error = new ErrorResponse();
+            error.set("No screening with that id found.");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         Ticket ticket1 = new Ticket();
-        ticket1.setCustomer(customer);
-        ticket1.setScreening(screening);
-        ticket1.setNumSeats(ticket.getNumSeats());
-        ticket1.setUpdatedAt(ZonedDateTime.now());
-
-
-        return new ResponseEntity<>(this.ticketRepository.save(ticket1), HttpStatus.CREATED);
+        try {
+            ticket1.setCustomer(customer);
+            ticket1.setScreening(screening);
+            ticket1.setNumSeats(ticket.getNumSeats());
+            ticket1.setUpdatedAt(ZonedDateTime.now());
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create ticket for that screening and customer");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        this.ticketRepository.save(ticket1);
+        TicketResponse ticketResponse = new TicketResponse();
+        ticketResponse.set(ticket1);
+        return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
     }
 }

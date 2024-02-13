@@ -1,15 +1,18 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.ZonedDateTime;
 
 @NoArgsConstructor
+@ToString
 @Getter
 @Setter
 @Entity
@@ -29,15 +32,9 @@ public class Screening {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties(value = {"title"})
-    private Movie movie;
 
-    public Screening(Integer screenNumber, Integer capacity, ZonedDateTime startsAt, Movie movie) {
-        this.screenNumber = screenNumber;
-        this.capacity = capacity;
-        this.startsAt = startsAt;
-        this.movie = movie;
-    }
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 }
