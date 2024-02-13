@@ -30,7 +30,6 @@ public class CustomerController {
         CustomerListResponse customerListResponse = new CustomerListResponse();
         customerListResponse.set(this.customerRepository.findAll());
         return ResponseEntity.ok(customerListResponse);
-        //return new Response<>("success", this.customerRepository.findAll());
     }
 
     @GetMapping("/{id}")
@@ -96,27 +95,6 @@ public class CustomerController {
         return  ResponseEntity.ok(customerResponse);
     }
 
-//    @GetMapping
-//    public Response<List<Customer>> getAllCustomer() {
-//        return new Response<>("success", this.customerRepository.findAll());
-//    }
-
-//    @PostMapping
-//    public ResponseEntity<Response<Customer>> createCustomer(@RequestBody Customer customer){
-//        if(customer.getName() == null|| customer.getEmail() == null|| customer.getPhone() == null){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new customer, please check all fields are correct");
-//        }
-//        return new ResponseEntity<>(new Response<>("success",this.customerRepository.save(customer)), HttpStatus.CREATED);
-//    }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Response<Customer>> getCustomerById(@PathVariable int id){
-//        Customer customer = this.getACustomer(id);
-//        if(customer.getName() == null|| customer.getEmail() == null|| customer.getPhone() == null){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new customer, please check all fields are correct");
-//        }
-//        return ResponseEntity.ok(new Response<>("success",this.getACustomer(id)));
-//    }
 
 
 

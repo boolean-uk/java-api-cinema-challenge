@@ -97,7 +97,7 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<Response<Movie>> deleteMovie (@PathVariable int id){
+    public ResponseEntity<ResponseGeneric<?>> deleteMovie (@PathVariable int id){
         Movie movieToDelete = this.getAMovie(id);
 
         //get the screening associated with the movie, first delete the screening then delete the movie
@@ -109,7 +109,7 @@ public class MovieController {
 
         MovieResponse movieResponse = new MovieResponse();
         movieResponse.set(movieToDelete);
-        return  ResponseEntity.ok(new Response<>("success",movieToDelete));
+        return  ResponseEntity.ok(movieResponse);
     }
 
 
