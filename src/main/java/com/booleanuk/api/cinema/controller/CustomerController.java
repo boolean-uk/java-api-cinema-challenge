@@ -72,6 +72,7 @@ public class CustomerController {
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         this.repository.delete(customerToDelete);
+        customerToDelete.setTickets(new ArrayList<>());
         Response<Customer> customerResponse = new Response<>();
         customerResponse.set(customerToDelete);
         return ResponseEntity.ok(customerResponse);
