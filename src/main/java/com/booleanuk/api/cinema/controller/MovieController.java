@@ -105,6 +105,7 @@ public class MovieController {
         for (Screening screening : screenings){
             this.screeningRepository.delete(screening);
         }
+        movieToDelete.setScreenings(new ArrayList<>());
         this.movieRepository.delete(movieToDelete);
 
         MovieResponse movieResponse = new MovieResponse();
