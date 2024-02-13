@@ -30,7 +30,7 @@ public class Movie {
     @Column(nullable = false)
     private String description;
 
-    @Column(name = "runtime_minutes", nullable = false)
+    @Column(name = "runtime_mins", nullable = false)
     private int runtimeMins;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -42,6 +42,7 @@ public class Movie {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
+    @JsonIncludeProperties({"id", "screenNumber", "startsAt", "capacity"})
     private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, int runtimeMins) {
@@ -61,4 +62,5 @@ public class Movie {
     public Movie(int id) {
         this.id = id;
     }
+
 }

@@ -1,11 +1,13 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.MovieDTO;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.response.*;
 import com.booleanuk.api.cinema.response.Error;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +27,19 @@ public class MovieController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    @Autowired
+    private EntityManager em;
+
     private LocalDateTime time = LocalDateTime.now();
 
     @GetMapping
     public ResponseEntity<Response> getAllMovies() {
         List<Movie> movies = this.movieRepository.findAll();
-        return new ResponseEntity<>(new MovieListResponse(this.movieRepository.findAll()), HttpStatus.OK);
+        List<MovieDTO> movieDTO = new ArrayList<>();
+        for(Movie m : movies) {
+            movieDTO.add(new MovieDTO(m));
+        }
+        return new ResponseEntity<>(new MovieListResponse(movieDTO), HttpStatus.OK);
     }
 
     @PostMapping
@@ -54,7 +63,7 @@ public class MovieController {
             } else {
                 newMovie.setScreenings(new ArrayList<>());
             }
-            return new ResponseEntity<>(new MovieResponse(newMovie), HttpStatus.CREATED);
+            return new ResponseEntity<>(new MovieResponse(new MovieDTO(newMovie)), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(new ErrorResponse(new Error("bad request")), HttpStatus.BAD_REQUEST);
         }
@@ -73,7 +82,8 @@ public class MovieController {
             movieToUpdate.setDescription(movie.getDescription());
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
             movieToUpdate.setUpdatedAt(LocalDateTime.now());
-            return new ResponseEntity<>(new MovieResponse(this.movieRepository.save(movieToUpdate)), HttpStatus.CREATED);
+            this.movieRepository.save(movieToUpdate);
+            return new ResponseEntity<>(new MovieResponse(new MovieDTO(movieToUpdate)), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(new ErrorResponse(new Error("bad request")), HttpStatus.BAD_REQUEST);
         }
@@ -91,7 +101,7 @@ public class MovieController {
         }
         this.movieRepository.delete(movieToDelete);
         movieToDelete.setScreenings(new ArrayList<>());
-        return new ResponseEntity<>(new MovieResponse(movieToDelete), HttpStatus.OK);
+        return new ResponseEntity<>(new MovieResponse(new MovieDTO(movieToDelete)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/screenings")
