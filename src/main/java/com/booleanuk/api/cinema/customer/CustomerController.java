@@ -69,6 +69,11 @@ public class CustomerController {
         if(customerToUpdate == null) {
             return new ResponseEntity<>(new ErrorResponse(new Error("Customer not found")), HttpStatus.NOT_FOUND);
         }
+
+        if(customer.getName().isEmpty() || customer.getEmail().isEmpty() || customer.getPhone().isEmpty()){
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad Request")), HttpStatus.BAD_REQUEST);
+        }
+
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
