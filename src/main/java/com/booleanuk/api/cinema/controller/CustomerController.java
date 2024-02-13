@@ -76,17 +76,17 @@ public class CustomerController {
         //Regex to make sure the names are strings
         String regexName = "^[a-zA-Z\\s]+$";
         if(!customer.getName().matches(regexName)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write the name correctly")),HttpStatus.BAD_REQUEST);
         }
         //Regex for email
         String regexEmail = "^[^@]+@[^@]+\\.[^@]+$";
         if(!customer.getEmail().matches(regexEmail)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write a valid email")),HttpStatus.BAD_REQUEST);
         }
         //Regex for norwegian phonenumber
         String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
         if(!customer.getPhone().matches(regexPhone)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write a valid phonenumber.(norwegian nr: 8 digits)")),HttpStatus.BAD_REQUEST);
         }
         Customer createdCustomer = this.customerRepository.save(customer);
 
@@ -126,17 +126,17 @@ public class CustomerController {
         //Regex to make sure the names are strings
         String regexName = "^[a-zA-Z\\s]+$";
         if(!customer.getName().matches(regexName)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write the name correctly")),HttpStatus.BAD_REQUEST);
         }
         //Regex for email
         String regexEmail =  "^[^@]+@[^@]+\\.[^@]+$";
         if(!customer.getEmail().matches(regexEmail)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write a valid email")),HttpStatus.BAD_REQUEST);
         }
         //Regex for norwegian phonenumber
         String regexPhone = "^(\\+[0-9]{2})*([0-9]{8})$";
         if(!customer.getPhone().matches(regexPhone)){
-            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request")),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(new Error("Bad request, write the phone number correctly. (norwegian number has 8 digits)")),HttpStatus.BAD_REQUEST);
         }
 
         customerToUpdate.setName(customer.getName());
