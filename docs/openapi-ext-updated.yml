@@ -299,6 +299,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error404'
+  /screenings/{id}:
+    put:
+      tags:
+        - screenings
+      summary: Update a screening
+      description: >-
+        Update an existing screening. If any field is not provided, the original
+        value should not be changed. Any combination of fields can be updated.
+      operationId: updateScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScreening'
+      responses:
+        '201':
+          description: Successfully updated the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleScreening'
+        '400':
+          description: >-
+            Could not update the specified screening, please check all fields are
+            correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No screening with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - AllScreenings
+      summary: Delete a screening
+      description: >-
+        Delete an existing screening. When deleting a screening, all of its tickets
+        should also be deleted.
+      operationId: deleteScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleScreening'
+        '404':
+          description: No screening with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
   /customers/{customerId}/screenings/{screeningId}:
     post:
       tags:
@@ -666,6 +736,19 @@ components:
           type: string
           format: DateTime
           example: '2023-03-19 11:30:00+00:00'
+    UpdateScreening:
+      type: object
+      properties:
+        screenNumber:
+          type: integer
+          example: 5
+        capacity:
+          type: integer
+          example: 40
+        startsAt:
+          type: string
+          format: DateTime
+          example: '2023-03-19T11:30:00.000+00:00'
     SingleScreening:
       type: object
       properties:
@@ -761,7 +844,7 @@ components:
         - numSeats
       properties:
         name:
-          type: integer
+          type: string
           example: 3
     SingleTicket:
       type: object

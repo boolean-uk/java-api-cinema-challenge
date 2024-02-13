@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -69,9 +71,11 @@ public class Screening {
 
     public void setStartsAt(String startsAt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
-
-        this.startsAt = OffsetDateTime.parse(startsAt, formatter);
+        ZonedDateTime zonedDateTime = OffsetDateTime.parse(startsAt, formatter).atZoneSameInstant(ZoneId.systemDefault());
+        this.startsAt = zonedDateTime.toOffsetDateTime();
     }
+
+
 
 }
 
