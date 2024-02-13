@@ -82,6 +82,11 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseGeneric<?>> deleteCustomer (@PathVariable int id){
         Customer customerToDelete = this.getACustomer(id);
+        if(customerToDelete == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
 
         List<Ticket> tickets = customerToDelete.getTickets();
         for (Ticket ticket : tickets){

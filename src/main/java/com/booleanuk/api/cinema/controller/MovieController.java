@@ -99,6 +99,11 @@ public class MovieController {
     @Transactional
     public ResponseEntity<ResponseGeneric<?>> deleteMovie (@PathVariable int id){
         Movie movieToDelete = this.getAMovie(id);
+        if(movieToDelete == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
 
         //get the screening associated with the movie, first delete the screening then delete the movie
         List<Screening> screenings = movieToDelete.getScreenings();
