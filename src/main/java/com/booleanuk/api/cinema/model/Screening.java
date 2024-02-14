@@ -64,8 +64,9 @@ public class Screening {
         updatedAt = OffsetDateTime.now();
     }
 
-    public Screening(int screenNumber, OffsetDateTime startsAt) {
+    public Screening(int screenNumber, int capacity, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
+        this.capacity = capacity;
         this.startsAt = startsAt;
     }
 
