@@ -1,0 +1,905 @@
+openapi: 3.1.0
+info:
+  title: Java API Cinema Challenge - Extension Criteria
+  description: Extension Criteria for Java API Cinema Challenge
+  version: 1.0.0-oas3.1
+  contact:
+    name: Cinema Booking Challenge
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: customers
+  - name: movies
+  - name: screenings
+  - name: tickets
+paths:
+  /customers:
+    post:
+      tags:
+        - customers
+      summary: Create a customer
+      description: Create a new customer account.
+      operationId: createCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomer'
+      responses:
+        '201':
+          description: Successfully created a new customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleCustomer'
+        '400':
+          description: Could not create a new customer, please check all fields are correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+    get:
+      tags:
+        - customers
+      summary: Get all customers
+      description: Get a list of every customer.
+      operationId: getCustomers
+      responses:
+        '200':
+          description: Successfully returned a list of all customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCustomers'
+  /customers/{id}:
+    put:
+      tags:
+        - customers
+      summary: Update a customer
+      description: >-
+        Update an existing customer. If any field is not provided, the original
+        value should not be changed. Any combination of fields can be updated.
+      operationId: updateCustomer
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the customer to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomer'
+      responses:
+        '201':
+          description: Successfully updated the specified customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleCustomer'
+        '400':
+          description: Could not create a new customer, please check all fields are correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No customer with that ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - customers
+      summary: Delete a customer
+      description: >-
+        Delete an existing customer. When deleting data, it's useful to send the
+        deleted record back to the client so they can re-create it if deletion
+        was a mistake.
+      operationId: deleteCustomer
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the customer to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleCustomer'
+        '404':
+          description: No customer with that ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /movies:
+    post:
+      tags:
+        - movies
+      summary: Create a movie
+      description: >-
+        Create a new movie. Optionally, a screenings array can be provided to
+        create screenings when the movie gets created. If no screenings array is
+        provided, the movie should be created as normal.
+      operationId: createMovie
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMovie'
+      responses:
+        '201':
+          description: Successfully created a new movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleMovie'
+        '400':
+          description: Could not create a new movie, please check all fields are correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+    get:
+      tags:
+        - movies
+      summary: Get all movies
+      description: Get a list of every movie.
+      operationId: getMovies
+      responses:
+        '200':
+          description: Successfully returned a list of all movies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMovies'
+  /movies/{id}:
+    put:
+      tags:
+        - movies
+      summary: Update a movie
+      description: >-
+        Update an existing movie. If any field is not provided, the original
+        value should not be changed. Any combination of fields can be updated.
+      operationId: updateMovie
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMovie'
+      responses:
+        '201':
+          description: Successfully updated the specified movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleMovie'
+        '400':
+          description: >-
+            Could not update the specified movie, please check all fields are
+            correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No movie with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - movies
+      summary: Delete a movie
+      description: >-
+        Delete an existing movie. When deleting a movie, all of its screenings
+        should also be deleted.
+      operationId: deleteMovie
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleMovie'
+        '404':
+          description: No movie with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /movies/{id}/screenings:
+    post:
+      tags:
+        - screenings
+      summary: Create a screening
+      description: Create a screening for an existing movie.
+      operationId: createScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to create a screening for
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScreening'
+      responses:
+        '201':
+          description: Successfully created a new screening for the specified movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleScreening'
+        '400':
+          description: >-
+            Could not create a screening for the specified movie, please check
+            all fields are correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No movie with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    get:
+      tags:
+        - screenings
+      summary: Get all screenings
+      description: Get a list of every screening for a movie.
+      operationId: getScreenings
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the movie to retrieve the screenings for
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: >-
+            Successfully returned a list of all screenings for the specified
+            movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllScreenings'
+        '404':
+          description: No movie with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /screenings/{id}:
+    put:
+      tags:
+        - screenings
+      summary: Update a screening
+      description: >-
+        Update an existing screening. If any field is not provided, the original
+        value should not be changed. Any combination of fields can be updated.
+      operationId: updateScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScreening'
+      responses:
+        '201':
+          description: Successfully updated the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleScreening'
+        '400':
+          description: >-
+            Could not update the specified screening, please check all fields are
+            correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No screening with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - AllScreenings
+      summary: Delete a screening
+      description: >-
+        Delete an existing screening. When deleting a screening, all of its tickets
+        should also be deleted.
+      operationId: deleteScreening
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the screening to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleScreening'
+        '404':
+          description: No screening with that id found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /customers/{customerId}/screenings/{screeningId}:
+    post:
+      tags:
+        - tickets
+      summary: Book a ticket
+      description: Create a new ticket for a particular customer and screening.
+      operationId: createTicket
+      parameters:
+        - name: customerId
+          in: path
+          description: The ID of the customer to create the ticket for
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening to create the ticket for
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicket'
+      responses:
+        '201':
+          description: Successfully created a ticket for the movie and screening specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleTicket'
+        '404':
+          description: No customer or screening with those ids found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    get:
+      tags:
+        - tickets
+      summary: Get all tickets
+      description: Get a list of every ticket a customer has booked for a screening.
+      operationId: getTickets
+      parameters:
+        - name: customerId
+          in: path
+          description: The ID of the customer the ticket is for
+          required: true
+          schema:
+            type: integer
+        - name: screeningId
+          in: path
+          description: The ID of the screening the ticket is for
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: >-
+            Successfully returned a list of all tickets for a given customer and
+            screening
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllTickets'
+        '404':
+          description: No ticket found for the customer and screening with those ids found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /tickets/{id}:
+    put:
+      tags:
+        - tickets
+      summary: Update a ticket
+      description: Update an existing ticket.
+      operationId: updateTicket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the ticket to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicket'
+      responses:
+        '201':
+          description: Successfully updated the specified ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleTicket'
+        '400':
+          description: Could not create a new ticket, please check all fields are correct
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '404':
+          description: No ticket with that ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - tickets
+      summary: Delete a ticket
+      description: Delete an existing ticket.
+      operationId: deleteTicket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the ticket to update
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully deleted the specified ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleTicket'
+        '404':
+          description: No ticket with that ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+components:
+  schemas:
+    CreateCustomer:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+      properties:
+        name:
+          type: string
+          example: Chris Wolstenholme
+        email:
+          type: string
+          example: chris@muse.mu
+        phone:
+          type: string
+          example: '+44729388192'
+    UpdateCustomer:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Chris Wolstenholme
+        email:
+          type: string
+          example: chris@muse.mu
+        phone:
+          type: string
+          example: '+44729388192'
+    SingleCustomer:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: Chris Wolstenholme
+            email:
+              type: string
+              example: chris@muse.mu
+            phone:
+              type: string
+              example: '+44729388192'
+            createdAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+            updatedAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Chris Wolstenholme
+        email:
+          type: string
+          example: chris@muse.mu
+        phone:
+          type: string
+          example: '+44729388192'
+        createdAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+        updatedAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+    AllCustomers:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+    CreateMovie:
+      type: object
+      required:
+        - title
+        - rating
+        - description
+        - runtimeMins
+      properties:
+        title:
+          type: string
+          example: Dodgeball
+        rating:
+          type: string
+          example: PG-13
+        description:
+          type: string
+          example: The greatest movie ever made.
+        runtimeMins:
+          type: integer
+          example: 126
+        screenings:
+          type: array
+          items:
+            type: object
+            required:
+              - screenNumber
+              - capacity
+              - startsAt
+            properties:
+              screenNumber:
+                type: integer
+                example: 5
+              capacity:
+                type: integer
+                example: 40
+              startsAt:
+                type: string
+                format: DateTime
+                example: '2023-03-19 11:30:00+00:00'
+    UpdateMovie:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Dodgeball
+        rating:
+          type: string
+          example: PG-13
+        description:
+          type: string
+          example: The greatest movie ever made.
+        runtimeMins:
+          type: integer
+          example: 126
+    SingleMovie:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            title:
+              type: string
+              example: Dodgeball
+            rating:
+              type: string
+              example: PG-13
+            description:
+              type: string
+              example: The greatest movie ever made.
+            runtimeMins:
+              type: integer
+              example: 126
+            createdAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+            updatedAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Dodgeball
+        rating:
+          type: string
+          example: PG-13
+        description:
+          type: string
+          example: The greatest movie ever made.
+        runtimeMins:
+          type: integer
+          example: 126
+        createdAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+        updatedAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+    AllMovies:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+    CreateScreening:
+      type: object
+      required:
+        - screenNumber
+        - capacity
+        - startsAt
+      properties:
+        screenNumber:
+          type: integer
+          example: 5
+        capacity:
+          type: integer
+          example: 40
+        startsAt:
+          type: string
+          format: DateTime
+          example: '2023-03-19 11:30:00+00:00'
+    UpdateScreening:
+      type: object
+      properties:
+        screenNumber:
+          type: integer
+          example: 5
+        capacity:
+          type: integer
+          example: 40
+        startsAt:
+          type: string
+          format: DateTime
+          example: '2023-03-19T11:30:00.000+00:00'
+    SingleScreening:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            screenNumber:
+              type: integer
+              example: 5
+            capacity:
+              type: integer
+              example: 40
+            startsAt:
+              type: string
+              format: DateTime
+              example: '2023-03-19T11:30:00.000+00:00'
+            createdAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+            updatedAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+    Screening:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        screenNumber:
+          type: integer
+          example: 5
+        capacity:
+          type: integer
+          example: 40
+        startsAt:
+          type: string
+          format: DateTime
+          example: '2023-03-19T11:30:00.000+00:00'
+        createdAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+        updatedAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+    AllScreenings:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Screening'
+    CreateTicket:
+      type: object
+      required:
+        - numSeats
+      properties:
+        numSeats:
+          type: integer
+          example: 3
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        numSeats:
+          type: integer
+          example: 3
+        createdAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+        updatedAt:
+          type: string
+          format: DateTime
+          example: '2023-03-14T11:01:56.633+00:00'
+    UpdateTicket:
+      type: object
+      required:
+        - numSeats
+      properties:
+        name:
+          type: string
+          example: 3
+    SingleTicket:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            numSeats:
+              type: integer
+              example: 3
+            createdAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+            updatedAt:
+              type: string
+              format: DateTime
+              example: '2023-03-14T11:01:56.633+00:00'
+    AllTickets:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+    Error400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: bad request
+    Error404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: not found
