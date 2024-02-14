@@ -40,13 +40,22 @@ public class Movie {
 
     private int runtimeMins;
 
-    @CreationTimestamp
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now(); 
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
     @JsonIgnoreProperties("movie")

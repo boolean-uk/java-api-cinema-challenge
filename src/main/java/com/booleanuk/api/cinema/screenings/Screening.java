@@ -41,13 +41,22 @@ public class Screening {
     @Positive
     private int capacity;
 
-    @CreationTimestamp
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now(); 
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 
     @ManyToOne

@@ -42,13 +42,22 @@ public class Ticket {
     @JsonIgnoreProperties("tickets")
     private Screening screening;
 
-    @CreationTimestamp
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now(); 
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Ticket(int numSeats) {
         this.numSeats = numSeats;
