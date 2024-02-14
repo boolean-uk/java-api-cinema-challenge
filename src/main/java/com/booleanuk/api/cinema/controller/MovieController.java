@@ -93,7 +93,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<DataResponse<?>> update(@PathVariable int id){
+    public ResponseEntity<DataResponse<?>> delete(@PathVariable int id){
         Movie deleteMovie = this.getMovie(id);
         if(deleteMovie == null){
             ErrorResponse errorResponse = new ErrorResponse();
