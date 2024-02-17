@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
 import com.booleanuk.api.cinema.ticket.Ticket;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
@@ -32,49 +33,46 @@ public class Screening {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime startsAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime startsAt;
 
     @Column
     private int capacity;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX") //ALT: "yyyy-MM-dd HH:mm:ssZ" "yyyy-MM-dd HH:mm:ssSSSZ"
+    private OffsetDateTime createdAt;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    @Temporal(TemporalType.TIMESTAMP)   //Behövs ev ej för Java.time
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime updatedAt;
 
-    @ManyToOne  //en screening har endast en movie
-    @JoinColumn(name = "movie_id", nullable = false)    //sätt FK som heter movie_id som är samma som Movie's id
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)    //skapa column som heter movie_id som är samma som Movie movie's @Id
     @JsonIncludeProperties(value = {"title", "rating", "description", "runTimeMins"})    //inkludera dessa fält från movie vid api anrop
     private Movie movie;
 
-    @OneToMany(mappedBy = "screening")  //en screening kan ha många tickets
+    @OneToMany(mappedBy = "screening")
     @JsonIgnoreProperties("screening")
     private List<Ticket> tickets;
 
     @PrePersist
     public void onCreate() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        this.createdAt = localDateTime;
-        this.updatedAt = localDateTime;
+        OffsetDateTime currentTime = OffsetDateTime.now();
+        this.createdAt = currentTime;
+        this.updatedAt = currentTime;
     }
 
     @PreUpdate
     public void onUpdate() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        this.updatedAt = localDateTime;
+        this.updatedAt = OffsetDateTime.now();
     }
 
-    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {  //Ev byta typ till OffsetDateTime
+    public Screening(int screenNumber, int capacity, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
     }
-
-
-    //LocalDateTime: 2024-02-09T10:50:39.713
-    //ZonedDateTime: 2023-03-19 11:30:00+00:00 eller 2024-02-09T13:51:12.356261100+01:00[Europe/Stockholm]
-    //OffsetDateTime: 2024-02-09T15:30:00+00:00 eller 2023-03-19T11:30Z (olika pga toString metoden i konsolen)
 }

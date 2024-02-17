@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.movie;
 
 import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -34,26 +36,28 @@ public class Movie {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime createdAt;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "movie")  //en movie kan ha många screenings
+    @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 
     @PrePersist
     public void onCreate() {
-        LocalDateTime creationDate = LocalDateTime.now();
+        OffsetDateTime creationDate = OffsetDateTime.now();
         this.createdAt = creationDate;
         this.updatedAt = creationDate;
     }
 
     @PreUpdate
     public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public Movie(String title, String rating, String description, int runtimeMins) {
@@ -61,6 +65,14 @@ public class Movie {
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
+    }
+
+    public Movie(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.screenings = screenings;
     }
 
     public Movie(int id) {

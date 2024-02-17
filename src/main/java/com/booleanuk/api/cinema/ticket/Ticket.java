@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.ticket;
 
 import com.booleanuk.api.cinema.customer.Customer;
 import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -25,11 +27,13 @@ public class Ticket {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime createdAt;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ssXXX")
+    private OffsetDateTime updatedAt;
 
     @ManyToOne  //en ticket har endast en customer
     @JoinColumn(name = "customer_id", nullable = false)
@@ -43,15 +47,15 @@ public class Ticket {
 
     @PrePersist
     public void onCreate() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        this.createdAt = localDateTime;
-        this.updatedAt = localDateTime;
+        OffsetDateTime currentTime = OffsetDateTime.now();
+        this.createdAt = currentTime;
+        this.updatedAt = currentTime;
     }
 
     @PreUpdate
     public void onUpdate() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        this.updatedAt = localDateTime;
+        OffsetDateTime currentTime = OffsetDateTime.now();
+        this.updatedAt = currentTime;
     }
 
     public Ticket(int numSeats) {

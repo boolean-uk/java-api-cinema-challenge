@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.customer;
 
+import com.booleanuk.api.cinema.response.*;
 import com.booleanuk.api.cinema.screening.Screening;
 import com.booleanuk.api.cinema.screening.ScreeningRepository;
 import com.booleanuk.api.cinema.ticket.Ticket;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,30 +24,44 @@ public class CustomerController {
     private TicketRepository ticketRepository;
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        validateCustomerOrThrowException(customer);
+    public ResponseEntity<?> createCustomer(@RequestBody Customer customer) {
+        if(customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("Could not create a new customer, please check all fields are correct.");
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
         Customer newCustomer = this.customerRepository.save(customer);
 
-        return new ResponseEntity<>(newCustomer, HttpStatus.CREATED);
+        CustomerResponse customerResponse = new CustomerResponse();
+        customerResponse.set(newCustomer);
+
+        return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(this.customerRepository.findAll());
+    public ResponseEntity<CustomerListResponse> getAllCustomers() {
+        List<Customer> allCustomers = this.customerRepository.findAll();
+
+        CustomerListResponse customerListResponse = new CustomerListResponse();
+        customerListResponse.set(allCustomers);
+
+        return ResponseEntity.ok(customerListResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
-        //validateCustomerOrThrowException(customer);
+    public ResponseEntity<?> updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+        Customer customerToBeUpdated = this.customerRepository.findById(id).orElse(null);
 
-        if(customer.getName() == null && customer.getEmail() == null && customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update customer, all provided fields are null.");
+        if(customerToBeUpdated == null) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("No customer with that id found.");
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
 
-        Customer customerToBeUpdated = findCustomerOrThrowException(id);
-
-        // If any field is not provided, the original value should not be changed. Any combination of fields can be updated.
+        // "If any field is not provided, the original value should not be changed. Any combination of fields can be updated."
         if(customer.getName() != null) {
             customerToBeUpdated.setName(customer.getName());
         }
@@ -58,50 +72,77 @@ public class CustomerController {
             customerToBeUpdated.setPhone(customer.getPhone());
         }
 
-        this.customerRepository.save(customerToBeUpdated);
+        Customer updatedCustomer = this.customerRepository.save(customerToBeUpdated);
 
-        return ResponseEntity.ok(customerToBeUpdated);
+        CustomerResponse customerResponse = new CustomerResponse();
+        customerResponse.set(updatedCustomer);
+
+        return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
-        Customer customerToBeDeleted = findCustomerOrThrowException(id);
+    public ResponseEntity<?> deleteCustomer(@PathVariable int id) {
+        Customer customerToBeDeleted = this.customerRepository.findById(id).orElse(null);
+
+        if(customerToBeDeleted == null) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("No customer with that id found.");
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
 
         this.customerRepository.deleteById(id);
+
+        CustomerResponse customerResponse = new CustomerResponse();
+        customerResponse.set(customerToBeDeleted);
 
         return ResponseEntity.ok(customerToBeDeleted);
     }
 
     @PostMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<Ticket> createTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
-        if(ticket.getNumSeats() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ticket field numSeats cannot be less than 0.");
+    public ResponseEntity<?> createTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody Ticket ticket) {
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+
+        Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+
+        if(customer == null || screening == null) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("No customer or screening with those ids found.");
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
-
-        Customer customer = findCustomerOrThrowException(customerId);
-
-        Screening screening = this.screeningRepository
-                .findById(screeningId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id found."));
 
         ticket.setCustomer(customer);
         ticket.setScreening(screening);
 
         Ticket newTicket = this.ticketRepository.save(ticket);
 
-        customer.getTickets().add(newTicket);
+        List<Ticket> customerTickets = customer.getTickets();
+        customerTickets.add(newTicket);
+        customer.setTickets(customerTickets);
 
-        screening.getTickets().add(newTicket);
+        List<Ticket> screeningTickets = screening.getTickets();
+        screeningTickets.add(newTicket);
+        customer.setTickets(screeningTickets);
 
-        return new ResponseEntity<>(newTicket, HttpStatus.CREATED);
+        TicketResponse ticketResponse = new TicketResponse();
+        ticketResponse.set(newTicket);
+
+        return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<List<Ticket>> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
-        //Get a list of every ticket a customer has booked for a screening.
+    public ResponseEntity<?> getAllTickets(@PathVariable int customerId, @PathVariable int screeningId) {
         List<Ticket> allTicketsACustomerHasBookedForAScreening = new ArrayList<>();
 
-        Customer customer = findCustomerOrThrowException(customerId);
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+
+        if(customer == null) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("No customer with that id found.");
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
 
         List<Ticket> customersTickets = customer.getTickets();
 
@@ -111,18 +152,9 @@ public class CustomerController {
             }
         }
 
-        return ResponseEntity.ok(allTicketsACustomerHasBookedForAScreening);
-    }
+        TicketListResponse ticketListResponse = new TicketListResponse();
+        ticketListResponse.set(allTicketsACustomerHasBookedForAScreening);
 
-    private void validateCustomerOrThrowException(Customer customer) {
-        if(customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create a new customer, please check all fields are correct.");
-        }
-    }
-
-    private Customer findCustomerOrThrowException(int id) {
-        return this.customerRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id found."));
+        return ResponseEntity.ok(ticketListResponse);
     }
 }
