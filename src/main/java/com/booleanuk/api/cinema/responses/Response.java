@@ -12,9 +12,10 @@ public class Response<T> {
         this.data = data;
     }
 
-    public void setError(String errorMessage) {
+    public Response<T> setError(String errorMessage) {
         this.status = "error";
         this.data = new ErrorData(errorMessage);
+        return this;
     }
 
         private record ErrorData(String message) {

@@ -24,9 +24,13 @@ public abstract class GenericController<T, ID> {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<T> getById(@PathVariable ID id) {
-        T entity = repository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found"));
+    public ResponseEntity<?> getById(@PathVariable ID id) {
+        Response<Object> response = new Response<>();
+        T entity = repository.findById(id).orElse(null);
+        if (entity == null) {
+            return new ResponseEntity<>(response.setError("not found"), HttpStatus.NOT_FOUND);
+        }
+        response.setSuccess(entity);
         return ResponseEntity.ok(entity);
     }
 
@@ -41,11 +45,11 @@ public abstract class GenericController<T, ID> {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<T> update(@PathVariable ID id, @RequestBody T entity) {
+    public ResponseEntity<?> update(@PathVariable ID id, @RequestBody T entity) {
+        Response<Object> response = new Response<>();
         Optional<T> existingEntityOptional  = repository.findById(id);
-        System.out.println(existingEntityOptional.toString() + " Existing: " + id);
         if (existingEntityOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
+            return new ResponseEntity<>(response.setError("not found"), HttpStatus.NOT_FOUND);
         }
 
         T existingEntity = existingEntityOptional.get();
