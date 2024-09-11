@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public class Movie {
 
     @OneToMany
     @JoinColumn(name = "screening_id")
+    @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 
     public Movie() {
@@ -106,7 +108,8 @@ public class Movie {
         return screenings;
     }
 
-    public void setScreenings(List<Screening> screenings) {
-        this.screenings = screenings;
+    public void addScreening(Screening toAdd) {
+        this.screenings.add(toAdd);
     }
+
 }
