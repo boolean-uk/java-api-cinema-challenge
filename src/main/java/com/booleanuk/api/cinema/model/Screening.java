@@ -1,0 +1,106 @@
+package com.booleanuk.api.cinema.model;
+
+import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "screenings")
+public class Screening {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column
+    private int screenNumber;
+
+    @Column
+    private int capacity;
+
+    @Column // TODO: format date
+    private LocalDateTime startsAt;
+
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
+
+    public Screening() {
+    }
+
+    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+    }
+
+    public Screening(int id, int screenNumber, int capacity, LocalDateTime startsAt) {
+        this.id = id;
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getScreenNumber() {
+        return screenNumber;
+    }
+
+    public void setScreenNumber(int screenNumber) {
+        this.screenNumber = screenNumber;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public LocalDateTime getStartsAt() {
+        return startsAt;
+    }
+
+    public void setStartsAt(LocalDateTime startsAt) {
+        this.startsAt = startsAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Movie getMovie() {
+        return movie;
+    }
+
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+}

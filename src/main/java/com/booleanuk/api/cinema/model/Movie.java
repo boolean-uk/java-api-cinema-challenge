@@ -3,6 +3,7 @@ package com.booleanuk.api.cinema.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "movies")
@@ -29,6 +30,10 @@ public class Movie {
 
     @Column
     private LocalDateTime updatedAt;
+
+    @OneToMany
+    @JoinColumn(name = "screening_id")
+    private List<Screening> screenings;
 
     public Movie() {
 
@@ -95,5 +100,13 @@ public class Movie {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Screening> getScreenings() {
+        return screenings;
+    }
+
+    public void setScreenings(List<Screening> screenings) {
+        this.screenings = screenings;
     }
 }
