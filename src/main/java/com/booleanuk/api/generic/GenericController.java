@@ -1,5 +1,6 @@
 package com.booleanuk.api.generic;
 
+import com.booleanuk.api.cinema.customers.Customer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +33,16 @@ abstract public class GenericController<Entity extends GenericEntity<Entity>> {
     try {
       return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(entity));
     } catch (DataIntegrityViolationException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create entity - " + e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
 
   @PutMapping(value = "{id}")
   public ResponseEntity<Entity> put(@PathVariable int id, @RequestBody Entity entity) {
     var existing = this.repository.findById(id);
-    if (existing.isEmpty())
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No entity with id '" + id + "' was found");
-
-    existing.get().update(entity);
-    return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(existing.get()));
+    return existing.map(x -> {
+      return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(x));
+    }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No entity with id '" + id + "' was found"));
   }
 
   @DeleteMapping(value = "{id}")

@@ -2,10 +2,16 @@ package com.booleanuk.api.cinema.customers;
 
 import com.booleanuk.api.generic.GenericEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "customers")
-public class Customer implements GenericEntity<Customer> {
+public class Customer implements Serializable, GenericEntity<Customer> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
