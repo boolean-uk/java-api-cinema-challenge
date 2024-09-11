@@ -1,13 +1,9 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.Screening;
-import com.booleanuk.api.cinema.model.Ticket;
-import com.booleanuk.api.cinema.model.TicketNumber;
+import com.booleanuk.api.cinema.model.*;
 import com.booleanuk.api.cinema.view.CustomerRepository;
 import com.booleanuk.api.cinema.view.ScreeningRepository;
 import com.booleanuk.api.cinema.view.TicketRepository;
-import com.sun.net.httpserver.HttpsServer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +15,9 @@ import java.util.List;
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
-	private CustomerRepository customerRepo;
-	private TicketRepository ticketRepo;
-	private ScreeningRepository screeningRepo;
+	private final CustomerRepository customerRepo;
+	private final TicketRepository ticketRepo;
+	private final ScreeningRepository screeningRepo;
 
 	public CustomerController(CustomerRepository customerRepository, TicketRepository ticketRepository, ScreeningRepository screeningRepo){
 		this.customerRepo = customerRepository;
@@ -30,8 +26,8 @@ public class CustomerController {
 	}
 
 	@GetMapping //all
-	public ResponseEntity<List<Customer>> getAll(){
-		return new ResponseEntity<>(customerRepo.findAll(), HttpStatus.OK);
+	public ResponseEntity<ResponseObject<List<Customer>>> getAll(){
+		return new ResponseEntity<>(new ResponseObject<>("Success", customerRepo.findAll()), HttpStatus.OK);
 	}
 
 
@@ -41,77 +37,106 @@ public class CustomerController {
 					customer.getEmail() == null ||
 					customer.getPhone() == null
 			) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body");
+				throw new Exception("Parse error found");
 			}
 		} catch (Exception e) { // catches null exception and response and properly throws the correct
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body");
 		}
 	}
 
+	public ResponseEntity<ResponseObject<Customer>> customerNotFound(){
+		return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+	}
+
 	@PostMapping
-	public ResponseEntity<Customer> postOne(@RequestBody Customer customer){
-		checkIfValidCustomer(customer);
-		// throws error if invalid.
-
-		customer.setCreatedAt(OffsetDateTime.now());
-
-		return new ResponseEntity<>(customerRepo.save(customer), HttpStatus.CREATED);
+	public ResponseEntity<ResponseObject<Customer>> postOne(@RequestBody Customer customer){
+		try {
+			checkIfValidCustomer(customer);
+			// throws error if invalid.
+		} catch (ResponseStatusException e) {
+			return customerNotFound();
+		}
+		customer.createdNow();
+		return new ResponseEntity<>(new ResponseObject<>("Success",customerRepo.save(customer)), HttpStatus.CREATED);
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Customer> putOne(@PathVariable int id, @RequestBody Customer customer){
-		Customer customerToUpdate = customerRepo.findById(id)
-				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	public ResponseEntity<ResponseObject<Customer>> putOne(@PathVariable int id, @RequestBody Customer customer){
+		Customer customerToUpdate;
+		try {
+			customerToUpdate = customerRepo.findById(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-		checkIfValidCustomer(customer);
+			checkIfValidCustomer(customer);
+		} catch (ResponseStatusException e) {
+			return customerNotFound();
+		}
 
 		// update
 		customerToUpdate.setName(customer.getName());
 		customerToUpdate.setEmail(customer.getEmail());
 		customerToUpdate.setPhone(customer.getPhone());
+		customerToUpdate.updatedNow();
 
 		// save and return
-		return new ResponseEntity<>(customerRepo.save(customerToUpdate), HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseObject<>("Success", customerRepo.save(customerToUpdate)), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<Customer> deleteMovie(@PathVariable int id){
-		Customer delCustomer = customerRepo.findById(id)
-				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	public ResponseEntity<ResponseObject<Customer>> deleteMovie(@PathVariable int id){
+		Customer delCustomer;
+		try{
+			delCustomer = customerRepo.findById(id)
+					.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		} catch (ResponseStatusException e) {
+			return customerNotFound();
+		}
 
 		customerRepo.delete(delCustomer);
-		return new ResponseEntity<>(delCustomer, HttpStatus.OK);
+		return new ResponseEntity<>(new ResponseObject<>("Success", delCustomer), HttpStatus.OK);
 	}
 
 	// extention
 	@GetMapping("{customer}/screenings/{screening}")
-	public ResponseEntity<List<Ticket>> getTickets(@PathVariable int customer, @PathVariable int screening){
-		Customer c = customerRepo.findById(customer)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid customer"));
-
-		return new ResponseEntity<>(c.getTickets(), HttpStatus.OK);
+	public ResponseEntity<ResponseObject<List<Ticket>>> getTickets(@PathVariable int customer, @PathVariable int screening){
+		Customer c;
+		try {
+			c = customerRepo.findById(customer)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid customer"));
+		} catch (ResponseStatusException e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(new ResponseObject<>("Success", c.getTickets()), HttpStatus.OK);
 	}
 
 
 	@PostMapping("{customer}/screenings/{screening}")
-	public ResponseEntity<Ticket> postTicket(@PathVariable int customer, @PathVariable int screening, @RequestBody TicketNumber numSeats){
-		Customer c = customerRepo.findById(customer)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid customer"));
+	public ResponseEntity<ResponseObject<Ticket>> postTicket(@PathVariable int customer, @PathVariable int screening, @RequestBody TicketNumber numSeats){
+		Customer c;
+		Screening s;
+		try {
+			c = customerRepo.findById(customer)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid customer"));
 
+			// check if valid screening
+			s = screeningRepo.findById(screening)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid screening"));
 
-		// check if valid screening
-		Screening s = screeningRepo.findById(screening)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid screening"));
+		} catch (Exception e){
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
 
+		}
+
+		// update ticket
 		Ticket t = new Ticket();
 		t.setCustomer(c);
 		t.setScreening(s);
 		t.createdNow();
 		t.setNumSeats(numSeats.tickets());
 
+		// save and return response object
 		ticketRepo.save(t);
-
-		return new ResponseEntity<>(t, HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseObject<>("Success", t), HttpStatus.CREATED);
 
 
 	}

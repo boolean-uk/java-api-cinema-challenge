@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,12 +35,22 @@ public class Customer {
 	@Column
 	private OffsetDateTime createdAt;
 
-	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
-	@JsonIgnoreProperties(value = {"customer"}) // ignorer customer sine tickets.
-	private List<Ticket> tickets;
-
 	@Column
 	private OffsetDateTime updatedAt;
 
+	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+	@JsonIgnoreProperties(value = {"customer" }) // ignorer customer sine tickets.
+	@JsonIgnore
+	private List<Ticket> tickets;
 
+
+	public void createdNow(){
+		OffsetDateTime n = OffsetDateTime.now();
+		this.createdAt = n;
+		this.updatedAt = n;
+	}
+
+	public void updatedNow(){
+		this.updatedAt = OffsetDateTime.now();
+	}
 }

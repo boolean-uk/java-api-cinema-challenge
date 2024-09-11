@@ -46,5 +46,14 @@ public class Movie{
 	@JsonIgnoreProperties(value = {"movie"}) // ignorer movie sine screenings.
 	private List<Screening> screenings;
 
+	public void createdNow(){
+		OffsetDateTime n = OffsetDateTime.now();
+		this.createdAt = n;
+		this.updatedAt = n;
+	}
+
+	public void updatedNow(){
+		this.updatedAt = OffsetDateTime.now();
+	}
 
 }

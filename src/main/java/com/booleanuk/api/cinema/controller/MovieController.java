@@ -2,11 +2,13 @@ package com.booleanuk.api.cinema.controller;
 
 
 import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.ResponseObject;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.view.MovieRepository;
 import com.booleanuk.api.cinema.view.ScreeningRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,38 +27,53 @@ public class MovieController {
 	}
 
 	@GetMapping //all
-	public ResponseEntity<List<Movie>> getAll(){
-		return new ResponseEntity<>(movieRepo.findAll(), HttpStatus.OK);
+	public ResponseEntity<ResponseObject<List<Movie>>> getAll(){
+		return new ResponseEntity<>(new ResponseObject<>("Success.", movieRepo.findAll()), HttpStatus.OK);
 	}
 
 
 	@PostMapping
-	public ResponseEntity<Movie> postOne(@RequestBody Movie movie){
-		checkIfValidMovie(movie);
-		// throws error if invalid.
+	public ResponseEntity<ResponseObject<Movie>> postOne(@RequestBody Movie movie){
+		try {
+			checkIfValidMovie(movie);
+			// throws error if invalid.
+		} catch (Exception e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed."), HttpStatus.BAD_REQUEST);
+		}
+		movie.createdNow();
 
-		movie.setCreatedAt(OffsetDateTime.now());
-
-		return new ResponseEntity<>(movieRepo.save(movie), HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseObject<>("Success",  movieRepo.save(movie)), HttpStatus.CREATED);
 	}
 
 
 	@PutMapping("{id}")
-	public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie){
-		Movie movieToUpdate = movieRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id" ));
+	public ResponseEntity<ResponseObject<Movie>> updateMovie(@PathVariable int id, @RequestBody Movie movie){
+		// check if valid id
+		Movie movieToUpdate;
+		try {
+			movieToUpdate = movieRepo.findById(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
 
-		checkIfValidMovie(movie);
-		// throws error if invalid.
+		} catch (ResponseStatusException e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+		}
+
+
+		// check if valid movie
+		try {
+			checkIfValidMovie(movie);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.BAD_REQUEST);
+		}
 
 		// update
 		movieToUpdate.setTitle(movie.getTitle());
 		movieToUpdate.setDescription(movie.getDescription());
 		movieToUpdate.setRating(movie.getRating());
 		movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-		movieToUpdate.setUpdatedAt(OffsetDateTime.now());
+		movieToUpdate.updatedNow();
 
-		return new ResponseEntity<>(movieRepo.save(movieToUpdate), HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseObject<>("Success", movieRepo.save(movieToUpdate)), HttpStatus.CREATED);
 	}
 
 	public void checkIfValidMovie(Movie movie){
@@ -75,30 +92,38 @@ public class MovieController {
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<Movie> deleteMovie(@PathVariable int id){
+	public ResponseEntity<ResponseObject<Movie>> deleteMovie(@PathVariable int id){
 		boolean isFound = movieRepo.existsById(id);
 		if (! isFound){
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
 		}
 
 		Movie delMovie = movieRepo.findById(id).get();
 		movieRepo.delete(delMovie);
-		return new ResponseEntity<>(delMovie, HttpStatus.OK);
+		return new ResponseEntity<>(new ResponseObject<>("Success", delMovie), HttpStatus.OK);
 	}
 
 	@GetMapping("{id}/screenings")
-	public ResponseEntity<List<Screening>> getAllScreenings(@PathVariable int id){
-		Movie m = movieRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id" ));
-		return new ResponseEntity<>(m.getScreenings(), HttpStatus.OK);
+	public ResponseEntity<ResponseObject<List<Screening>>> getAllScreenings(@PathVariable int id){
+		try {
+			Movie m = movieRepo.findById(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
+			return new ResponseEntity<>(new ResponseObject<>("Success", m.getScreenings()), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@PostMapping("{id}/screenings")
-	public ResponseEntity<Screening> postScreening(@PathVariable int id, @RequestBody Screening screening){
-		// check if movie exists
-		Movie m = movieRepo.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id" ));
-
+	public ResponseEntity<ResponseObject<Screening>> postScreening(@PathVariable int id, @Validated @RequestBody Screening screening){
+		Movie m;
+		try {
+			// check if movie exists
+			m = movieRepo.findById(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
+		} catch (ResponseStatusException e){
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+		}
 		// check if valid screening
 		try{
 			if (screening.getScreenNumber() == -1 ||
@@ -108,14 +133,16 @@ public class MovieController {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body");
 			}
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body");
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.BAD_REQUEST);
+
 		}
 
 		screening.setMovie(m);
-		screening.setCreatedAt(OffsetDateTime.now());
+		screening.createdNow();
 		screeningRepo.save(screening);
 
-		return new ResponseEntity<>(screening, HttpStatus.CREATED);
+
+		return new ResponseEntity<>(new ResponseObject<>("Success", screening), HttpStatus.CREATED);
 	}
 
 
