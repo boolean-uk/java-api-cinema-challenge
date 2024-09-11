@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
+
+    @Autowired
     MovieRepository movieRepository;
 
     @PostMapping
