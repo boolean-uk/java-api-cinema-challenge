@@ -1,8 +1,10 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "movies")
@@ -29,6 +31,10 @@ public class Movie {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "movie")
+    @JsonManagedReference(value = "movie-screenings")
+    private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, Integer runtimeMin) {
         this.title = title;
