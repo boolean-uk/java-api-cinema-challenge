@@ -24,11 +24,11 @@ public class Customer {
     private String phone;
 
     @Column
-    //@JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ") // TODO: fix format
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Column
-    //@JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.SSSZ") // TODO: fix format
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public Customer() {
