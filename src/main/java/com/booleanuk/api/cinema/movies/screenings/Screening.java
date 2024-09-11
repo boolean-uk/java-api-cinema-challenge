@@ -13,23 +13,23 @@ import java.time.LocalDateTime;
 public class Screening implements Serializable, GenericEntity<Screening> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  int id;
+  private int id;
 
   @Column(nullable = false)
-  int screenNumber;
+  private int screenNumber;
 
   @Column(nullable = false)
-  int capacity;
+  private int capacity;
 
   // TODO: use datetime type
   @Column(nullable = false)
-  String startsAt;
+  private String startsAt;
 
   @Column(nullable = false)
-  String createdAt;
+  private String createdAt;
 
   @Column(nullable = false)
-  String updatedAt;
+  private String updatedAt;
 
   public Screening(int screenNumber, int capacity, String startsAt) {
     this.screenNumber = screenNumber;

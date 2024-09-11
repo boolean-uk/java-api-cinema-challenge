@@ -16,19 +16,19 @@ import java.io.Serializable;
 public class Movie implements Serializable, GenericEntity<Movie> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  int id;
+  private int id;
 
   @Column(nullable = false)
-  String title;
+  private String title;
 
   @Column(nullable = false)
-  String rating;
+  private String rating;
 
   @Column(nullable = false)
-  String description;
+  private String description;
 
   @Column(nullable = false)
-  int runtimeMins;
+  private int runtimeMins;
 
   @Override
   public void update(Movie source) {
