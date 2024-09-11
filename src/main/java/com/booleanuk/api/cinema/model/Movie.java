@@ -15,16 +15,16 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "rating")
+    @Column(name = "rating", nullable = false)
     private String rating;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "runtime_min")
+    @Column(name = "runtime_min", nullable = false)
     private int runtimeMin;
 
     @Column(name = "created_at")
