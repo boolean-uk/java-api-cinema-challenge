@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +45,7 @@ public class Movie{
 
 	@OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
 	@JsonIgnoreProperties(value = {"movie"}) // ignorer movie sine screenings.
+	@JsonIgnore
 	private List<Screening> screenings;
 
 	public void createdNow(){

@@ -1,3 +1,8 @@
 package com.booleanuk.api.cinema.model;
 
-public record TicketNumber(int tickets) {}
+import lombok.Data;
+
+@Data
+public class TicketNumber {
+	public int numSeats;
+}

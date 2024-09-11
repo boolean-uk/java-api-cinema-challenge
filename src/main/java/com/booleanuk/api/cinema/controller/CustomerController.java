@@ -6,11 +6,13 @@ import com.booleanuk.api.cinema.view.ScreeningRepository;
 import com.booleanuk.api.cinema.view.TicketRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("customers")
@@ -106,12 +108,27 @@ public class CustomerController {
 		} catch (ResponseStatusException e) {
 			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(new ResponseObject<>("Success", c.getTickets()), HttpStatus.OK);
+
+		Screening s;
+		try{
+			s = screeningRepo.findById(screening)
+					.orElseThrow(() -> new Exception("Failed to find screening"));
+		} catch (Exception e) {
+			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+		}
+
+		List<Ticket> tickets = c.getTickets();
+		tickets = tickets.stream()
+				.filter(ticket -> ticket.getScreening() == s)
+				.toList();
+
+
+		return new ResponseEntity<>(new ResponseObject<>("Success", tickets), HttpStatus.OK);
 	}
 
 
 	@PostMapping("{customer}/screenings/{screening}")
-	public ResponseEntity<ResponseObject<Ticket>> postTicket(@PathVariable int customer, @PathVariable int screening, @RequestBody TicketNumber numSeats){
+	public ResponseEntity<ResponseObject<Ticket>> postTicket(@PathVariable int customer, @PathVariable int screening, @Validated @RequestBody TicketNumber numSeats){
 		Customer c;
 		Screening s;
 		try {
@@ -132,7 +149,8 @@ public class CustomerController {
 		t.setCustomer(c);
 		t.setScreening(s);
 		t.createdNow();
-		t.setNumSeats(numSeats.tickets());
+		System.out.println(numSeats.getNumSeats());
+		t.setNumSeats(numSeats.getNumSeats());
 
 		// save and return response object
 		ticketRepo.save(t);

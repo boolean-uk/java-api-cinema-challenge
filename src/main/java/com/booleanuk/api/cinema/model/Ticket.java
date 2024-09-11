@@ -31,12 +31,14 @@ public class Ticket {
 	@ManyToOne
 	@JoinColumn(name="customerId") // kolonnen
 	@JsonIgnoreProperties(value={"tickets"})
+	@JsonIgnore
 	private Customer customer;
 
 
 	@ManyToOne
 	@JoinColumn(name="screeningId")
 	@JsonIgnoreProperties(value={"tickets"})
+	@JsonIgnore
 	private Screening screening;
 
 	@Column
