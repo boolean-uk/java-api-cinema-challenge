@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +24,8 @@ public class Customer {
     private String email;
     @Column(nullable = false)
     private String phoneNumber;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 
     public Customer(String name, String email, String phoneNumber) {
         this.name = name;
