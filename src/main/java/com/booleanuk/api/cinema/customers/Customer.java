@@ -28,9 +28,10 @@ public class Customer implements Serializable, GenericEntity<Customer> {
   private String phone;
 
   @Override
-  public void update(Customer other) {
-    this.name = other.name;
-    this.email = other.email;
-    this.phone = other.phone;
+  public void update(Customer source) {
+    this.id = source.id;
+    this.name = source.name;
+    this.email = source.email;
+    this.phone = source.phone;
   }
 }
