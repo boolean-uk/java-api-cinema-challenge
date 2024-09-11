@@ -30,29 +30,29 @@ public class Customer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "costumer-tickets")
     private List<Ticket> tickets;
 
-    // Used to create a new customer.
     public Customer(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.tickets = new ArrayList<>();
     }
 
-    // Used to update an existing customer.
-    public Customer(String name, String email, String phone, LocalDateTime time) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.updatedAt = time;
+    public Customer() {}
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Customer() {}
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Integer getId() {
         return id;

@@ -24,7 +24,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonBackReference(value = "customer-tickets")
+    @JsonBackReference(value = "costumer-tickets")
     private Customer customer;
 
     @ManyToOne
@@ -36,18 +36,20 @@ public class Ticket {
         this.customer = customer;
         this.screening = screening;
         this.numSeats = numSeats;
+    }
+
+    public Ticket() {}
+
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Ticket(Customer customer, Screening screening, int numSeats, LocalDateTime time) {
-        this.customer = customer;
-        this.screening = screening;
-        this.numSeats = numSeats;
-        this.updatedAt = time;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
-
-    public Ticket() {}
 
     public Customer getCustomer() {
         return customer;

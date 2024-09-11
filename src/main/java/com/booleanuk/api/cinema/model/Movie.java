@@ -24,8 +24,8 @@ public class Movie {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "runtimeMin")
-    private Integer runtimeMin;
+    @Column(name = "runtime_min")
+    private int runtimeMin;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -33,29 +33,32 @@ public class Movie {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "movie")
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "movie-screenings")
     private List<Screening> screenings;
+
 
     public Movie(String title, String rating, String description, Integer runtimeMin) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMin = runtimeMin;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.screenings = new ArrayList<>();
     }
 
-    public Movie(String title, String rating, String description, Integer runtimeMin, LocalDateTime time) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMin = runtimeMin;
-        this.updatedAt = time;
+    public Movie() {}
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Movie() {}
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Integer getId() {
         return id;

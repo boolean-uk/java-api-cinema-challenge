@@ -36,7 +36,7 @@ public class Screening {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "screening")
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "screening-tickets")
     private List<Ticket> tickets;
 
@@ -45,22 +45,30 @@ public class Screening {
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.tickets = new ArrayList<>();
     }
 
-    // Used to update object.
-    public Screening(Movie movie, int screenNumber, LocalDateTime startsAt, int capacity, LocalDateTime time) {
-        this.movie = movie;
-        this.screenNumber = screenNumber;
-        this.startsAt = startsAt;
-        this.capacity = capacity;
+    public Screening() {}
+
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = time;
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Screening() {}
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Movie getMovie() {
         return movie;
@@ -108,5 +116,13 @@ public class Screening {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }
