@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.customers;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.booleanuk.api.generic.GenericRepository;
 
-public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+public interface CustomerRepository extends GenericRepository<Customer> {
 }

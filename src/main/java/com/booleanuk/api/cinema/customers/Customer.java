@@ -1,12 +1,11 @@
 package com.booleanuk.api.cinema.customers;
 
-
-import com.booleanuk.api.base.Patchable;
+import com.booleanuk.api.generic.GenericEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "customers")
-public class Customer implements Patchable<Customer> {
+public class Customer implements GenericEntity<Customer> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
@@ -21,7 +20,7 @@ public class Customer implements Patchable<Customer> {
   private String phone;
 
   @Override
-  public void patch(Customer other) {
+  public void update(Customer other) {
     this.name = other.name;
     this.email = other.email;
     this.phone = other.phone;

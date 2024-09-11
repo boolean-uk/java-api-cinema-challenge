@@ -1,7 +1,6 @@
-package com.booleanuk.api.base;
+package com.booleanuk.api.generic;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,10 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-abstract public class Controller<Entity extends Patchable<Entity>> {
-  private final JpaRepository<Entity, Integer> repository;
+abstract public class GenericController<Entity extends GenericEntity<Entity>> {
+  private final GenericRepository<Entity> repository;
 
-  protected Controller(JpaRepository<Entity, Integer> repository) {
+  public GenericController(GenericRepository<Entity> repository) {
     this.repository = repository;
   }
 
@@ -33,7 +32,7 @@ abstract public class Controller<Entity extends Patchable<Entity>> {
     try {
       return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(entity));
     } catch (DataIntegrityViolationException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create entity " + e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create entity - " + e.getMessage());
     }
   }
 
@@ -43,7 +42,7 @@ abstract public class Controller<Entity extends Patchable<Entity>> {
     if (existing.isEmpty())
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No entity with id '" + id + "' was found");
 
-    existing.get().patch(entity);
+    existing.get().update(entity);
     return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(existing.get()));
   }
 
