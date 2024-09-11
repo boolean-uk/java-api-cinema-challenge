@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
@@ -19,7 +21,13 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(customerRepository.findAll());
+        List<Customer> customers = customerRepository.findAll();
+        ResponseDTO<List<Customer>> response = new ResponseDTO<>(
+                "success",
+                customers);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
     }
 
     @PostMapping

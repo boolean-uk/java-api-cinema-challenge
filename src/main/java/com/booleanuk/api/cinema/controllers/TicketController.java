@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("customers/{customerId}/screenings/{screeningId}")
 public class TicketController {
@@ -36,7 +38,13 @@ public class TicketController {
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(
                 () -> new NotFoundException("No screening with that id: " + screeningId + " found")
         );
-        return ResponseEntity.ok(ticketRepository.findByCustomerAndScreening(customer, screening));
+        List<Ticket> tickets = ticketRepository.findByCustomerAndScreening(customer, screening);
+
+        ResponseDTO<List<Ticket>> response = new ResponseDTO<>(
+                "success",
+                tickets);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping()

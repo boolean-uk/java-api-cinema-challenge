@@ -93,7 +93,13 @@ public class MovieController {
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(movieRepository.findAll());
+        List<Movie> movies = movieRepository.findAll();
+        ResponseDTO<List<Movie>> response = new ResponseDTO<>(
+                "success",
+                movies);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
     }
 
     private Movie findById(int id) {
