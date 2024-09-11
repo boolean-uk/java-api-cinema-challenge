@@ -1,6 +1,5 @@
 package com.booleanuk.api.generic;
 
-import com.booleanuk.api.cinema.customers.Customer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 abstract public class GenericController<Entity extends GenericEntity<Entity>> {
-  private final GenericRepository<Entity> repository;
+  protected final GenericRepository<Entity> repository;
 
   public GenericController(GenericRepository<Entity> repository) {
     this.repository = repository;

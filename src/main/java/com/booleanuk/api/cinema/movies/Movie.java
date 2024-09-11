@@ -1,10 +1,7 @@
 package com.booleanuk.api.cinema.movies;
 
 import com.booleanuk.api.generic.GenericEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +11,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "movies")
 public class Movie implements Serializable, GenericEntity<Movie> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
