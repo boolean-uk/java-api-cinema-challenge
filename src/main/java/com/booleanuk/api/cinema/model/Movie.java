@@ -20,21 +20,30 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "rating")
+    @Column(name = "rating", nullable = false)
     private String rating;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "runtimeMins")
+    @Column(name = "runtimeMins", nullable = false)
     private String runtimeMins;
 
-    @Column(name = "createdAt")
+    @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    private void onCreate() {
+        /*
+        This method is called before the entity manager saves the entity to the database.
+         */
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
