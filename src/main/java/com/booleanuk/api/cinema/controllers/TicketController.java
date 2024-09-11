@@ -30,11 +30,11 @@ public class TicketController {
     @GetMapping
     public ResponseEntity<?> getAll(@PathVariable int customerId, @PathVariable int screeningId) {
         Customer customer = this.customerRepository.findById(customerId).orElseThrow(
-                () -> new NotFoundException("No Customer with that id: " + screeningId + " found")
+                () -> new NotFoundException("No customer with that id: " + screeningId + " found")
         );
 
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(
-                () -> new NotFoundException("No Screening with that id: " + screeningId + " found")
+                () -> new NotFoundException("No screening with that id: " + screeningId + " found")
         );
         return ResponseEntity.ok(ticketRepository.findByCustomerAndScreening(customer, screening));
     }
@@ -43,11 +43,11 @@ public class TicketController {
     public ResponseEntity<?> create(@RequestBody Ticket ticket, @PathVariable int customerId, @PathVariable int screeningId) {
 
         Customer customer = this.customerRepository.findById(customerId).orElseThrow(
-                () -> new NotFoundException("No movie with that id: " + screeningId + " found")
+                () -> new NotFoundException("No customer with that id: " + screeningId + " found")
         );
 
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(
-                () -> new NotFoundException("No movie with that id: " + screeningId + " found")
+                () -> new NotFoundException("No screening with that id: " + screeningId + " found")
         );
         try{
             ticket.setCustomer(customer);

@@ -98,7 +98,7 @@ public class MovieController {
 
     private Movie findById(int id) {
         return this.movieRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Customer not found with ID " + id)
+                () -> new NotFoundException("Movie not found with ID " + id)
         );
 
     }
