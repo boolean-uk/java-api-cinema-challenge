@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -45,7 +46,7 @@ public class MovieController {
             movieToUpdate.setRating(movie.getRating());
             movieToUpdate.setDescription(movie.getDescription());
             movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
-            movieToUpdate.setUpdatedAt(LocalDateTime.now());
+            movieToUpdate.setUpdatedAt(OffsetDateTime.now());
             return new ResponseEntity<>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occurred when attempting to update movie: " + e.getMessage());

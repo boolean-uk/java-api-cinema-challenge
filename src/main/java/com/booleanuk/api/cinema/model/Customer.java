@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -35,10 +35,10 @@ public class Customer {
     private String phone;
 
     @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updatedAt", nullable = false)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
 
     @PrePersist
@@ -46,7 +46,7 @@ public class Customer {
         /*
         This method is called before the entity manager saves the entity to the database.
          */
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 }

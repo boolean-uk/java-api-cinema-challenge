@@ -1,21 +1,26 @@
 package com.booleanuk.api.cinema.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 
 @Entity
 @Table(name = "movies")
 public class Movie {
+    public Movie (String title, String rating, String description, int runtimeMins) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -30,20 +35,20 @@ public class Movie {
     private String description;
 
     @Column(name = "runtimeMins", nullable = false)
-    private String runtimeMins;
+    private int runtimeMins;
 
     @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updatedAt", nullable = false)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @PrePersist
     private void onCreate() {
         /*
         This method is called before the entity manager saves the entity to the database.
          */
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 }

@@ -2,14 +2,13 @@ package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 
@@ -47,7 +46,7 @@ public class CustomerController {
             customerToUpdate.setName(customer.getName());
             customerToUpdate.setPhone(customer.getPhone());
             customerToUpdate.setEmail(customer.getEmail());
-            customerToUpdate.setUpdatedAt(LocalDateTime.now());
+            customerToUpdate.setUpdatedAt(OffsetDateTime.now());
 
             return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
         } catch (Exception e) {
