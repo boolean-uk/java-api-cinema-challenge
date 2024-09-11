@@ -1,9 +1,12 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "screenings")
@@ -33,6 +36,10 @@ public class Screening {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "screening")
+    @JsonManagedReference(value = "screening-tickets")
+    private List<Ticket> tickets;
+
     public Screening(Movie movie, int screenNumber, LocalDateTime startsAt, int capacity) {
         this.movie = movie;
         this.screenNumber = screenNumber;
@@ -40,6 +47,7 @@ public class Screening {
         this.capacity = capacity;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.tickets = new ArrayList<>();
     }
 
     // Used to update object.

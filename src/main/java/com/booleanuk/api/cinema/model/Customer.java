@@ -1,8 +1,11 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -27,6 +30,10 @@ public class Customer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "customer")
+    @JsonManagedReference(value = "costumer-tickets")
+    private List<Ticket> tickets;
+
     // Used to create a new customer.
     public Customer(String name, String email, String phone) {
         this.name = name;
@@ -34,6 +41,7 @@ public class Customer {
         this.phone = phone;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.tickets = new ArrayList<>();
     }
 
     // Used to update an existing customer.
@@ -92,5 +100,13 @@ public class Customer {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }
