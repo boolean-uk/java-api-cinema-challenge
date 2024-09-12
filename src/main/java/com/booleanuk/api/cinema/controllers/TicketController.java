@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping(name = "customers/{customerId}/screenings/{screeningId}")
+@RequestMapping(name = "customers/")
 public class TicketController {
 
     @Autowired
@@ -27,9 +27,8 @@ public class TicketController {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @PostMapping
+    @PostMapping("{customerId}/screenings/{screeningId}")
     public ResponseEntity<Ticket> createTicket(@PathVariable(name = "customerId") int customerId, @PathVariable(name = "screeningId") int screeningId, @RequestBody Ticket ticket){
-
 
         Customer customer = this.customerRepository.findById(customerId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found 1.."));
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found. 2."));
@@ -41,4 +40,5 @@ public class TicketController {
 
         return new ResponseEntity<Ticket>(this.ticketRepository.save(ticket), HttpStatus.CREATED);
     }
+
 }

@@ -14,13 +14,12 @@ public class Ticket {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     @JsonIncludeProperties(value = {"name", "email", "phone", "created_at", "updated_at"})
     private Customer customer;
 
-    //Done one to many
     @ManyToOne
-    @JoinColumn(name = "screening_id")
+    @JoinColumn(name = "screening_id", nullable = false)
     @JsonIncludeProperties(value = {"movie_id", "screen_number", "starts_at", "capacity", "created_at", "updated_at"})
     private Screening screening;
 
@@ -38,20 +37,11 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(int id) {
-        this.id = id;
+    public Ticket(int numSeats){
+        this.numSeats = numSeats;
     }
 
     public Ticket(Customer customer, Screening screening, int numSeats, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.customer = customer;
-        this.screening = screening;
-        this.numSeats = numSeats;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public Ticket(int id, Customer customer, Screening screening, int numSeats, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
         this.customer = customer;
         this.screening = screening;
         this.numSeats = numSeats;

@@ -32,6 +32,7 @@ public class ScreeningController {
     //Need to fix to specific id
     @GetMapping
     public List<Screening> getAllCustomers (@PathVariable int id) {
+
         return this.screeningRepository.findAll();
     }
 
