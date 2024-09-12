@@ -17,9 +17,12 @@ import java.util.List;
 @RequestMapping("movies")
 public class MovieController {
     private static final String SUCCESS = "success";
+    private final MovieRepository movieRepository;
 
     @Autowired
-    private MovieRepository movieRepository;
+    public MovieController(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
+    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

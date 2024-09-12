@@ -1,52 +1,59 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.ApiResponse;
+import com.booleanuk.api.cinema.exception.NotFoundException;
 import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("customers")
 public class CustomerController {
+    private static final String SUCCESS = "success";
+    private final CustomerRepository customerRepository;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    public CustomerController(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer create(@RequestBody Customer body) {
-        return this.customerRepository.save(body);
+    public ApiResponse<Customer> create(@Valid @RequestBody Customer body) {
+        Customer customer = this.customerRepository.save(body);
+        return new ApiResponse<>(SUCCESS, customer);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Customer> getAll() {
-        return this.customerRepository.findAll();
+    public ApiResponse<List<Customer>> getAll() {
+        return new ApiResponse<>(SUCCESS, this.customerRepository.findAll());
     }
 
     @PutMapping("{id}")
-    public Customer update(@PathVariable int id, @RequestBody Customer body) {
+    public ApiResponse<Customer> update(@PathVariable int id, @Valid @RequestBody Customer body) {
         return this.customerRepository.findById(id)
                 .map(customer -> {
                     customer.setName(body.getName());
                     customer.setEmail(body.getEmail());
                     customer.setPhone(body.getPhone());
-                    return this.customerRepository.save(customer);
+                    return new ApiResponse<>(SUCCESS, this.customerRepository.save(customer));
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+                .orElseThrow(() -> new NotFoundException("not found"));
     }
 
     @DeleteMapping("{id}")
-    public Customer delete(@PathVariable int id) {
+    public ApiResponse<Customer> delete(@PathVariable int id) {
         return this.customerRepository.findById(id)
                 .map(customer -> {
                     this.customerRepository.delete(customer);
-                    return customer;
+                    return new ApiResponse<>(SUCCESS, customer);
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+                .orElseThrow(() -> new NotFoundException("not found"));
     }
 }

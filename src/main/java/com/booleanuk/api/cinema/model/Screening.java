@@ -1,8 +1,10 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,14 +23,17 @@ public class Screening {
     @JsonBackReference(value = "movie-screenings")
     private Movie movie;
 
+    @NotNull(message = "Screen number cannot be null")
     @Column(name = "screen_number")
-    private int screenNumber;
+    private Integer screenNumber;
 
+    @NotNull(message = "Start time must be specified")
     @Column(name = "starts_at")
     private LocalDateTime startsAt;
 
+    @NotNull(message = "Capacity cannot be null")
     @Column(name = "capacity")
-    private int capacity;
+    private Integer capacity;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -36,6 +41,7 @@ public class Screening {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "screening-tickets")
     private List<Ticket> tickets;
@@ -82,7 +88,7 @@ public class Screening {
         return screenNumber;
     }
 
-    public void setScreenNumber(int screenNumber) {
+    public void setScreenNumber(Integer screenNumber) {
         this.screenNumber = screenNumber;
     }
 
@@ -98,7 +104,7 @@ public class Screening {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 

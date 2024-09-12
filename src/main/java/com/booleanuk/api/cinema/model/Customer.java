@@ -1,7 +1,9 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,12 +17,15 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Name cannot be blank")
     @Column(name = "name")
     private String name;
 
+    @NotBlank(message = "Email cannot be blank")
     @Column(name = "email")
     private String email;
 
+    @NotBlank(message = "Phone cannot be blank")
     @Column(name = "phone")
     private String phone;
 
@@ -30,6 +35,7 @@ public class Customer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "costumer-tickets")
     private List<Ticket> tickets;
