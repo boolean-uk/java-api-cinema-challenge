@@ -23,13 +23,6 @@ public class CustomerController {
         return this.customerRepository.findAll();
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Customer> getCustomer (@PathVariable int id) {
-        Customer customer = this.customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found.."));
-
-        return ResponseEntity.ok(customer);
-    }
-
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
         customer.setCreatedAt(LocalDateTime.now());

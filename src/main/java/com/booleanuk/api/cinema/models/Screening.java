@@ -1,11 +1,12 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Entity
 @Table(name = "screenings")
@@ -19,6 +20,10 @@ public class Screening {
     @JoinColumn(name = "movie_id")
     @JsonIncludeProperties(value = {"title", "rating", "description", "run_time_mins", "created_at", "updated_at"})
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     @Column(name = "screen_number")
     private int screenNumber;
@@ -114,5 +119,13 @@ public class Screening {
 
     public void setScreenNumber(int screenNumber) {
         this.screenNumber = screenNumber;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }

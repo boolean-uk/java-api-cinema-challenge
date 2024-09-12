@@ -2,8 +2,10 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
+import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,11 @@ public class ScreeningController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private TicketRepository ticketRepository;
+
+
+    //Need to fix to specific id
     @GetMapping
     public List<Screening> getAllCustomers (@PathVariable int id) {
         return this.screeningRepository.findAll();

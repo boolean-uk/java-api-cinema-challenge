@@ -2,7 +2,9 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
+import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
+import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,9 @@ public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
     @GetMapping
     public List<Movie> getAllMovies(){
         return this.movieRepository.findAll();
@@ -27,6 +32,8 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie){
+        List<Screening> screenings = movie.getScreenings();
+
         movie.setCreatedTime(LocalDateTime.now());
         movie.setUpdatedTime(LocalDateTime.now());
 
