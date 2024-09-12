@@ -9,20 +9,12 @@ import com.booleanuk.api.cinema.response.ErrorResponse;
 import com.booleanuk.api.cinema.response.MovieListResponse;
 import com.booleanuk.api.cinema.response.MovieResponse;
 import com.booleanuk.api.cinema.response.Response;
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Array;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @RestController
 @RequestMapping("movies")
@@ -49,17 +41,13 @@ public class MovieController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseEntity<Object> createMovie(@RequestBody Movie movie) {
-        if (movie.getScreenings()==null) {
-            MovieResponse movieResponse = new MovieResponse();
-            movieResponse.set(this.repository.save(movie));
-            return ResponseEntity.ok(movieResponse);
-        }
-
         Movie savedMovie = this.repository.save(movie);
-        List<Screening> newScreenings = movie.getScreenings();
-        for (Screening screen : newScreenings){
-            screen.setMovie(savedMovie);
-            this.screeningRepository.save(screen);
+
+        if (movie.getScreenings()!=null) {
+            for (Screening screening : movie.getScreenings()){
+                screening.setMovie(savedMovie);
+                this.screeningRepository.save(screening);
+            }
         }
 
         MovieResponse movieResponse = new MovieResponse();

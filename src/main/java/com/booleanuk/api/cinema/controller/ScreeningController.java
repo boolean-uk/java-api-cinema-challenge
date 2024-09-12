@@ -1,6 +1,5 @@
 package com.booleanuk.api.cinema.controller;
 
-
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -12,11 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -35,13 +29,14 @@ public class ScreeningController {
 
     @GetMapping
     public ResponseEntity<Object> getAll(@PathVariable int id) {
-        ScreeningListResponse screeningListResponse = new ScreeningListResponse();
         List<Screening> screenings = this.repository.findAllByMovie_id(id);
         if (screenings.isEmpty()) {
             ErrorResponse error = new ErrorResponse();
             error.set("not found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
+
+        ScreeningListResponse screeningListResponse = new ScreeningListResponse();
         screeningListResponse.set(screenings);
         return ResponseEntity.ok(screeningListResponse);
     }
