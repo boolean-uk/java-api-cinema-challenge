@@ -33,16 +33,17 @@ public class Movie {
     @Column
     private int runtimeMins;
 
-    @Column
-    private LocalDateTime createdAt=LocalDateTime.now();
 
-    @Column
-    private LocalDateTime updatedAt=LocalDateTime.now();
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties(value ={"movie", "tickets"})
     private List<Screening> screenings;
 
+    @Column
+    private LocalDateTime createdAt=LocalDateTime.now();
+
+    @Column
+    private LocalDateTime updatedAt=LocalDateTime.now();
 
 
 }
