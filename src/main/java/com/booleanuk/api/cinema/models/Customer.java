@@ -37,12 +37,9 @@ public class Customer {
     @Column
     private LocalDateTime updatedAt;
 
-    /*
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("customer")
     private List<Ticket> tickets;
-
-     */
 
     public Customer(String name, String email, String phone) {
         this.name = name;

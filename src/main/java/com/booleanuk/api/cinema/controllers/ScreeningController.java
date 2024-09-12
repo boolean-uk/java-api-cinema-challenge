@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,6 +27,7 @@ public class ScreeningController {
 
     @PostMapping
     public ResponseEntity<Screening> create(@RequestBody Screening screening, @PathVariable int id) {
+        System.out.println("Test screening post");
         Movie movie = this.movieRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id")
         );
@@ -36,8 +38,17 @@ public class ScreeningController {
     }
 
     @GetMapping
-    public List<Screening> getAll() {
-        return this.screeningRepository.findAll();
+    public List<Screening> getAllByMovieId(@PathVariable int id) {
+        Movie movie = this.movieRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id")
+        );
+        List<Screening> result = new ArrayList<>();
+        for (Screening s : screeningRepository.findAll()){
+            if(s.getMovie().getId() == id){
+                result.add(s);
+            }
+        }
+        return result;
     }
 /*
     @GetMapping

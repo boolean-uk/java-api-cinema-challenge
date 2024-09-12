@@ -1,10 +1,13 @@
 package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Movie;
+import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
+import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,12 +20,24 @@ import java.util.List;
 public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
+    @Autowired
+    private ScreeningRepository screeningRepository;
 
     @PostMapping
     public ResponseEntity<Movie> create(@RequestBody Movie movie) {
         movie.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         movie.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        return new ResponseEntity<>(this.movieRepository.save(movie), HttpStatus.CREATED);
+        List<Screening> tempScreenings = movie.getScreenings();
+        movie.setScreenings(null);
+        this.movieRepository.save(movie);
+        for(Screening s : tempScreenings){
+            s.setMovie(movie);
+            s.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            s.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        }
+        screeningRepository.saveAll(tempScreenings);
+        movie.setScreenings(tempScreenings);
+        return new ResponseEntity<>(movie, HttpStatus.CREATED);
     }
 
     @GetMapping

@@ -44,11 +44,12 @@ public class Movie {
     @JsonIgnoreProperties("movie")
     private List<Screening> screenings;
 
-    public Movie(String title, String rating, String description) {
+    public Movie(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
         this.title = title;
         this.rating = rating;
         this.description = description;
-        this.runtimeMins = 0;
+        this.runtimeMins = runtimeMins;
+        this.screenings.addAll(screenings);
     }
 
     public Movie(int id){

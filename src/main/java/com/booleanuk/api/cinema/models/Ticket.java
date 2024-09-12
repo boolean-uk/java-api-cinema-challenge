@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,12 +22,6 @@ public class Ticket {
     private int id;
 
     @Column
-    private int customerId;
-
-    @Column
-    private int screeningId;
-
-    @Column
     private int numSeats;
 
     @Column
@@ -35,13 +30,25 @@ public class Ticket {
     @Column
     private LocalDateTime updatedAt;
 
-    public Ticket(int customerId, int screeningId, int numSeats) {
-        this.customerId = customerId;
-        this.screeningId = screeningId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIncludeProperties(value = {"name", "email", "phone"})
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "screening_id", nullable = false)
+    @JsonIncludeProperties(value = {"screenNumber", "capacity", "startsAt"})
+    private Screening screening;
+
+    public Ticket(int numSeats) {
         this.numSeats = numSeats;
     }
 
+    /*
+    //clashes with above constructor
     public Ticket(int id){
         this.id = id;
     }
+
+     */
 }

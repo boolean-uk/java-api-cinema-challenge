@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,8 +27,8 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int movieId;
+    //@Column
+    //private int movieId;
 
     @Column
     private int screenNumber;
@@ -48,6 +50,10 @@ public class Screening {
     @JsonIncludeProperties(value = {"title", "rating", "description", "runtimeMins"})
     private Movie movie;
 
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
+
     public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
         //this.movieId = movieId;
         this.screenNumber = screenNumber;
@@ -57,5 +63,9 @@ public class Screening {
 
     public Screening(int id){
         this.id = id;
+    }
+
+    public String toString(){
+        return "Screening " + this.id + ": screenNumber=" + this.screenNumber + " capacity=" + this.capacity;
     }
 }
