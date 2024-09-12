@@ -52,7 +52,7 @@ public class Screening {
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "screenings", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("screenings")
     private List<Ticket> screeningTickets;
 

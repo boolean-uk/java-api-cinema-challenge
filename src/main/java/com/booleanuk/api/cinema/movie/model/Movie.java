@@ -47,7 +47,7 @@ public class Movie {
     @Column(name = "updatedAt", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "movies", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("movies")
     private List<Screening> movieScreenings;
 
