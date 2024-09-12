@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.model;
+package com.booleanuk.api.cinema.screening.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
