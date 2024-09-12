@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,10 +25,10 @@ public class Customer {
     private String email;
     @Column(nullable = false)
     private String phoneNumber;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime updatedAt;
 
     public Customer(String name, String email, String phoneNumber) {
         this.name = name;
@@ -42,14 +42,14 @@ public class Customer {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.createdAt = this.getCreatedAt();
-        this.updatedAt = OffsetDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public String toString() {

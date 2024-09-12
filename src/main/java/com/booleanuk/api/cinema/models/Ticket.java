@@ -1,15 +1,14 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,21 +23,21 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    @JsonIncludeProperties({"name", "email"})
+    @JsonIgnore
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "screening_id", nullable = false)
-    @JsonIncludeProperties({"screenNumber", "startsAt"})
+    @JsonIgnore
     private Screening screening;
 
     @Column(nullable = false)
     private Integer numSeats;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime updatedAt;
 
     public Ticket(Customer customer, Screening screening, Integer numSeats) {
         this.customer = customer;
@@ -52,13 +51,13 @@ public class Ticket {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = OffsetDateTime.now(ZoneId.systemDefault());
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.createdAt = this.getCreatedAt();
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.updatedAt = LocalDateTime.now();
     }
 }

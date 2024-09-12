@@ -1,15 +1,14 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,19 +25,19 @@ public class Screening {
     @Column(nullable = false)
     private int capacity;
     @Column(nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    private OffsetDateTime startsAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startsAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIncludeProperties({"title", "rating", "description", "runtimeMinutes"})
+    @JsonIgnore
     private Movie movie;
 
-    public Screening(int screenNumber, int capacity, OffsetDateTime startsAt) {
+    public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
@@ -50,13 +49,13 @@ public class Screening {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = OffsetDateTime.now(ZoneId.systemDefault());
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.createdAt = this.getCreatedAt();
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.updatedAt = LocalDateTime.now();
     }
 }

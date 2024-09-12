@@ -17,6 +17,6 @@ public class Response<T> {
         this.data = new ErrorData(errorMessage);
     }
 
-        private record ErrorData(String message) {
+    private record ErrorData(String message) {
     }
 }

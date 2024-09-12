@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -20,17 +19,6 @@ public abstract class GenericController<T, ID> {
     @GetMapping
     public ResponseEntity<?> getAll() {
         response.setSuccess(repository.findAll());
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable ID id) {
-        T entity = repository.findById(id).orElse(null);
-        if (entity == null) {
-            response.setError("not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        response.setSuccess(entity);
         return ResponseEntity.ok(response);
     }
 

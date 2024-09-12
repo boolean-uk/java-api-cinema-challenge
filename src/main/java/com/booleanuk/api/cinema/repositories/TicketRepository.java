@@ -9,5 +9,4 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByCustomerAndScreening(Customer customer, Screening screening);
-
 }

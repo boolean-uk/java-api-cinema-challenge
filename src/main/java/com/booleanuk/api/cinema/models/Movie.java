@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -27,13 +26,14 @@ public class Movie {
     private String description;
     @Column(nullable = false)
     private int runtimeMinutes;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
-    OffsetDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(nullable = false)
+    LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"id", "movie"})
+    @JsonIgnoreProperties({"movie", "id", "createdAt", "updatedAt"})
     private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, int runtimeMinutes) {
@@ -49,15 +49,15 @@ public class Movie {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = OffsetDateTime.now(ZoneId.systemDefault());
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.screenings = getScreenings();
         this.createdAt = getCreatedAt();
-        this.updatedAt = OffsetDateTime.now(ZoneId.systemDefault());
+        this.updatedAt = LocalDateTime.now();
     }
 
     public String toString() {
