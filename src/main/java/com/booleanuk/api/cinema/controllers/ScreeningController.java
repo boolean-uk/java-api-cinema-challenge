@@ -41,6 +41,7 @@ public class ScreeningController {
             return new ResponseEntity<>(new ResponseCreator<>("error", new Message("Movie not found")) , HttpStatus.NOT_FOUND);
         }
 
+        //Check for overlapping screening times on the same screen
         List<Screening> screeningsAtScreen = this.screeningRepository.findByScreenNumber(screening.getScreenNumber());
         for (Screening screeningAtScreen : screeningsAtScreen) {
             if ((screeningAtScreen.getStartsAt().isBefore(screening.getStartsAt()) && screeningAtScreen.getStartsAt().plusMinutes(movie.getRuntimeMins()).isAfter(screening.getStartsAt()) )||
@@ -51,6 +52,11 @@ public class ScreeningController {
         }
 
         screening.setMovie(movie);
-        return new ResponseEntity<>(new ResponseCreator<>("success", this.screeningRepository.save(screening)), HttpStatus.CREATED);
+        try {
+            this.screeningRepository.save(screening);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseCreator<>("error", new Message("At least one non-null field is null")) , HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResponseCreator<>("success", screening), HttpStatus.CREATED);
     }
 }

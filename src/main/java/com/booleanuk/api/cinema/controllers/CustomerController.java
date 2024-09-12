@@ -54,8 +54,9 @@ public class CustomerController {
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate = this.customerRepository.save(customerToUpdate);
-        if (customerToUpdate == null) {
+        try {
+            this.customerRepository.save(customerToUpdate);
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseCreator<>("error", new Message("At least one non-null field is null")) , HttpStatus.NOT_FOUND);
         }
 

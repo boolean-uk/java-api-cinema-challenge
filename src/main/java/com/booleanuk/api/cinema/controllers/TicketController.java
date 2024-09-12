@@ -57,7 +57,8 @@ public class TicketController {
             return new ResponseEntity<>(new ResponseCreator<>("error", new Message("Customer not found")) , HttpStatus.NOT_FOUND);
         }
 
-        int ticketsRemaining = screening.getCapacity();
+        //Check that maximum capacity is not exceeded
+        int ticketsRemaining = screening.getCapacity() - ticket.getNumSeats();
         for (Ticket ticketToCount : this.ticketRepository.findByCustomerAndScreening(customer, screening)) {
             ticketsRemaining -= ticketToCount.getNumSeats();
         }
@@ -67,6 +68,11 @@ public class TicketController {
         }
         ticket.setScreening(screening);
         ticket.setCustomer(customer);
-        return new ResponseEntity<>(new ResponseCreator<>("success", this.ticketRepository.save(ticket)), HttpStatus.CREATED);
+        try {
+            this.ticketRepository.save(ticket);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseCreator<>("error", new Message("At least one non-null field is null")) , HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResponseCreator<>("success", ticket), HttpStatus.CREATED);
     }
 }
