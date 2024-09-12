@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "screenings")
@@ -36,6 +37,11 @@ public class Screening {
     @JoinColumn(name = "movie_id")
     @JsonIgnoreProperties("screenings")
     private Movie movie;
+
+    @OneToMany
+    @JoinColumn(name = "ticket_id")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
 
     public Screening() {
     }

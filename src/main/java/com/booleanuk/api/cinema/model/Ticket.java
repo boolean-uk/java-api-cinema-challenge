@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.cglib.core.Local;
 
@@ -24,6 +25,16 @@ public class Ticket {
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    @JsonIgnoreProperties("tickets")
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "screening_id")
+    @JsonIgnoreProperties("tickets")
+    private Screening screening;
 
     public Ticket() {
 
@@ -68,5 +79,21 @@ public class Ticket {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Screening getScreening() {
+        return screening;
+    }
+
+    public void setScreening(Screening screening) {
+        this.screening = screening;
     }
 }
