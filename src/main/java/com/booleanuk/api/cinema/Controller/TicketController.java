@@ -1,13 +1,97 @@
 package com.booleanuk.api.cinema.Controller;
 
+import com.booleanuk.api.cinema.Model.Customer;
+import com.booleanuk.api.cinema.Model.Movie;
+import com.booleanuk.api.cinema.Model.Screening;
+import com.booleanuk.api.cinema.Model.Ticket;
+import com.booleanuk.api.cinema.Repository.CustomerRepository;
+import com.booleanuk.api.cinema.Repository.MovieRepository;
+import com.booleanuk.api.cinema.Repository.ScreeningRepository;
+import com.booleanuk.api.cinema.Repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 @RestController
-@RequestMapping("tickets")
+@RequestMapping("customers/{customerId}/screenings/{screeningID}")
 public class TicketController {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
+
+    @PostMapping()
+    public ResponseEntity<Ticket> createTicket(@RequestBody Integer numseats, @PathVariable("screeningId") Integer
+            screeningId, @PathVariable("customerId") Integer customerId){
+
+
+        try {
+
+
+            Screening screening = this.screeningRepository.findById(
+                    screeningId).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that id exists")
+            );
+
+            Customer customer = this.customerRepository.findById(
+                    screeningId).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id exists")
+            );
+
+
+
+            Ticket ticket=new Ticket();
+            ticket.setNumSeats(numseats);
+            ticket.setCustomer(customer);
+            ticket.setScreening(screening);
+            return new ResponseEntity<Ticket>(this.ticketRepository.save(ticket),
+                    HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create ticket for the specified " +
+                    "customer/screening, please check all required fields are correct.");
+        }
+
+
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Ticket> getAll(@PathVariable("screeningId") Integer
+            screeningId, @PathVariable("customerId") Integer customerId) {
+        List<Ticket> allTickets=new ArrayList<>();
+
+
+        Customer customer = this.customerRepository.findById(
+                customerId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id exists")
+        );
+
+        Screening screening = this.screeningRepository.findById(
+                screeningId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id exists")
+        );
+
+        for (Ticket t:this.ticketRepository.findAll()){
+            if (t.getCustomer().getId()==customerId && t.getScreening().getId()==screeningId){
+                allTickets.add(t);
+            }
+        }
+
+        if(allTickets.size()==0){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No ticket for that customer and screening exists");
+        }
+
+
+        return (ResponseEntity<Ticket>) allTickets;
+
+    }
 }
