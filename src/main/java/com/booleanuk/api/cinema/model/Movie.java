@@ -2,6 +2,8 @@ package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,15 +17,19 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Title cannot be blank")
     @Column(name = "title", nullable = false)
     private String title;
 
+    @NotBlank(message = "Rating cannot be blank")
     @Column(name = "rating", nullable = false)
     private String rating;
 
+    @NotBlank(message = "Description cannot be blank")
     @Column(name = "description", nullable = false)
     private String description;
 
+    @NotNull(message = "Runtime must be specified")
     @Column(name = "runtime_min", nullable = false)
     private int runtimeMin;
 
