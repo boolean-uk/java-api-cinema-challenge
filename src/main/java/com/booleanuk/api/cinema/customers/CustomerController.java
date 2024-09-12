@@ -31,8 +31,8 @@ public class CustomerController extends GenericController<Customer> {
     var screening = this.screeningRepository.findById(screeningId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-    ticket.setCustomerId(customer);
-    ticket.setScreeningId(screening);
+    ticket.setCustomer(customer);
+    ticket.setScreening(screening);
     try {
       return ResponseEntity.status(HttpStatus.CREATED).body(this.ticketRepository.save(ticket));
     } catch (DataIntegrityViolationException e) {
@@ -49,7 +49,7 @@ public class CustomerController extends GenericController<Customer> {
 
     try {
       return ResponseEntity.ok(this.ticketRepository.findAll().stream()
-          .filter(ticket -> ticket.getCustomerId().getId() == customerId && ticket.getScreeningId().getId() == screeningId)
+          .filter(ticket -> ticket.getCustomer().getId() == customerId && ticket.getScreening().getId() == screeningId)
           .toList()
       );
     } catch (Exception e) {

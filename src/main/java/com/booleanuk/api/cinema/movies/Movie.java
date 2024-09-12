@@ -39,9 +39,9 @@ public class Movie implements Serializable, GenericEntity<Movie> {
   private String createdAt = LocalDateTime.now().toString();
 
   // We could json-ignore this, since it's not specified in the spec, but I prefer having it in.
-  @OneToMany(mappedBy = "movieId", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonIgnoreProperties(value = "movieId")
-  List<Screening> screenings = new ArrayList<>();
+  @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnoreProperties(value = "movie", allowSetters = true)
+  private List<Screening> screenings = new ArrayList<>();
 
   @Column(nullable = false)
   private String updatedAt = this.createdAt;

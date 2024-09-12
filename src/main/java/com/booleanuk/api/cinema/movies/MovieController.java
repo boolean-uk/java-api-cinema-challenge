@@ -23,6 +23,20 @@ public class MovieController extends GenericController<Movie> {
   }
 
   @Override
+  public ResponseEntity<Movie> post(@RequestBody Movie movie) {
+    try {
+      movie.getScreenings().forEach(screening -> {
+        screening.setMovie(movie);
+        this.screeningRepository.save(screening);
+      });
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(movie));
+    } catch (DataIntegrityViolationException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  @Override
   public ResponseEntity<Movie> put(@PathVariable int id, @RequestBody Movie movie) {
     return this.repository.findById(id).map(existing -> {
       existing.update(movie);
@@ -34,11 +48,9 @@ public class MovieController extends GenericController<Movie> {
   @PostMapping(value = "{id}/screenings")
   public ResponseEntity<Screening> postScreening(@PathVariable int id, @RequestBody Screening screening) {
     try {
-      var movie = this.repository.findById(id);
-      if (movie.isEmpty())
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      var movie = this.repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+      screening.setMovie(movie);
 
-      screening.setMovieId(movie.get());
       return ResponseEntity.status(HttpStatus.CREATED).body(this.screeningRepository.save(screening));
     } catch (DataIntegrityViolationException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -52,7 +64,7 @@ public class MovieController extends GenericController<Movie> {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
     return ResponseEntity.ok(this.screeningRepository.findAll().stream()
-        .filter(screening -> screening.getMovieId().getId() == id)
+        .filter(screening -> screening.getMovie().getId() == id)
         .toList());
   }
 }

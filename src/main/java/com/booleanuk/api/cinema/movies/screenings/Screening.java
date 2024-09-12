@@ -17,10 +17,10 @@ public class Screening implements Serializable, GenericEntity<Screening> {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   @JsonIgnoreProperties(value = {"screenings"})
   @JoinColumn(name = "movie_id")
-  private Movie movieId;
+  private Movie movie;
 
   @Column(nullable = false)
   private int screenNumber;

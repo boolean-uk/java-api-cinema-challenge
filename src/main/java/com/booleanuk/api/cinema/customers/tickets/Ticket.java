@@ -16,11 +16,11 @@ public class Ticket implements GenericEntity<Ticket> {
 
   @ManyToOne
   @JoinColumn(name = "customer_id")
-  private Customer customerId;
+  private Customer customer;
 
   @ManyToOne
   @JoinColumn(name = "screening_id")
-  private Screening screeningId;
+  private Screening screening;
 
   @Column(nullable = false)
   private int numSeats;
