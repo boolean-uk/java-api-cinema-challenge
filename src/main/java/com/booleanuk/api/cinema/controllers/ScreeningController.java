@@ -28,12 +28,11 @@ public class ScreeningController {
     @Autowired
     private TicketRepository ticketRepository;
 
-
-    //Need to fix to specific id
     @GetMapping
-    public List<Screening> getAllCustomers (@PathVariable int id) {
+    public ResponseEntity<Movie> getAllCustomers (@PathVariable int id) {
+        Movie movie = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
 
-        return this.screeningRepository.findAll();
+        return ResponseEntity.ok(movie);
     }
 
     @PostMapping
@@ -44,7 +43,6 @@ public class ScreeningController {
         screening.setCreatedAt(LocalDateTime.now());
         screening.setUpdatedAt(LocalDateTime.now());
         movie.addScreening(screening);
-
 
         return new ResponseEntity<Screening>(this.screeningRepository.save(screening), HttpStatus.CREATED);
     }

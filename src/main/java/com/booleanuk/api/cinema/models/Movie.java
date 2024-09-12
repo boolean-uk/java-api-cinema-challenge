@@ -47,13 +47,11 @@ public class Movie {
         this.id = id;
     }
 
-    public Movie(String title, String rating, String description, int runtimeMins, LocalDateTime createdTime, LocalDateTime updatedTime){
+    public Movie(String title, String rating, String description, int runtimeMins){
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        this.createdTime = createdTime;
-        this.updatedTime = updatedTime;
     }
 
 

@@ -56,13 +56,11 @@ public class Screening {
         this.startsAt = startsAt;
     }
 
-    public Screening(int id, int screenNumber, LocalDateTime startsAt, int capacity, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Screening(int id, int screenNumber, LocalDateTime startsAt, int capacity) {
         this.id = id;
         this.screenNumber = screenNumber;
         this.startsAt = startsAt;
         this.capacity = capacity;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public int getId() {
