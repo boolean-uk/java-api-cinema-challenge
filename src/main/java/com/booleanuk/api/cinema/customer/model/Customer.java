@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.model;
+package com.booleanuk.api.cinema.customer.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,30 +12,27 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "movies")
-public class Movie {
-    public Movie (String title, String rating, String description, int runtimeMins) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMins = runtimeMins;
+@Table(name = "customers")
+public class Customer {
+
+    public Customer (String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "rating", nullable = false)
-    private String rating;
+    @Column(name = "email", nullable = false)
+    private String email;
 
-    @Column(name = "description", nullable = false)
-    private String description;
-
-    @Column(name = "runtimeMins", nullable = false)
-    private int runtimeMins;
+    @Column(name = "phone", nullable = false)
+    private String phone;
 
     @Column(name = "createdAt", nullable = false)
     private OffsetDateTime createdAt;

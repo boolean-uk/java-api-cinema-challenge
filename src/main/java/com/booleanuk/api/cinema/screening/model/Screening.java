@@ -1,5 +1,9 @@
-package com.booleanuk.api.cinema.model;
+package com.booleanuk.api.cinema.screening.model;
 
+import com.booleanuk.api.cinema.movie.model.Movie;
+import com.booleanuk.api.cinema.ticket.model.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "Screening")
+@Table(name = "screenings")
 public class Screening {
     public Screening (int screenNumber, int capacity, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
@@ -28,8 +32,10 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "movieId")
-    private int movieId;
+    @ManyToOne
+    @JsonIncludeProperties(value = {})
+    @JoinColumn(name = "movieId")
+    private Movie movie;
 
     @Column(name = "screenNumber", nullable = false)
     private int screenNumber;
@@ -45,6 +51,10 @@ public class Screening {
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "screenings", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("screenings")
+    private List<Ticket> screeningTickets;
 
     @PrePersist
     private void onCreate() {
