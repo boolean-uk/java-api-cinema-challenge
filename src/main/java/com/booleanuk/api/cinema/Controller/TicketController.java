@@ -65,7 +65,7 @@ public class TicketController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Ticket> getAll(@PathVariable("screeningId") Integer
+    public ResponseEntity<List<Ticket>> getAll(@PathVariable("screeningId") Integer
             screeningId, @PathVariable("customerId") Integer customerId) {
         List<Ticket> allTickets=new ArrayList<>();
 
@@ -80,18 +80,7 @@ public class TicketController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id exists")
         );
 
-        for (Ticket t:this.ticketRepository.findAll()){
-            if (t.getCustomer().getId()==customerId && t.getScreening().getId()==screeningId){
-                allTickets.add(t);
-            }
-        }
-
-        if(allTickets.size()==0){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No ticket for that customer and screening exists");
-        }
-
-
-        return (ResponseEntity<Ticket>) allTickets;
+        return new ResponseEntity<List<Ticket>>(screening.getTickets(), HttpStatus.FOUND);
 
     }
 }

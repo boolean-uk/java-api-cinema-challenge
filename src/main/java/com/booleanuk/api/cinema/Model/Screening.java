@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class Screening {
     private Movie movie;
 
     @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties(value ={"screenings", "tickets", "movie","customer","screening"})
     private List<Ticket> tickets;
 
 

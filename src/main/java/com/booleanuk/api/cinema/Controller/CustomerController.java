@@ -19,7 +19,7 @@ public class CustomerController {
 
 
     @PostMapping
-    public ResponseEntity<Customer> createAuthor(@RequestBody Customer customer){
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
         try {
             return new ResponseEntity<Customer>(this.repository.save(customer),
                     HttpStatus.CREATED);

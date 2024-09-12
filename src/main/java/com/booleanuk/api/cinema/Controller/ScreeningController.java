@@ -51,7 +51,7 @@ public class ScreeningController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Screening> getAll(@PathVariable("id") Integer id) {
+    public ResponseEntity<List<Screening>> getAll(@PathVariable("id") Integer id) {
         List<Screening> allMovs=new ArrayList<>();
 
 
@@ -60,20 +60,12 @@ public class ScreeningController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id exists")
         );
 
-        for (Screening s:this.screeningRepository.findAll()){
-            if (s.getMovie().getId()==id){
-                allMovs.add(s);
-            }
-        }
 
-        if (allMovs.size()==0){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id exists");
-        }
-
-
-        return (ResponseEntity<Screening>) allMovs;
+        return new ResponseEntity<List<Screening>>(movie.getScreenings(), HttpStatus.FOUND);
 
     }
+
+
 
 
 
