@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.movies.screenings;
 
+import com.booleanuk.api.cinema.movies.Movie;
 import com.booleanuk.api.generic.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +17,11 @@ public class Screening implements Serializable, GenericEntity<Screening> {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
+  @ManyToOne
+  @JsonIgnoreProperties(value = {"screenings"})
+  @JoinColumn(name = "movie_id")
+  private Movie movieId;
+
   @Column(nullable = false)
   private int screenNumber;
 
@@ -26,22 +33,13 @@ public class Screening implements Serializable, GenericEntity<Screening> {
   private String startsAt;
 
   @Column(nullable = false)
-  private String createdAt;
+  private String createdAt = LocalDateTime.now().toString();
 
   @Column(nullable = false)
-  private String updatedAt;
-
-  public Screening(int screenNumber, int capacity, String startsAt) {
-    this.screenNumber = screenNumber;
-    this.capacity = capacity;
-    this.startsAt = startsAt;
-    this.createdAt = LocalDateTime.now().toString();
-    this.updatedAt = this.createdAt;
-  }
+  private String updatedAt = this.createdAt;
 
   @Override
   public void update(Screening source) {
-    this.id = source.id;
     this.screenNumber = source.screenNumber;
     this.capacity = source.capacity;
     this.startsAt = source.startsAt;

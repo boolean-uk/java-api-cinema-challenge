@@ -1,12 +1,17 @@
 package com.booleanuk.api.cinema.movies;
 
+import com.booleanuk.api.cinema.movies.screenings.Screening;
 import com.booleanuk.api.generic.GenericEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -30,9 +35,18 @@ public class Movie implements Serializable, GenericEntity<Movie> {
   @Column(nullable = false)
   private int runtimeMins;
 
+  @Column(nullable = false)
+  private String createdAt = LocalDateTime.now().toString();
+
+  @OneToMany(mappedBy = "movieId", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnoreProperties(value = "movieId")
+  List<Screening> screenings = new ArrayList<>();
+
+  @Column(nullable = false)
+  private String updatedAt = this.createdAt;
+
   @Override
   public void update(Movie source) {
-    this.id = source.id;
     this.title = source.title;
     this.rating = source.rating;
     this.description = source.description;

@@ -38,9 +38,9 @@ abstract public class GenericController<Entity extends GenericEntity<Entity>> {
 
   @PutMapping(value = "{id}")
   public ResponseEntity<Entity> put(@PathVariable int id, @RequestBody Entity entity) {
-    var existing = this.repository.findById(id);
-    return existing.map(x -> {
-      return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(x));
+    return this.repository.findById(id).map(existing -> {
+      existing.update(entity);
+      return ResponseEntity.status(HttpStatus.CREATED).body(this.repository.save(existing));
     }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No entity with id '" + id + "' was found"));
   }
 
