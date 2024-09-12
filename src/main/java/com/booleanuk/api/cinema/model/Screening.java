@@ -38,6 +38,11 @@ public class Screening {
     @JsonIgnore()
     private Movie movie;
 
+    @OneToMany(mappedBy = "screening")
+    @JsonIgnoreProperties("screening")
+    private List<Ticket> tickets;
+
+
     public Screening() {}
 
     public Screening(Integer screenNumber, Date startsAt, Integer capacity, Date createdAt, Date updatedAt, Movie movie) {
@@ -113,5 +118,17 @@ public class Screening {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public void addTicket(Ticket ticket){
+        this.tickets.add(ticket);
     }
 }

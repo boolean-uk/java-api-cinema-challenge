@@ -98,7 +98,7 @@ public class Movie {
         this.description = description;
     }
 
-    public int getRunTimesMins() {
+    public Integer getRunTimesMins() {
         return runTimesMins;
     }
 

@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -29,7 +30,7 @@ public class Customer {
     private Date updatedAt;
 
     @OneToMany(mappedBy = "customer")
-    @JsonIgnoreProperties("customer")
+    @JsonIgnore
     private List<Ticket> tickets;
 
     public Customer(Integer id, String name, String email, String phone, Date createdAt, Date updatedAt) {
@@ -104,5 +105,18 @@ public class Customer {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public void addTicket(Ticket ticket){
+        this.tickets.add(ticket);
     }
 }

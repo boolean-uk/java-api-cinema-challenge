@@ -1,8 +1,10 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,10 +17,20 @@ public class Ticket {
     @Column(name = "numSeats")
     private Integer numSeats;
 
-    @ManyToOne(cascade = { CascadeType.ALL })
-    private Movie movie;
+    @Column(name = "createdAt")
+    private Date createdAt;
 
-    @ManyToOne(cascade = { CascadeType.ALL })
+    @Column(name = "updatedAt")
+    private Date updatedAt;
+
+    @ManyToOne()
+    @JsonIgnore
+    @JoinColumn(name = "screening_id", nullable = false)
+    private Screening screening;
+
+    @ManyToOne()
+    @JsonIgnore
+    @JoinColumn(name = "customer_id", nullable = false)
     private  Customer customer;
 
     public Ticket(Integer numSeats) {
@@ -48,15 +60,31 @@ public class Ticket {
         return customer;
     }
 
-    public Movie getMovie() {
-        return movie;
+    public Screening getScreening() {
+        return screening;
     }
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    public void setMovie(Movie movie) {
-        this.movie = movie;
+    public void setScreening(Screening screening) {
+        this.screening = screening;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
