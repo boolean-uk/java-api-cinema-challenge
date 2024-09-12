@@ -59,7 +59,7 @@ public class TicketController {
 
         //Check that maximum capacity is not exceeded
         int ticketsRemaining = screening.getCapacity() - ticket.getNumSeats();
-        for (Ticket ticketToCount : this.ticketRepository.findByCustomerAndScreening(customer, screening)) {
+        for (Ticket ticketToCount : this.ticketRepository.findByScreening(screening)) {
             ticketsRemaining -= ticketToCount.getNumSeats();
         }
 
