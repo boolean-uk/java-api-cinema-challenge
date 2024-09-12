@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -39,6 +43,10 @@ public class Screening {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Movie movie;
 
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Ticket> tickets;
+
     public Screening(Integer screenNumber, Integer capacity, OffsetDateTime startsAt, Movie movie) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
@@ -47,6 +55,7 @@ public class Screening {
         this.createdAt = now;
         this.updatedAt = now;
         this.movie = movie;
+        this.tickets = new ArrayList<>();
     }
 
     public Screening(int id) {
@@ -54,6 +63,7 @@ public class Screening {
         OffsetDateTime now = OffsetDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
+        this.tickets = new ArrayList<>();
     }
 
     @Override
