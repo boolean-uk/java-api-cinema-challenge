@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -31,6 +32,12 @@ public class Movie {
 
     @Column
     private int runtimeMins;
+
+    @Column
+    private LocalDateTime createdAt=LocalDateTime.now();
+
+    @Column
+    private LocalDateTime updatedAt=LocalDateTime.now();
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties(value ={"movie", "tickets"})

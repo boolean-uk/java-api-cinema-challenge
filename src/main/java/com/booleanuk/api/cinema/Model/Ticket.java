@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +21,12 @@ public class Ticket {
 
     @Column
     private int numSeats;
+
+    @Column
+    private LocalDateTime createdAt=LocalDateTime.now();
+
+    @Column
+    private LocalDateTime updatedAt=LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name="customerId", nullable = false)

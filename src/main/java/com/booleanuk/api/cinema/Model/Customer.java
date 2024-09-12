@@ -33,10 +33,13 @@ public class Customer {
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties(value ={"customer", "screening"})
     private List<Ticket> tickets;
-    /*
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-     */
+    @Column
+    private LocalDateTime createdAt=LocalDateTime.now();
+
+    @Column
+    private LocalDateTime updatedAt=LocalDateTime.now();
+
+
 
 }

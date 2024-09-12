@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @RestController
 @RequestMapping("movies")
@@ -48,6 +49,7 @@ public class MovieController {
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        movieToUpdate.setUpdatedAt(LocalDateTime.now());
         try{
             return new ResponseEntity<Movie>(this.repository.save(movieToUpdate
             ), HttpStatus.CREATED);

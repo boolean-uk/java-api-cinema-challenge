@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 @RestController
-@RequestMapping("customers/{customerId}/screenings/{screeningID}")
+@RequestMapping("customers/{customerId}/screenings/{screeningId}")
 public class TicketController {
 
     @Autowired
@@ -64,7 +64,7 @@ public class TicketController {
 
     }
 
-    @GetMapping("{id}")
+    @GetMapping()
     public ResponseEntity<List<Ticket>> getAll(@PathVariable("screeningId") Integer
             screeningId, @PathVariable("customerId") Integer customerId) {
         List<Ticket> allTickets=new ArrayList<>();
