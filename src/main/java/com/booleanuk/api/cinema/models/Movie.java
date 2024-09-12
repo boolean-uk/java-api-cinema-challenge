@@ -47,7 +47,6 @@ public class Movie {
     private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie")
-    @JsonIgnore
     private List<Screening> screenings;
 
     public Movie(Integer id) {
