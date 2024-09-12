@@ -2,15 +2,15 @@ package com.booleanuk.api.cinema.customer.controller;
 
 import com.booleanuk.api.cinema.customer.model.Customer;
 import com.booleanuk.api.cinema.customer.repository.CustomerRepository;
-import com.booleanuk.api.cinema.response.ErrorResponse;
 import com.booleanuk.api.cinema.response.ResponseInterface;
-import com.booleanuk.api.cinema.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
+
+import static com.booleanuk.api.cinema.response.ResponseFactory.*;
 
 @RestController
 @RequestMapping("/customers")
@@ -21,84 +21,72 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<ResponseInterface> addCustomer(@RequestBody Customer customer) {
-        ResponseInterface response;
-
         try {
             Customer newCustomer = this.customerRepository.save(customer);
-            response = new SuccessResponse<>(newCustomer);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return CreatedSuccessResponse(newCustomer);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+            return BadRequestErrorResponse();
         }
     }
 
     @GetMapping
     public ResponseEntity<ResponseInterface> getAllCustomers() {
-        ResponseInterface response = new SuccessResponse<>(this.customerRepository.findAll());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return OkSuccessResponse(this.customerRepository.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseInterface> getCustomerById(@PathVariable (name = "id") int id) {
-        ResponseInterface response;
-        Customer customer = findCustomerById(id);
-        if (customer == null) {
-            response = new ErrorResponse("not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        var customer = findCustomerById(id);
+        if (customer.isEmpty()) {
+            return NotFoundErrorResponse();
         }
-        response = new SuccessResponse<>(customer);
-        return ResponseEntity.ok(response);
+        return OkSuccessResponse(customer);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseInterface> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
-        ResponseInterface response;
-        Customer customerToUpdate = findCustomerById(id);
 
-        if (customerToUpdate == null) {
-            response = new ErrorResponse("not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        if (findCustomerById(id).isEmpty()) {
+            return NotFoundErrorResponse();
         }
 
         try {
-            customerToUpdate.setName(customer.getName());
-            customerToUpdate.setPhone(customer.getPhone());
-            customerToUpdate.setEmail(customer.getEmail());
-            customerToUpdate.setUpdatedAt(OffsetDateTime.now());
+            Customer customerToUpdate = findCustomerById(id).get();
+            updateCustomer(customerToUpdate, customer);
+            Customer updatedCustomer = this.customerRepository.save(customerToUpdate);
 
-            response = new SuccessResponse<>(this.customerRepository.save(customerToUpdate));
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return CreatedSuccessResponse(updatedCustomer);
 
         } catch (Exception e) {
-            response = new ErrorResponse("bad request");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return BadRequestErrorResponse();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseInterface> deleteCustomer(@PathVariable (name = "id") int id){
-        ResponseInterface response;
-        Customer customerToDelete = findCustomerById(id);
-
-        if (customerToDelete == null) {
-            response = new ErrorResponse("not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        if (findCustomerById(id).isEmpty()) {
+            return NotFoundErrorResponse();
         }
 
         try {
+            Customer customerToDelete = findCustomerById(id).get();
             this.customerRepository.delete(customerToDelete);
-            response = new SuccessResponse<>(customerToDelete);
-            return ResponseEntity.ok(response);
-
+            return OkSuccessResponse(customerToDelete);
         } catch (Exception e) {
-            response = new ErrorResponse("bad request");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return BadRequestErrorResponse();
         }
     }
 
     /* Helper functions */
-    private Customer findCustomerById(int id) {
-        return this.customerRepository.findById(id).orElse(null);
+    private Optional<Customer> findCustomerById(int id) {
+        return this.customerRepository.findById(id);
+    }
+
+    private void updateCustomer(Customer oldCustomer, Customer newCustomer) {
+        oldCustomer.setName(newCustomer.getName());
+        oldCustomer.setPhone(newCustomer.getPhone());
+        oldCustomer.setEmail(newCustomer.getEmail());
+        oldCustomer.setUpdatedAt(OffsetDateTime.now());
     }
 }
