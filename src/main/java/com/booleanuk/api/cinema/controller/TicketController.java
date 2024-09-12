@@ -14,9 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -47,8 +46,6 @@ public class TicketController {
         }
         ticketListResponse.set(tickets);
         return ResponseEntity.ok(ticketListResponse);
-        //ticketListResponse.set(this.repository.findAll());
-        //return ResponseEntity.ok(ticketListResponse);
     }
 
 
@@ -68,8 +65,6 @@ public class TicketController {
             error.set("not found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-        ticket.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        ticket.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
         ticket.setCustomer(customer);
         ticket.setScreening(screening);

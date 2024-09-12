@@ -8,14 +8,15 @@ import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.response.ScreeningListResponse;
 import com.booleanuk.api.cinema.response.ScreeningResponse;
 import com.booleanuk.api.cinema.response.ErrorResponse;
-import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -43,8 +44,6 @@ public class ScreeningController {
         }
         screeningListResponse.set(screenings);
         return ResponseEntity.ok(screeningListResponse);
-        //screeningListResponse.set(this.repository.findAll());
-        //return ResponseEntity.ok(screeningListResponse);
     }
 
 
@@ -58,8 +57,6 @@ public class ScreeningController {
             error.set("not found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-        screening.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        screening.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
         screening.setMovie(movie);
 

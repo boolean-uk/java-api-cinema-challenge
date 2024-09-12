@@ -9,9 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "screenings")
@@ -22,24 +24,31 @@ public class Screening {
 
     private Integer screenNumber;
     private Integer capacity;
-    private String startsAt;
-    private String createdAt;
-    private String updatedAt;
+    private OffsetDateTime startsAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIgnoreProperties(value = {"screenings", "movie"})
+    @JsonIgnoreProperties(value = {"screenings"})
     @JsonIgnore
     private Movie movie;
 
-    public Screening(Integer screenNumber, Integer capacity, String startsAt) {
+    public Screening(Integer screenNumber, Integer capacity, OffsetDateTime startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
         this.startsAt = startsAt;
+        this.createdAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        this.updatedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 
     public Screening(int id){
         this.id = id;
+    }
+
+    public Screening(){
+        this.createdAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        this.updatedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 }

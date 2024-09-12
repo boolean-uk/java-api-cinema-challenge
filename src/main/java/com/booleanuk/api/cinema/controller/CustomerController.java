@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("customers")
@@ -37,8 +36,6 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
-        customer.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        customer.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         CustomerResponse customerResponse = new CustomerResponse();
         customerResponse.set(this.repository.save(customer));
         return ResponseEntity.ok(customerResponse);
@@ -56,7 +53,7 @@ public class CustomerController {
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
-        customerToUpdate.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        customerToUpdate.setUpdatedAt(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 
         CustomerResponse customerResponse = new CustomerResponse();
         customerResponse.set(this.repository.save(customerToUpdate));

@@ -8,9 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "tickets")
@@ -20,8 +22,8 @@ public class Ticket {
     private Integer id;
 
     private Integer numSeats;
-    private String createdAt;
-    private String updatedAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 
 
     @ManyToOne
@@ -38,9 +40,16 @@ public class Ticket {
 
     public Ticket(Integer numSeats) {
         this.numSeats = numSeats;
+        this.createdAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        this.updatedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 
     public Ticket(int id){
         this.id = id;
+    }
+
+    public Ticket () {
+        this.createdAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        this.updatedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 }
