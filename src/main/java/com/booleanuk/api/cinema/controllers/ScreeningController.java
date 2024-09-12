@@ -1,6 +1,5 @@
 package com.booleanuk.api.cinema.controllers;
 
-import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -36,6 +35,8 @@ public class ScreeningController {
         screening.setMovie(movie);
         screening.setCreatedAt(LocalDateTime.now());
         screening.setUpdatedAt(LocalDateTime.now());
+        movie.addScreening(screening);
+
 
         return new ResponseEntity<Screening>(this.screeningRepository.save(screening), HttpStatus.CREATED);
     }

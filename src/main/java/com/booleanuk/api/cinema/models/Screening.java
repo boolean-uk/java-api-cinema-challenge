@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "screenings")
@@ -23,18 +24,19 @@ public class Screening {
     private int screenNumber;
 
     @Column(name = "starts_at")
-    private LocalDateTime startsAt = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startsAt;
 
     @Column(name = "capacity")
     private int capacity;
 
     @Column(name = "created_at")
-    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
 
     public Screening() {
     }

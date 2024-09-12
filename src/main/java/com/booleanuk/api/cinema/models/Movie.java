@@ -1,4 +1,5 @@
 package com.booleanuk.api.cinema.models;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -28,10 +29,12 @@ public class Movie {
     private int runtimeMins;
 
     @Column(name = "created_at")
-    private LocalDateTime createdTime = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdTime;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedTime = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedTime;
 
     @OneToMany(mappedBy = "movie")
     @JsonIgnoreProperties("movie")
@@ -117,5 +120,9 @@ public class Movie {
 
     public void setScreenings(List<Screening> screenings) {
         this.screenings = screenings;
+    }
+
+    public void addScreening(Screening screening){
+        this.screenings.add(screening);
     }
 }
