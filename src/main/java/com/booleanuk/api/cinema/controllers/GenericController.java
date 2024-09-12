@@ -15,62 +15,73 @@ public abstract class GenericController<T, ID> {
 
     @Autowired
     private JpaRepository<T, ID> repository;
+    private final Response<Object> response = new Response<>();
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        Response<Object> response = new Response<>();
         response.setSuccess(repository.findAll());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable ID id) {
-        Response<Object> response = new Response<>();
         T entity = repository.findById(id).orElse(null);
         if (entity == null) {
-            return new ResponseEntity<>(response.setError("not found"), HttpStatus.NOT_FOUND);
+            response.setError("not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
         response.setSuccess(entity);
-        return ResponseEntity.ok(entity);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<T> create(@RequestBody T entity) {
+    public ResponseEntity<?> create(@RequestBody T entity) {
         try {
             T newEntity = repository.save(entity);
+            response.setSuccess(newEntity);
             return new ResponseEntity<>(newEntity, HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not create entity, please check all required fields are correct.");
+            response.setError("Bad request");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable ID id, @RequestBody T entity) {
-        Response<Object> response = new Response<>();
-        Optional<T> existingEntityOptional  = repository.findById(id);
+        Optional<T> existingEntityOptional = repository.findById(id);
         if (existingEntityOptional.isEmpty()) {
-            return new ResponseEntity<>(response.setError("not found"), HttpStatus.NOT_FOUND);
+            response.setError("not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
         T existingEntity = existingEntityOptional.get();
 
-        System.out.println(existingEntity.toString() + " Existing2: " + id);
-        System.out.println(entity.toString() + " Entity: " + id);
         BeanUtils.copyProperties(entity, existingEntity, "id", "createdAt", "updatedAt", "screenings");
 
         try {
             T updatedEntity = repository.save(existingEntity);
-            return new ResponseEntity<>(updatedEntity, HttpStatus.CREATED);
+            response.setSuccess(updatedEntity);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update the entity, please check all required fields are correct.");
+            response.setError("Bad request");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<T> delete(@PathVariable ID id) {
-        T entityToDelete = repository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found"));
-        repository.deleteById(id);
-        return ResponseEntity.ok(entityToDelete);
+    public ResponseEntity<?> delete(@PathVariable ID id) {
+        T entityToDelete = repository.findById(id).orElse(null);
+        if (entityToDelete == null) {
+            response.setError("not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        try {
+            repository.deleteById(id);
+            response.setSuccess(entityToDelete);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setError("Bad request");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }
