@@ -1,14 +1,13 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -36,8 +35,8 @@ public class Screening {
     private OffsetDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIgnoreProperties("screenings")
+    @JoinColumn(name = "movie", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Movie movie;
 
     public Screening(Integer screenNumber, Integer capacity, OffsetDateTime startsAt, Movie movie) {
@@ -52,6 +51,9 @@ public class Screening {
 
     public Screening(int id) {
         this.id = id;
+        OffsetDateTime now = OffsetDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     @Override

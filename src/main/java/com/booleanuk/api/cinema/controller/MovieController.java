@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +37,16 @@ public class MovieController {
         }
 
         Movie movie = new Movie(movieDetails.getTitle(), movieDetails.getRating(), movieDetails.getDescription(), movieDetails.getRuntimeMins());
+        //I need to save the movie in order to use it as an argument in the screening below
+        repository.save(movie);
+
+        if (movieDetails.getScreenings() != null && !movieDetails.getScreenings().isEmpty()) {
+            for (Screening screeningDetails : movieDetails.getScreenings()) {
+                Screening screening = new Screening(screeningDetails.getScreenNumber(), screeningDetails.getCapacity(), screeningDetails.getStartsAt(), movie);
+                movie.getScreenings().add(sRepository.save(screening));
+            }
+        }
+        // Save again to apply changes to screenings
         ApiResponse<Movie> response = new ApiResponse<>("success", repository.save(movie));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -79,7 +88,7 @@ public class MovieController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
-        List<Screening> screenings = this.sRepository.findAll();
+        List<Screening> screenings = this.sRepository.findByMovieId(id);
         ApiResponse<List<Screening>> response = new ApiResponse<>("success", screenings);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

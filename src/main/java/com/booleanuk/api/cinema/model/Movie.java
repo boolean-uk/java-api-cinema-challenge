@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public class Movie {
     private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("movie")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Screening> screenings;
 
     public Movie(String title, String rating, String description, Integer runtimeMins) {
@@ -47,6 +47,16 @@ public class Movie {
         createdAt = OffsetDateTime.now();
         updatedAt = OffsetDateTime.now();
         screenings = new ArrayList<>();
+    }
+
+    public Movie(String title, String rating, String description, Integer runtimeMins, List<Screening> screenings) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        createdAt = OffsetDateTime.now();
+        updatedAt = OffsetDateTime.now();
+        this.screenings = new ArrayList<>(screenings);
     }
 
     public Movie(int id) {
