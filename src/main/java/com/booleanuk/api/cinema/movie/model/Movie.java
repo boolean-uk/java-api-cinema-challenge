@@ -1,7 +1,7 @@
 package com.booleanuk.api.cinema.movie.model;
 
 import com.booleanuk.api.cinema.screening.model.Screening;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +17,12 @@ import java.util.List;
 @Entity
 @Table(name = "movies")
 public class Movie {
-    public Movie (String title, String rating, String description, int runtimeMins, List<Screening> movieScreenings) {
+    public Movie (String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.runtimeMins = runtimeMins;
-        this.movieScreenings = movieScreenings;
+        this.screenings = screenings;
     }
 
     @Id
@@ -47,9 +47,10 @@ public class Movie {
     @Column(name = "updatedAt", nullable = false)
     private OffsetDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("movies")
-    private List<Screening> movieScreenings;
+    /* Ignore this list in response */
+    private List<Screening> screenings;
 
     @PrePersist
     private void onCreate() {

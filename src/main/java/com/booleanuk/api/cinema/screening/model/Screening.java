@@ -1,9 +1,7 @@
 package com.booleanuk.api.cinema.screening.model;
 
 import com.booleanuk.api.cinema.movie.model.Movie;
-import com.booleanuk.api.cinema.ticket.model.Ticket;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +10,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -33,7 +30,7 @@ public class Screening {
     private int id;
 
     @ManyToOne
-    @JsonIncludeProperties(value = {})
+    @JsonIgnore
     @JoinColumn(name = "movieId")
     private Movie movie;
 
@@ -51,10 +48,6 @@ public class Screening {
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("screenings")
-    private List<Ticket> screeningTickets;
 
     @PrePersist
     private void onCreate() {

@@ -2,7 +2,7 @@ package com.booleanuk.api.cinema.ticket.model;
 
 import com.booleanuk.api.cinema.customer.model.Customer;
 import com.booleanuk.api.cinema.screening.model.Screening;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,13 +20,13 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @JsonIgnore
     @ManyToOne
-    @JsonIncludeProperties(value = {})
     @JoinColumn(name = "customerId", nullable = false)
     private Customer customer;
 
+    @JsonIgnore
     @ManyToOne
-    @JsonIncludeProperties(value = {})
     @JoinColumn(name = "screeningId", nullable = false)
     private Screening screening;
 
@@ -38,4 +38,13 @@ public class Ticket {
 
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    private void onCreate() {
+        /*
+        This method is called before the entity manager saves the entity to the database.
+         */
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

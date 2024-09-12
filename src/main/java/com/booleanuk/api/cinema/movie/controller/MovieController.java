@@ -1,19 +1,21 @@
 package com.booleanuk.api.cinema.movie.controller;
 
 import com.booleanuk.api.cinema.movie.model.Movie;
+import com.booleanuk.api.cinema.movie.model.MovieDTO;
 import com.booleanuk.api.cinema.movie.repository.MovieRepository;
 import com.booleanuk.api.cinema.response.ResponseInterface;
 import com.booleanuk.api.cinema.screening.model.Screening;
 import com.booleanuk.api.cinema.screening.model.ScreeningDTO;
 import com.booleanuk.api.cinema.screening.repository.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.booleanuk.api.cinema.response.ResponseFactory.*;
 
@@ -28,17 +30,25 @@ public class MovieController {
     ScreeningRepository screeningRepository;
 
     @PostMapping
-    public ResponseEntity<ResponseInterface> addMovie(@RequestBody Movie movie) {
+    public ResponseEntity<ResponseInterface> addMovie(@RequestBody MovieDTO movieDTO) {
         try {
+            List<Screening> screenings = convertScreeningDTOList(movieDTO.getScreenings());
 
-            return CreatedSuccessResponse(this.movieRepository.save(movie));
+            Movie movie = extractMovieFromMovieDTO(movieDTO);
+            movie.setScreenings(screenings);
+            movie = this.movieRepository.save(movie);
+
+            addMovieToScreenings(screenings, movie);
+            saveScreenings(screenings);
+
+            return CreatedSuccessResponse(movie);
         } catch (Exception e) {
             return BadRequestErrorResponse();
         }
     }
 
     @GetMapping
-    public ResponseEntity<ResponseInterface> getAllMovies() throws ResponseStatusException {
+    public ResponseEntity<ResponseInterface> getAllMovies() {
         return OkSuccessResponse(this.movieRepository.findAll());
     }
 
@@ -64,7 +74,7 @@ public class MovieController {
             update(movieToUpdate, updatedMovie);
             return CreatedSuccessResponse(this.movieRepository.save(movieToUpdate));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occurred when attempting to update movie: " + e.getMessage());
+            return BadRequestErrorResponse();
         }
     }
 
@@ -102,7 +112,8 @@ public class MovieController {
         if (movie == null) {
             return NotFoundErrorResponse();
         }
-        return OkSuccessResponse(movie.getMovieScreenings());
+
+        return OkSuccessResponse(this.screeningRepository.findScreeningsByMovie(movie));
     }
 
 
@@ -117,11 +128,34 @@ public class MovieController {
         return this.movieRepository.findById(id).orElse(null);
     }
 
+    private List<Screening> convertScreeningDTOList(List<ScreeningDTO> screeningDTOList) {
+        List<Screening> screenings = new ArrayList<>();
+        screeningDTOList.forEach(s -> screenings.add(convertFromDTO(s)));
+        return screenings;
+    }
+
     private void update(Movie oldMovie, Movie newMovie) {
         oldMovie.setTitle(newMovie.getTitle());
         oldMovie.setRating(newMovie.getRating());
         oldMovie.setDescription(newMovie.getDescription());
         oldMovie.setRuntimeMins(newMovie.getRuntimeMins());
         oldMovie.setUpdatedAt(OffsetDateTime.now());
+    }
+
+    private Movie extractMovieFromMovieDTO(MovieDTO movieDTO){
+        Movie movie = new Movie();
+        movie.setTitle(movieDTO.getTitle());
+        movie.setRating(movieDTO.getRating());
+        movie.setDescription(movieDTO.getDescription());
+        movie.setRuntimeMins(movieDTO.getRuntimeMins());
+        return movie;
+    }
+
+    private void saveScreenings(List<Screening> screenings){
+        screenings.forEach(s -> this.screeningRepository.save(s));
+    }
+
+    private void addMovieToScreenings(List<Screening> screenings, Movie movie) {
+        screenings.forEach(s -> s.setMovie(movie));
     }
 }

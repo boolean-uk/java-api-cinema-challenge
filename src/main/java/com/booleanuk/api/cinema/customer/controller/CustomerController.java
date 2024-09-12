@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 import static com.booleanuk.api.cinema.response.ResponseFactory.*;
 
@@ -47,21 +46,21 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseInterface> getCustomerById(@PathVariable (name = "id") int id) {
-        if (findCustomerById(id).isEmpty()) {
+        if (this.customerRepository.findById(id).isEmpty()) {
             return NotFoundErrorResponse();
         }
-        return OkSuccessResponse(findCustomerById(id).get());
+        return OkSuccessResponse(this.customerRepository.findById(id).get());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseInterface> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
 
-        if (findCustomerById(id).isEmpty()) {
+        if (this.customerRepository.findById(id).isEmpty()) {
             return NotFoundErrorResponse();
         }
 
         try {
-            Customer customerToUpdate = findCustomerById(id).get();
+            Customer customerToUpdate = this.customerRepository.findById(id).get();
             update(customerToUpdate, customer);
             Customer updatedCustomer = this.customerRepository.save(customerToUpdate);
 
@@ -74,12 +73,12 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseInterface> deleteCustomer(@PathVariable (name = "id") int id){
-        if (findCustomerById(id).isEmpty()) {
+        if (this.customerRepository.findById(id).isEmpty()) {
             return NotFoundErrorResponse();
         }
 
         try {
-            Customer customerToDelete = findCustomerById(id).get();
+            Customer customerToDelete = this.customerRepository.findById(id).get();
             this.customerRepository.delete(customerToDelete);
             return OkSuccessResponse(customerToDelete);
         } catch (Exception e) {
@@ -94,7 +93,11 @@ public class CustomerController {
                                                         @PathVariable (name = "screeningId") int screeningId,
                                                         @RequestBody Ticket ticket) {
 
-        if (this.customerRepository.findById(customerId).isEmpty() || this.screeningRepository.findById(screeningId).isEmpty()) {
+        if (this.customerRepository.findById(customerId).isEmpty()) {
+            return NotFoundErrorResponse();
+        }
+
+        if (this.screeningRepository.findById(screeningId).isEmpty()) {
             return NotFoundErrorResponse();
         }
 
@@ -114,7 +117,11 @@ public class CustomerController {
     public ResponseEntity<ResponseInterface> getAllTickets(@PathVariable (name = "customerId") int customerId,
                                                            @PathVariable (name = "screeningId") int screeningId) {
 
-        if (this.customerRepository.findById(customerId).isEmpty() || this.screeningRepository.findById(screeningId).isEmpty()) {
+        if (this.customerRepository.findById(customerId).isEmpty()) {
+            return NotFoundErrorResponse();
+        }
+
+        if (this.screeningRepository.findById(screeningId).isEmpty()) {
             return NotFoundErrorResponse();
         }
 
@@ -124,11 +131,6 @@ public class CustomerController {
         return OkSuccessResponse(this.ticketRepository.findAllByCustomerAndScreening(customer, screening));
     }
 
-
-    /* Helper functions */
-    private Optional<Customer> findCustomerById(int id) {
-        return this.customerRepository.findById(id);
-    }
 
     private void update(Customer oldCustomer, Customer newCustomer) {
         oldCustomer.setName(newCustomer.getName());
