@@ -6,15 +6,14 @@ import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.responses.TicketListResponse;
 import com.booleanuk.api.cinema.responses.TicketResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,8 +37,15 @@ public class TicketController {
     @PostMapping("{customerId}/screenings/{screeningId}")
         public ResponseEntity<Response<?>> createTicket(@PathVariable(name = "customerId") int customerId, @PathVariable(name = "screeningId") int screeningId, @RequestBody Ticket ticket){
 
-            Customer customer = this.customerRepository.findById(customerId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found 1.."));
-            Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found. 2."));
+            Customer customer = this.customerRepository.findById(customerId).orElse(null);
+            Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+
+            if (customer == null || screening == null){
+                ErrorResponse error = new ErrorResponse();
+                error.set("No customer or screening with those ids found");
+
+                new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            }
 
             ticket.setCustomer(customer);
             ticket.setScreening(screening);
@@ -55,12 +61,24 @@ public class TicketController {
     @GetMapping("{customerId}/screenings/{screeningId}")
     public ResponseEntity<Response<?>> getAllTickets (@PathVariable(name = "customerId") int customerId, @PathVariable(name = "screeningId") int screeningId){
 
-        Customer customer = this.customerRepository.findById(customerId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found ..1"));
-        Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found ..2"));
+        Customer customer = this.customerRepository.findById(customerId).orElse(null);
+        Screening screening = this.screeningRepository.findById(screeningId).orElse(null);
+        if (customer == null || screening == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer or screening with those ids found");
+
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
 
         List<Ticket> ticketList = this.ticketRepository.findAllByCustomerIdAndScreeningId(customer.getId(), screening.getId());
-        this.ticketListResponse.set(ticketList);
+        if (ticketList.isEmpty()){
+            ErrorResponse error = new ErrorResponse();
+            error.set("No ticket found for the customer and screening with those ids found");
 
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        this.ticketListResponse.set(ticketList);
         return ResponseEntity.ok(ticketListResponse);
     }
 

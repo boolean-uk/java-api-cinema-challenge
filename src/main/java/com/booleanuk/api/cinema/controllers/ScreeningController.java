@@ -6,6 +6,7 @@ import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
 import com.booleanuk.api.cinema.responses.ScreeningListResponse;
 import com.booleanuk.api.cinema.responses.ScreeningResponse;
@@ -36,7 +37,14 @@ public class ScreeningController {
 
     @GetMapping
     public ResponseEntity<Response<?>> getAllScreening(@PathVariable int id) {
-        Movie movie = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+        Movie movie = this.movieRepository.findById(id).orElse(null);
+        if (movie == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("No movie with that id found");
+
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
         List<Screening> screeningsList = this.screeningRepository.findByMovie(movie);
         this.screeningListResponse.set(screeningsList);
 
@@ -45,7 +53,20 @@ public class ScreeningController {
 
     @PostMapping
     public ResponseEntity<Response<?>> createScreening(@PathVariable int id, @RequestBody Screening screening){
-        Movie movie = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found.."));
+        if (screening.getScreenNumber() <= 0 || screening.getCapacity() <= 0 || screening.getStartsAt() == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create a screening for the specified movie, please check all fields are correct");
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        Movie movie = this.movieRepository.findById(id).orElse(null);
+        if (movie == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("No movie with that id found");
+
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
 
         screening.setMovie(movie);
         screening.setCreatedAt(LocalDateTime.now());
@@ -54,7 +75,6 @@ public class ScreeningController {
 
         this.screeningRepository.save(screening);
         this.screeningResponse.set(screening);
-
 
         return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
     }

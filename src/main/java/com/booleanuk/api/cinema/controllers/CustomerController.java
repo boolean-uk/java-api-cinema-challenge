@@ -4,12 +4,12 @@ import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.responses.CustomerListResponse;
 import com.booleanuk.api.cinema.responses.CustomerResponse;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
 import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +34,14 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Response<?>> createCustomer(@RequestBody Customer customer){
+
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create a new customer, please check all fields are correct");
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
         customer.setCreatedAt(LocalDateTime.now());
         customer.setUpdatedAt(LocalDateTime.now());
         this.customerResponse.set(customer);
@@ -44,7 +52,19 @@ public class CustomerController {
 
     @PutMapping("{id}")
     public ResponseEntity<Response<?>> updateCustomer(@PathVariable int id, @RequestBody Customer customer){
-        Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found.."));
+
+        if (customer.getName() == null || customer.getEmail() == null || customer.getPhone() == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create a new customer, please check all fields are correct");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        Customer customerToUpdate = customerRepository.findById(id).orElse(null);
+        if(customerToUpdate == null){
+                ErrorResponse error = new ErrorResponse();
+                error.set("No customer with that ID found");
+                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
 
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
@@ -58,7 +78,14 @@ public class CustomerController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Response<?>> deleteCustomer(@PathVariable int id){
-        Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+
+        Customer customerToDelete = this.customerRepository.findById(id).orElse(null);
+        if (customerToDelete == null){
+            ErrorResponse error = new ErrorResponse();
+            error.set("No customer with that ID found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
         this.customerResponse.set(customerToDelete);
         this.customerRepository.delete(customerToDelete);
 
