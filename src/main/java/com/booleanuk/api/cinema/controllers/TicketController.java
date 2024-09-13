@@ -45,7 +45,13 @@ public class TicketController {
 
     @GetMapping("{customerId}/screenings/{screeningId}")
     public ResponseEntity<List<Ticket>> getAllTickets (@PathVariable(name = "customerId") int customerId, @PathVariable(name = "screeningId") int screeningId){
-        return null;
+
+        Customer customer = this.customerRepository.findById(customerId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found ..1"));
+        Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found ..2"));
+
+        List<Ticket> ticketList = this.ticketRepository.findAllByCustomerIdAndScreeningId(customer.getId(), screening.getId());
+
+        return ResponseEntity.ok(ticketList);
     }
 
 }

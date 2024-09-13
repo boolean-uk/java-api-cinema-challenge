@@ -32,8 +32,6 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie){
-        List<Screening> screenings = movie.getScreenings();
-
         movie.setCreatedTime(LocalDateTime.now());
         movie.setUpdatedTime(LocalDateTime.now());
 
