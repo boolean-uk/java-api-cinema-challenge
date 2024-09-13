@@ -6,6 +6,7 @@ import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.responses.ScreeningResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +30,12 @@ public class ScreeningController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public ResponseEntity<Movie> getAllCustomers (@PathVariable int id) {
+    public ResponseEntity<List<Screening>> getAllScreening(@PathVariable int id) {
         Movie movie = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
 
-        return ResponseEntity.ok(movie);
+        List<Screening> screeningsList = this.screeningRepository.findByMovie(movie);
+
+        return ResponseEntity.ok(screeningsList);
     }
 
     @PostMapping
