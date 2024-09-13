@@ -5,6 +5,9 @@ import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.responses.MovieListResponse;
+import com.booleanuk.api.cinema.responses.MovieResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,21 +28,30 @@ public class MovieController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    private MovieResponse movieResponse = new MovieResponse();
+    private MovieListResponse movieListResponse = new MovieListResponse();
+
     @GetMapping
-    public List<Movie> getAllMovies(){
-        return this.movieRepository.findAll();
+    public ResponseEntity<Response<?>> getAllMovies(){
+        List<Movie> movies = this.movieRepository.findAll();
+        this.movieListResponse.set(movies);
+
+        return ResponseEntity.ok(movieListResponse);
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie){
+    public ResponseEntity<Response<?>> createMovie(@RequestBody Movie movie){
         movie.setCreatedTime(LocalDateTime.now());
         movie.setUpdatedTime(LocalDateTime.now());
 
-        return new ResponseEntity<Movie>(this.movieRepository.save(movie), HttpStatus.CREATED);
+        this.movieRepository.save(movie);
+        this.movieResponse.set(movie);
+
+        return new ResponseEntity<>(movieResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie){
+    public ResponseEntity<Response<?>> updateMovie(@PathVariable int id, @RequestBody Movie movie){
         Movie movieToUpdate = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
 
         movieToUpdate.setTitle(movie.getTitle());
@@ -47,14 +59,19 @@ public class MovieController {
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
 
-        return new ResponseEntity<Movie>(this.movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+        this.movieRepository.save(movieToUpdate);
+        this.movieResponse.set(movieToUpdate);
+
+        return new ResponseEntity<>(movieResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id){
+    public ResponseEntity<Response<?>> deleteMovie(@PathVariable int id){
         Movie movieToDelete = this.movieRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
 
         this.movieRepository.delete(movieToDelete);
-        return ResponseEntity.ok(movieToDelete);
+        this.movieResponse.set(movieToDelete);
+
+        return ResponseEntity.ok(movieResponse);
     }
 }
