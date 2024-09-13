@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "movies")
 public class Movie {
-    public Movie (String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
+    public Movie (String title, String rating, String description, Integer runtimeMins, List<Screening> screenings) {
         this.title = title;
         this.rating = rating;
         this.description = description;
@@ -32,21 +32,15 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Bean validation framework. Validates object fields at application level.
-    @NotBlank(message = "Title is required")
     @Column(name = "title", nullable = false)
     private String title;
 
-    @NotBlank(message = "Rating is required")
     @Column(name = "rating", nullable = false)
     private String rating;
 
-    @NotBlank(message = "Description is required")
     @Column(name = "description", nullable = false)
     private String description;
 
-    // Validation check for non-string fields.
-    @NotNull(message = "RuntimeMins is required")
     @Column(name = "runtimeMins", nullable = false)
     private Integer runtimeMins;
 

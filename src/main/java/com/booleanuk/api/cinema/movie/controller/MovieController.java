@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.movie.controller;
 
+import com.booleanuk.api.cinema.mapper.MovieMapper;
 import com.booleanuk.api.cinema.movie.model.Movie;
+import com.booleanuk.api.cinema.movie.model.MovieRequestDTO;
 import com.booleanuk.api.cinema.movie.model.MovieResponseDTO;
 import com.booleanuk.api.cinema.movie.model.MovieUpdateDTO;
 import com.booleanuk.api.cinema.movie.repository.MovieRepository;
@@ -30,11 +32,16 @@ public class MovieController {
     @Autowired
     ScreeningRepository screeningRepository;
 
+    @Autowired
+    MovieMapper movieMapper;
+
     @PostMapping
-    public ResponseEntity<Response> addMovie(@Valid @RequestBody Movie movie, BindingResult result) {
+    public ResponseEntity<Response> addMovie(@Valid @RequestBody MovieRequestDTO movieRequestDTO, BindingResult result) {
         if (result.hasErrors()){
             return badRequestErrorResponse();
         }
+
+        Movie movie = movieMapper.toEntity(movieRequestDTO);
 
         // Set movie to each screening.
         if (movie.getScreenings() != null) {
@@ -45,7 +52,7 @@ public class MovieController {
         Movie savedMovie = this.movieRepository.save(movie);
 
         // Convert to DTO without screenings
-        MovieResponseDTO responseDTO = convertToResponseDTO(savedMovie);
+        MovieResponseDTO responseDTO = movieMapper.toResponseDTO(savedMovie);
 
         return createdSuccessResponse(responseDTO);
     }
@@ -54,26 +61,25 @@ public class MovieController {
     @GetMapping
     public ResponseEntity<Response> getAllMovies() {
         List<MovieResponseDTO> responseList = new ArrayList<>();
-        this.movieRepository.findAll().forEach(movie -> responseList.add(convertToResponseDTO(movie)));
+        this.movieRepository.findAll().forEach(movie -> responseList.add(movieMapper.toResponseDTO(movie)));
         return okSuccessResponse(responseList);
     }
 
 
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateMovie(@PathVariable (name = "id") int id,
-                                                @Valid @RequestBody MovieUpdateDTO updatedMovie,
+                                                @Valid @RequestBody MovieUpdateDTO updatedMovieDTO,
                                                 BindingResult result) {
 
         if (result.hasErrors()) {
             return badRequestErrorResponse();
-
         }
 
         return this.movieRepository.findById(id)
                 .map(movieToUpdate -> {
-                    updateMovieDetails(movieToUpdate, updatedMovie);
+                    updateMovieDetails(movieToUpdate, updatedMovieDTO);
                     Movie savedMovie = this.movieRepository.save(movieToUpdate);
-                    MovieResponseDTO responseDTO = convertToResponseDTO(savedMovie);
+                    MovieResponseDTO responseDTO = movieMapper.toResponseDTO(savedMovie);
                     return createdSuccessResponse(responseDTO);
                 }).orElseGet(ResponseFactory::notFoundErrorResponse);
     }
@@ -83,7 +89,7 @@ public class MovieController {
         return this.movieRepository.findById(id)
                 .map(movie -> {
                     this.movieRepository.delete(movie);
-                    MovieResponseDTO responseDTO = convertToResponseDTO(movie);
+                    MovieResponseDTO responseDTO = movieMapper.toResponseDTO(movie);
                     return okSuccessResponse(responseDTO);
                 })
                 .orElseGet(ResponseFactory::notFoundErrorResponse);
