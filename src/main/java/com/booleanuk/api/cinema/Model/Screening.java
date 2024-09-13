@@ -22,10 +22,13 @@ public class Screening {
     private int id;
 
     @Column
-    int screenNumber;
+    private int screenNumber;
 
     @Column
-    int capacity;
+    private int capacity;
+
+    @Column
+    private String startsAt;
 
     @Column
     private LocalDateTime createdAt=LocalDateTime.now();
