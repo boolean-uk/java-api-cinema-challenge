@@ -2,19 +2,17 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
-import com.booleanuk.api.cinema.models.Ticket;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
-import com.booleanuk.api.cinema.responses.ErrorResponse;
-import com.booleanuk.api.cinema.responses.Response;
-import com.booleanuk.api.cinema.responses.ScreeningListResponse;
-import com.booleanuk.api.cinema.responses.ScreeningResponse;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.ScreeningListResponse;
+import com.booleanuk.api.cinema.response.ScreeningResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;

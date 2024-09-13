@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.responses;
+package com.booleanuk.api.cinema.response;
 
 import com.booleanuk.api.cinema.models.Movie;
 

@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.responses;
+package com.booleanuk.api.cinema.response;
 
 public class Response<T> {
         protected String status;

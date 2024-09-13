@@ -2,10 +2,10 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
-import com.booleanuk.api.cinema.responses.CustomerListResponse;
-import com.booleanuk.api.cinema.responses.CustomerResponse;
-import com.booleanuk.api.cinema.responses.ErrorResponse;
-import com.booleanuk.api.cinema.responses.Response;
+import com.booleanuk.api.cinema.response.CustomerListResponse;
+import com.booleanuk.api.cinema.response.CustomerResponse;
+import com.booleanuk.api.cinema.response.ErrorResponse;
+import com.booleanuk.api.cinema.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

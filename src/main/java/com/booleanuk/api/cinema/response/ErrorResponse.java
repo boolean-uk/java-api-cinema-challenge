@@ -1,4 +1,4 @@
-package com.booleanuk.api.cinema.responses;
+package com.booleanuk.api.cinema.response;
 
 import java.util.HashMap;
 import java.util.Map;
