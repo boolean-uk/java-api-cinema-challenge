@@ -36,7 +36,7 @@ public class Movie {
 
 
     @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties(value ={"movie", "tickets"})
+    @JsonIgnoreProperties(value ={"screenings", "tickets", "movie","customer","screening"})
     private List<Screening> screenings;
 
     @Column

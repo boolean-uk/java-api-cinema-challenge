@@ -30,7 +30,7 @@ public class TicketController {
     private TicketRepository ticketRepository;
 
     @PostMapping()
-    public ResponseEntity<Ticket> createTicket(@RequestBody Integer numseats, @PathVariable("screeningId") Integer
+    public ResponseEntity<Ticket> createTicket(@RequestBody Ticket ticket, @PathVariable("screeningId") Integer
             screeningId, @PathVariable("customerId") Integer customerId){
 
 
@@ -43,14 +43,13 @@ public class TicketController {
             );
 
             Customer customer = this.customerRepository.findById(
-                    screeningId).orElseThrow(
+                    customerId).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that id exists")
             );
 
 
 
-            Ticket ticket=new Ticket();
-            ticket.setNumSeats(numseats);
+
             ticket.setCustomer(customer);
             ticket.setScreening(screening);
             return new ResponseEntity<Ticket>(this.ticketRepository.save(ticket),

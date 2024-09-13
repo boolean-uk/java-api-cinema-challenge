@@ -31,7 +31,7 @@ public class Customer {
     private String phone;
 
     @OneToMany(mappedBy = "customer")
-    @JsonIgnoreProperties(value ={"customer", "screening"})
+    @JsonIgnoreProperties(value ={"screenings", "tickets", "movie","customer","screening"})
     private List<Ticket> tickets;
 
     @Column
@@ -39,6 +39,7 @@ public class Customer {
 
     @Column
     private LocalDateTime updatedAt=LocalDateTime.now();
+
 
 
 

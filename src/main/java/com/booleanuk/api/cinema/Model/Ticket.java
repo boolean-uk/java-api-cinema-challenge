@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +30,18 @@ public class Ticket {
     private LocalDateTime updatedAt=LocalDateTime.now();
 
     @ManyToOne
+    @JsonIgnoreProperties(value ={"screenings", "tickets", "movie","customer","screening"})
     @JoinColumn(name="customerId", nullable = false)
     private Customer customer;
 
     @ManyToOne
+    @JsonIgnoreProperties(value ={"screenings", "tickets", "movie","customer","screening"})
     @JoinColumn(name="screeningId", nullable = false)
     private Screening screening;
+
+    public Ticket(int numSeats) {
+        this.numSeats = numSeats;
+        createdAt=LocalDateTime.now();
+        updatedAt=LocalDateTime.now();
+    }
 }
