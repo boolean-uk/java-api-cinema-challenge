@@ -2,7 +2,10 @@ package com.booleanuk.api.cinema.movie.model;
 
 import com.booleanuk.api.cinema.screening.model.Screening;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,17 +32,23 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    // Bean validation framework. Validates object fields at application level.
+    @NotBlank(message = "Title is required")
     @Column(name = "title", nullable = false)
     private String title;
 
+    @NotBlank(message = "Rating is required")
     @Column(name = "rating", nullable = false)
     private String rating;
 
+    @NotBlank(message = "Description is required")
     @Column(name = "description", nullable = false)
     private String description;
 
+    // Validation check for non-string fields.
+    @NotNull(message = "RuntimeMins is required")
     @Column(name = "runtimeMins", nullable = false)
-    private int runtimeMins;
+    private Integer runtimeMins;
 
     @Column(name = "createdAt", nullable = false)
     private OffsetDateTime createdAt;
@@ -47,9 +56,8 @@ public class Movie {
     @Column(name = "updatedAt", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    /* Ignore this list in response */
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Screening> screenings;
 
     @PrePersist

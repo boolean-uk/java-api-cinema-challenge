@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class SuccessResponse<T> implements ResponseInterface  {
+public class SuccessResponse<T> implements Response {
     private String status;
     private T data;
 

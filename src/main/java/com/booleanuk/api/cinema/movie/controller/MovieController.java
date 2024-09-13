@@ -1,19 +1,20 @@
 package com.booleanuk.api.cinema.movie.controller;
 
 import com.booleanuk.api.cinema.movie.model.Movie;
-import com.booleanuk.api.cinema.movie.model.MovieDTO;
+import com.booleanuk.api.cinema.movie.model.MovieResponseDTO;
+import com.booleanuk.api.cinema.movie.model.MovieUpdateDTO;
 import com.booleanuk.api.cinema.movie.repository.MovieRepository;
-import com.booleanuk.api.cinema.response.ResponseInterface;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.ResponseFactory;
 import com.booleanuk.api.cinema.screening.model.Screening;
-import com.booleanuk.api.cinema.screening.model.ScreeningDTO;
 import com.booleanuk.api.cinema.screening.repository.ScreeningRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,132 +31,116 @@ public class MovieController {
     ScreeningRepository screeningRepository;
 
     @PostMapping
-    public ResponseEntity<ResponseInterface> addMovie(@RequestBody MovieDTO movieDTO) {
-        try {
-            List<Screening> screenings = convertScreeningDTOList(movieDTO.getScreenings());
-
-            Movie movie = extractMovieFromMovieDTO(movieDTO);
-            movie.setScreenings(screenings);
-            movie = this.movieRepository.save(movie);
-
-            addMovieToScreenings(screenings, movie);
-            saveScreenings(screenings);
-
-            return CreatedSuccessResponse(movie);
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
+    public ResponseEntity<Response> addMovie(@Valid @RequestBody Movie movie, BindingResult result) {
+        if (result.hasErrors()){
+            return badRequestErrorResponse();
         }
+
+        // Set movie to each screening.
+        if (movie.getScreenings() != null) {
+            movie.getScreenings().forEach(s -> s.setMovie(movie));
+        }
+
+        // Save movie
+        Movie savedMovie = this.movieRepository.save(movie);
+
+        // Convert to DTO without screenings
+        MovieResponseDTO responseDTO = convertToResponseDTO(savedMovie);
+
+        return createdSuccessResponse(responseDTO);
     }
+
 
     @GetMapping
-    public ResponseEntity<ResponseInterface> getAllMovies() {
-        return OkSuccessResponse(this.movieRepository.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseInterface> getMovieById(@PathVariable (name = "id") int id) {
-        Movie movie = findMovieById(id);
-
-        if (findMovieById(id) == null){
-            return NotFoundErrorResponse();
-        }
-        return OkSuccessResponse(movie);
+    public ResponseEntity<Response> getAllMovies() {
+        List<MovieResponseDTO> responseList = new ArrayList<>();
+        this.movieRepository.findAll().forEach(movie -> responseList.add(convertToResponseDTO(movie)));
+        return okSuccessResponse(responseList);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseInterface> updateMovie(@PathVariable (name = "id") int id, @RequestBody Movie updatedMovie) throws ResponseStatusException {
-        Movie movieToUpdate = findMovieById(id);
-        if (movieToUpdate == null) {
-            return NotFoundErrorResponse();
+    public ResponseEntity<Response> updateMovie(@PathVariable (name = "id") int id,
+                                                @Valid @RequestBody MovieUpdateDTO updatedMovie,
+                                                BindingResult result) {
+
+        if (result.hasErrors()) {
+            return badRequestErrorResponse();
+
         }
 
-        try {
-            update(movieToUpdate, updatedMovie);
-            return CreatedSuccessResponse(this.movieRepository.save(movieToUpdate));
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
-        }
+        return this.movieRepository.findById(id)
+                .map(movieToUpdate -> {
+                    updateMovieDetails(movieToUpdate, updatedMovie);
+                    Movie savedMovie = this.movieRepository.save(movieToUpdate);
+                    MovieResponseDTO responseDTO = convertToResponseDTO(savedMovie);
+                    return createdSuccessResponse(responseDTO);
+                }).orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseInterface> deleteMovie(@PathVariable (name = "id") int id) throws ResponseStatusException {
-        Movie movieToDelete = findMovieById(id);
-        if (movieToDelete == null){
-            return NotFoundErrorResponse();
-        }
-        this.movieRepository.delete(movieToDelete);
-        return OkSuccessResponse(movieToDelete);
+    public ResponseEntity<Response> deleteMovie(@PathVariable (name = "id") int id) {
+        return this.movieRepository.findById(id)
+                .map(movie -> {
+                    this.movieRepository.delete(movie);
+                    MovieResponseDTO responseDTO = convertToResponseDTO(movie);
+                    return okSuccessResponse(responseDTO);
+                })
+                .orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     /* Screenings */
     @PostMapping("/{id}/screenings")
-    public ResponseEntity<ResponseInterface> addScreening(@PathVariable (name = "id") int id, @RequestBody ScreeningDTO screeningDTO) {
-        Movie movie = findMovieById(id);
-        if (movie == null) {
-            return NotFoundErrorResponse();
+    public ResponseEntity<Response> addScreening(@PathVariable (name = "id") int id,
+                                                 @Valid @RequestBody Screening screening,
+                                                 BindingResult result) {
+
+        if (result.hasErrors()) {
+            return badRequestErrorResponse();
         }
 
-        try {
-            Screening screening = convertFromDTO(screeningDTO);
+        return this.movieRepository.findById(id).map(movie -> {
             screening.setMovie(movie);
-            return CreatedSuccessResponse(this.screeningRepository.save(screening));
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
-        }
+            return createdSuccessResponse(this.screeningRepository.save(screening));
+        }).orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     @GetMapping("{id}/screenings")
-    public ResponseEntity<ResponseInterface> getAllScreenings(@PathVariable (name = "id") int id) {
-        Movie movie = findMovieById(id);
-
-        if (movie == null) {
-            return NotFoundErrorResponse();
-        }
-
-        return OkSuccessResponse(this.screeningRepository.findScreeningsByMovie(movie));
+    public ResponseEntity<Response> getAllScreenings(@PathVariable (name = "id") int id) {
+        return this.movieRepository.findById(id)
+                .map(movie -> okSuccessResponse(this.screeningRepository.findScreeningsByMovie(movie)))
+                    .orElseGet(ResponseFactory::notFoundErrorResponse);
     }
-
 
     /* Helper functions */
-    private Screening convertFromDTO(ScreeningDTO screeningDTO) {
-        String formattedDate = screeningDTO.getStartsAt().replace(" ", "T");
-        OffsetDateTime startsAt = OffsetDateTime.parse(formattedDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        return new Screening(screeningDTO.getScreenNumber(), screeningDTO.getCapacity(), startsAt);
-    }
+    private void updateMovieDetails(Movie oldMovie, MovieUpdateDTO newMovie) {
+        if (newMovie.getTitle() != null) {
+            oldMovie.setTitle(newMovie.getTitle());
+        }
 
-    private Movie findMovieById(int id) {
-        return this.movieRepository.findById(id).orElse(null);
-    }
+        if (newMovie.getRating() != null) {
+            oldMovie.setRating(newMovie.getRating());
+        }
 
-    private List<Screening> convertScreeningDTOList(List<ScreeningDTO> screeningDTOList) {
-        List<Screening> screenings = new ArrayList<>();
-        screeningDTOList.forEach(s -> screenings.add(convertFromDTO(s)));
-        return screenings;
-    }
+        if (newMovie.getDescription() != null) {
+            oldMovie.setDescription(newMovie.getDescription());
+        }
 
-    private void update(Movie oldMovie, Movie newMovie) {
-        oldMovie.setTitle(newMovie.getTitle());
-        oldMovie.setRating(newMovie.getRating());
-        oldMovie.setDescription(newMovie.getDescription());
-        oldMovie.setRuntimeMins(newMovie.getRuntimeMins());
+        if (newMovie.getRuntimeMins() != null) {
+            oldMovie.setRuntimeMins(newMovie.getRuntimeMins());
+        }
+
         oldMovie.setUpdatedAt(OffsetDateTime.now());
     }
 
-    private Movie extractMovieFromMovieDTO(MovieDTO movieDTO){
-        Movie movie = new Movie();
-        movie.setTitle(movieDTO.getTitle());
-        movie.setRating(movieDTO.getRating());
-        movie.setDescription(movieDTO.getDescription());
-        movie.setRuntimeMins(movieDTO.getRuntimeMins());
-        return movie;
-    }
-
-    private void saveScreenings(List<Screening> screenings){
-        screenings.forEach(s -> this.screeningRepository.save(s));
-    }
-
-    private void addMovieToScreenings(List<Screening> screenings, Movie movie) {
-        screenings.forEach(s -> s.setMovie(movie));
+    private MovieResponseDTO convertToResponseDTO(Movie movie) {
+        return new MovieResponseDTO(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getRating(),
+                movie.getDescription(),
+                movie.getRuntimeMins(),
+                movie.getCreatedAt(),
+                movie.getUpdatedAt());
     }
 }

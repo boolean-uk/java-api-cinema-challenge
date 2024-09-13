@@ -1,6 +1,6 @@
 package com.booleanuk.api.cinema.response;
 
-public interface ResponseInterface {
+public interface Response {
     String getStatus();
     Object getData();
 }

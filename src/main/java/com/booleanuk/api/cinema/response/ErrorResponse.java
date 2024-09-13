@@ -3,7 +3,7 @@ package com.booleanuk.api.cinema.response;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ErrorResponse implements ResponseInterface {
+public class ErrorResponse implements Response {
     private final String status;
     private final Map<String, String> data;
 
