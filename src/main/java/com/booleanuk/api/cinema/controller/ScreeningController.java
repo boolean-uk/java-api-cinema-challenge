@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.DTO.BadRequestException;
+import com.booleanuk.api.cinema.DTO.NotFoundException;
 import com.booleanuk.api.cinema.Movie;
 import com.booleanuk.api.cinema.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -31,8 +33,9 @@ public class ScreeningController {
     @PostMapping
     public ResponseEntity<Screening> createScreening(@PathVariable int movieId, @RequestBody Screening screening) {
 
+
         Movie movie = this.movieRepository.findById(movieId).orElseThrow(
-                () -> new RuntimeException("No movie with that ID found")
+                () -> new NotFoundException("No movie with that ID found")
         );
         screening.setMovie(movie);
         return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
@@ -42,15 +45,18 @@ public class ScreeningController {
     public ResponseEntity<Screening> getScreeningById(@PathVariable int id) {
         Screening screening = null;
         screening = this.screeningRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No screening with that ID found")
+                () -> new NotFoundException("No screening with that ID found")
         );
         return ResponseEntity.ok(screening);
     }
 
     @PutMapping()
     public ResponseEntity<Screening> updateScreening(@PathVariable int id, @RequestBody Screening screening) {
+        if(screening.getMovie() == null) {
+            throw new BadRequestException("Movie must be provided");
+        }
         Screening screeningToUpdate = this.screeningRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No screening with that ID found")
+                () -> new NotFoundException("No screening with that ID found")
         );
         screening.setId(screeningToUpdate.getId());
         return new ResponseEntity<>(this.screeningRepository.save(screening), HttpStatus.CREATED);
@@ -59,7 +65,7 @@ public class ScreeningController {
     @DeleteMapping()
     public ResponseEntity<Screening> deleteScreening(@RequestBody int id) {
         Screening screeningToDelete = this.screeningRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No screening with that ID found")
+                () -> new NotFoundException("No screening with that ID found")
         );
         this.screeningRepository.delete(screeningToDelete);
         return ResponseEntity.ok(screeningToDelete);

@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.DTO.BadRequestException;
+import com.booleanuk.api.cinema.DTO.NotFoundException;
 import com.booleanuk.api.cinema.Movie;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,11 @@ public class MovieController {
 
     @PutMapping("{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+        if(movie.getTitle() == null || movie.getDescription().length() < 2) {
+            throw new BadRequestException("bad request");
+        }
         Movie movieToUpdate = this.movieRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No movie with that ID found")
+                () -> new NotFoundException("No movie with that ID found")
         );
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRating(movie.getRating());
@@ -46,7 +51,7 @@ public class MovieController {
     @DeleteMapping("{id}")
     public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
         Movie movieToDelete = this.movieRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No movie with that ID found")
+                () -> new NotFoundException("No movie with that ID found")
         );
         this.movieRepository.delete(movieToDelete);
         return ResponseEntity.ok(movieToDelete);

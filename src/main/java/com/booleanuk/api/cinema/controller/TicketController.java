@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.Customer;
+import com.booleanuk.api.cinema.DTO.NotFoundException;
 import com.booleanuk.api.cinema.DTO.TicketDTO;
 import com.booleanuk.api.cinema.Screening;
 import com.booleanuk.api.cinema.Ticket;
@@ -34,31 +35,13 @@ public class TicketController {
         return this.ticketRepository.findAll();
     }
 
-    /*
-    @PostMapping
-    public ResponseEntity<Ticket> createTicket(@PathVariable int customerId, int screeningId, @RequestBody Ticket ticket){
-        Customer customer = this.customerRepository.findById(customerId).orElseThrow(
-                () -> new RuntimeException("No customer with that ID found")
-        );
-        Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(
-                () -> new RuntimeException("No screening with that ID found")
-        );
-
-        Ticket newTicket = new Ticket();
-        newTicket.setNumSeats(ticket.getNumSeats());
-        newTicket.setScreening(screening);
-        newTicket.setCustomer(customer);
-        return new ResponseEntity<>(this.ticketRepository.save(newTicket), HttpStatus.CREATED);
-    }
-
-     */
     @PostMapping
     public ResponseEntity<Ticket> createTicket(@PathVariable int customerId, @PathVariable int screeningId, @RequestBody TicketDTO ticketDTO) {
         Customer customer = this.customerRepository.findById(customerId).orElseThrow(
-                () -> new RuntimeException("No customer with that ID found")
+                () -> new NotFoundException("No customer with that ID found")
         );
         Screening screening = this.screeningRepository.findById(screeningId).orElseThrow(
-                () -> new RuntimeException("No screening with that ID found")
+                () -> new NotFoundException("No screening with that ID found")
         );
 
         Ticket newTicket = new Ticket();

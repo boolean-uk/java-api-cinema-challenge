@@ -43,7 +43,6 @@ public class CustomerController {
     @PutMapping("{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @Valid @RequestBody Customer customer) {
         if(customer.getName() == null || customer.getName().length() < 2) {
-            System.out.println("TEST");
             throw new BadRequestException("Name must be at least 2 characters long");
         }
 
@@ -55,56 +54,14 @@ public class CustomerController {
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
 
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.OK);
+        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.CREATED);
     }
 
-    /*
-    // Exception handler for 404 Not Found
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex) {
-        ErrorResponse errorResponse = new ErrorResponse("error", "not found");
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-     */
-
-
-
-
-    /*
-    @PutMapping("{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable int id, @RequestBody Customer customer){
-        Customer customerToUpdate = this.customerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No customer with that ID found")
-        );
-        // Only update the fields that are being changed
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
-
-
-        return new ResponseEntity<>(this.customerRepository.save(customerToUpdate), HttpStatus.OK);
-    }
-
-     */
-
-
-
-    /*
-    @DeleteMapping("{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id){
-        Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No customer with that ID found")
-        );
-        this.customerRepository.delete(customerToDelete);
-        return ResponseEntity.ok(customerToDelete);
-    }
-     */
 
     @DeleteMapping("{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
         Customer customerToDelete = this.customerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No customer with that ID found")
+                () -> new NotFoundException("No customer with that ID found")
         );
         this.customerRepository.delete(customerToDelete);
         return ResponseEntity.ok(customerToDelete);
