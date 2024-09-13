@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -31,9 +32,8 @@ public class Screening {
 
     @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "screening-ticket")
+    @JsonIgnore
     private List<Ticket> tickets;
-
-
 
     public Screening(int screenNumber, int capacity, LocalDateTime startsAt) {
         this.screenNumber = screenNumber;

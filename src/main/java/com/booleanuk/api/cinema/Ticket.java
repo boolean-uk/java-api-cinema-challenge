@@ -98,6 +98,14 @@ public class Ticket {
     public void setScreening(Screening screening) {
         this.screening = screening;
     }
+
+    public LocalDateTime getStartsAt() {
+        return startsAt;
+    }
+
+    public void setStartsAt(LocalDateTime startsAt) {
+        this.startsAt = startsAt;
+    }
 }
 
 

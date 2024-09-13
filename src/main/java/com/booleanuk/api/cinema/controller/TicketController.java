@@ -48,6 +48,7 @@ public class TicketController {
         newTicket.setNumSeats(ticketDTO.getNumSeats());
         newTicket.setScreening(screening);
         newTicket.setCustomer(customer);
+        newTicket.setStartsAt(screening.getStartsAt());
         return new ResponseEntity<>(this.ticketRepository.save(newTicket), HttpStatus.CREATED);
     }
 }
