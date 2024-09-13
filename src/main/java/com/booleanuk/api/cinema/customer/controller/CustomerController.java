@@ -1,17 +1,24 @@
 package com.booleanuk.api.cinema.customer.controller;
 
 import com.booleanuk.api.cinema.customer.model.Customer;
+import com.booleanuk.api.cinema.customer.model.CustomerResponseDTO;
 import com.booleanuk.api.cinema.customer.repository.CustomerRepository;
-import com.booleanuk.api.cinema.response.ResponseInterface;
+import com.booleanuk.api.cinema.response.Response;
+import com.booleanuk.api.cinema.response.ResponseFactory;
 import com.booleanuk.api.cinema.screening.model.Screening;
 import com.booleanuk.api.cinema.screening.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.ticket.model.Ticket;
 import com.booleanuk.api.cinema.ticket.repository.TicketRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.booleanuk.api.cinema.response.ResponseFactory.*;
 
@@ -28,115 +35,122 @@ public class CustomerController {
     @Autowired
     ScreeningRepository screeningRepository;
 
-    @PostMapping
-    public ResponseEntity<ResponseInterface> addCustomer(@RequestBody Customer customer) {
-        try {
-            Customer newCustomer = this.customerRepository.save(customer);
-            return CreatedSuccessResponse(newCustomer);
+    // Workaround for exception 415
+    @PostMapping(consumes = {"application/json", "application/json;charset=UTF-8"})
+    public ResponseEntity<Response> addCustomer(@Valid @RequestBody Customer customer, BindingResult result) {
 
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
+        if (result.hasErrors()) {
+            return badRequestErrorResponse();
         }
+
+        Customer savedCustomer = this.customerRepository.save(customer);
+        CustomerResponseDTO response = convertToCustomerResponseDTO(savedCustomer);
+        return createdSuccessResponse(response);
     }
 
     @GetMapping
-    public ResponseEntity<ResponseInterface> getAllCustomers() {
-        return OkSuccessResponse(this.customerRepository.findAll());
+    public ResponseEntity<Response> getAllCustomers() {
+        List<CustomerResponseDTO> response = new ArrayList<>();
+        this.customerRepository.findAll().forEach(customer ->
+            response.add(convertToCustomerResponseDTO(customer))
+        );
+        return okSuccessResponse(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseInterface> getCustomerById(@PathVariable (name = "id") int id) {
-        if (this.customerRepository.findById(id).isEmpty()) {
-            return NotFoundErrorResponse();
-        }
-        return OkSuccessResponse(this.customerRepository.findById(id).get());
+    public ResponseEntity<Response> getCustomerById(@PathVariable (name = "id") int id) {
+        return this.customerRepository.findById(id).
+                map(customer -> {
+                    CustomerResponseDTO response = convertToCustomerResponseDTO(customer);
+                    return okSuccessResponse(response);
+                })
+                .orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseInterface> updateCustomer(@PathVariable (name = "id") int id, @RequestBody Customer customer) {
+    public ResponseEntity<Response> updateCustomer(@PathVariable (name = "id") int id, @Valid @RequestBody Customer updatedCustomer, BindingResult result) {
 
-        if (this.customerRepository.findById(id).isEmpty()) {
-            return NotFoundErrorResponse();
+        if (result.hasErrors()) {
+            return badRequestErrorResponse();
         }
 
-        try {
-            Customer customerToUpdate = this.customerRepository.findById(id).get();
-            update(customerToUpdate, customer);
-            Customer updatedCustomer = this.customerRepository.save(customerToUpdate);
-
-            return CreatedSuccessResponse(updatedCustomer);
-
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
-        }
+        return this.customerRepository.findById(id).map(customerToUpdate -> {
+            updateCustomerDetails(customerToUpdate, updatedCustomer);
+            Customer savedCustomer = this.customerRepository.save(customerToUpdate);
+            CustomerResponseDTO response = convertToCustomerResponseDTO(savedCustomer);
+            return createdSuccessResponse(response);
+        }).orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseInterface> deleteCustomer(@PathVariable (name = "id") int id){
-        if (this.customerRepository.findById(id).isEmpty()) {
-            return NotFoundErrorResponse();
-        }
-
-        try {
-            Customer customerToDelete = this.customerRepository.findById(id).get();
+    public ResponseEntity<Response> deleteCustomer(@PathVariable (name = "id") int id){
+        return this.customerRepository.findById(id).map(customerToDelete -> {
             this.customerRepository.delete(customerToDelete);
-            return OkSuccessResponse(customerToDelete);
-        } catch (Exception e) {
-            return BadRequestErrorResponse();
-        }
+            return okSuccessResponse(customerToDelete);
+        }).orElseGet(ResponseFactory::notFoundErrorResponse);
     }
 
     /* Tickets */
-
     @PostMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<ResponseInterface> bookTicket(@PathVariable (name = "customerId") int customerId,
-                                                        @PathVariable (name = "screeningId") int screeningId,
-                                                        @RequestBody Ticket ticket) {
+    public ResponseEntity<Response> bookTicket(@PathVariable (name = "customerId") int customerId,
+                                               @PathVariable (name = "screeningId") int screeningId,
+                                               @Valid @RequestBody Ticket ticket, BindingResult result) {
 
-        if (this.customerRepository.findById(customerId).isEmpty()) {
-            return NotFoundErrorResponse();
+        if (result.hasErrors()) {
+            return badRequestErrorResponse();
         }
 
-        if (this.screeningRepository.findById(screeningId).isEmpty()) {
-            return NotFoundErrorResponse();
+        Optional<Customer> optionalCustomer = this.customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()){
+            return notFoundErrorResponse();
         }
 
-        Customer customer = this.customerRepository.findById(customerId).get();
-        Screening screening = this.screeningRepository.findById(screeningId).get();
-
-        try {
-            ticket.setCustomer(customer);
-            ticket.setScreening(screening);
-            return CreatedSuccessResponse(ticketRepository.save(ticket));
-        } catch (Exception e) {
-            return NotFoundErrorResponse();
+        Optional<Screening> optionalScreening = this.screeningRepository.findById(screeningId);
+        if (optionalScreening.isEmpty()){
+            return notFoundErrorResponse();
         }
+
+        Customer customer = optionalCustomer.get();
+        Screening screening = optionalScreening.get();
+
+        ticket.setCustomer(customer);
+        ticket.setScreening(screening);
+
+        Ticket savedTicket = this.ticketRepository.save(ticket);
+        return createdSuccessResponse(savedTicket);
+
     }
 
     @GetMapping("/{customerId}/screenings/{screeningId}")
-    public ResponseEntity<ResponseInterface> getAllTickets(@PathVariable (name = "customerId") int customerId,
-                                                           @PathVariable (name = "screeningId") int screeningId) {
+    public ResponseEntity<Response> getAllTickets(@PathVariable (name = "customerId") int customerId,
+                                                  @PathVariable (name = "screeningId") int screeningId) {
 
         if (this.customerRepository.findById(customerId).isEmpty()) {
-            return NotFoundErrorResponse();
+            return notFoundErrorResponse();
         }
 
         if (this.screeningRepository.findById(screeningId).isEmpty()) {
-            return NotFoundErrorResponse();
+            return notFoundErrorResponse();
         }
 
         Customer customer = this.customerRepository.findById(customerId).get();
         Screening screening = this.screeningRepository.findById(screeningId).get();
 
-        return OkSuccessResponse(this.ticketRepository.findAllByCustomerAndScreening(customer, screening));
+        List<Ticket> ticketList = this.ticketRepository.findAllByCustomerAndScreening(customer, screening);
+
+        return okSuccessResponse(ticketList);
     }
 
 
-    private void update(Customer oldCustomer, Customer newCustomer) {
+    private void updateCustomerDetails(Customer oldCustomer, Customer newCustomer) {
         oldCustomer.setName(newCustomer.getName());
         oldCustomer.setPhone(newCustomer.getPhone());
         oldCustomer.setEmail(newCustomer.getEmail());
         oldCustomer.setUpdatedAt(OffsetDateTime.now());
+    }
+
+    private CustomerResponseDTO convertToCustomerResponseDTO(Customer customer){
+        return new CustomerResponseDTO(customer.getId(), customer.getName(), customer.getEmail(), customer.getPhone(), customer.getCreatedAt(), customer.getUpdatedAt());
     }
 
 

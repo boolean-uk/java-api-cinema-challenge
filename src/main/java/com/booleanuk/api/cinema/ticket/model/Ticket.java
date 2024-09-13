@@ -2,8 +2,10 @@ package com.booleanuk.api.cinema.ticket.model;
 
 import com.booleanuk.api.cinema.customer.model.Customer;
 import com.booleanuk.api.cinema.screening.model.Screening;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,16 +22,7 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "customerId", nullable = false)
-    private Customer customer;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "screeningId", nullable = false)
-    private Screening screening;
-
+    @NotNull(message = "numberOfSeats is required")
     @Column(name = "numberOfSeats")
     private int numberOfSeats;
 
@@ -38,6 +31,16 @@ public class Ticket {
 
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "customerId", nullable = false)
+    @JsonBackReference(value = "customer-tickets")
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "screeningId", nullable = false)
+    @JsonBackReference(value = "movie tickets")
+    private Screening screening;
 
     @PrePersist
     private void onCreate() {
