@@ -10,9 +10,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("customers")
@@ -21,10 +20,15 @@ public class CustomerController {
 	private final TicketRepository ticketRepo;
 	private final ScreeningRepository screeningRepo;
 
+	private HashMap<String, String> errorMessage;
+
+
 	public CustomerController(CustomerRepository customerRepository, TicketRepository ticketRepository, ScreeningRepository screeningRepo){
 		this.customerRepo = customerRepository;
 		this.ticketRepo = ticketRepository;
 		this.screeningRepo = screeningRepo;
+		this.errorMessage= new HashMap<>();
+		errorMessage.put("message", "Failed");
 	}
 
 	@GetMapping //all
@@ -46,12 +50,12 @@ public class CustomerController {
 		}
 	}
 
-	public ResponseEntity<ResponseObject<Customer>> customerNotFound(){
+	public ResponseEntity<ResponseObject<?>> customerNotFound(){
 		return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
 	}
 
 	@PostMapping
-	public ResponseEntity<ResponseObject<Customer>> postOne(@RequestBody Customer customer){
+	public ResponseEntity<ResponseObject<?>> postOne(@RequestBody Customer customer){
 		try {
 			checkIfValidCustomer(customer);
 			// throws error if invalid.
@@ -63,7 +67,7 @@ public class CustomerController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<ResponseObject<Customer>> putOne(@PathVariable int id, @RequestBody Customer customer){
+	public ResponseEntity<ResponseObject<?>> putOne(@PathVariable int id, @RequestBody Customer customer){
 		Customer customerToUpdate;
 		try {
 			customerToUpdate = customerRepo.findById(id)
@@ -85,7 +89,7 @@ public class CustomerController {
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<ResponseObject<Customer>> deleteMovie(@PathVariable int id){
+	public ResponseEntity<ResponseObject<?>> deleteMovie(@PathVariable int id){
 		Customer delCustomer;
 		try{
 			delCustomer = customerRepo.findById(id)
@@ -100,7 +104,7 @@ public class CustomerController {
 
 	// extention
 	@GetMapping("{customer}/screenings/{screening}")
-	public ResponseEntity<ResponseObject<List<Ticket>>> getTickets(@PathVariable int customer, @PathVariable int screening){
+	public ResponseEntity<ResponseObject<?>> getTickets(@PathVariable int customer, @PathVariable int screening){
 		Customer c;
 		try {
 			c = customerRepo.findById(customer)
@@ -114,7 +118,7 @@ public class CustomerController {
 			s = screeningRepo.findById(screening)
 					.orElseThrow(() -> new Exception("Failed to find screening"));
 		} catch (Exception e) {
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 		}
 
 		List<Ticket> tickets = c.getTickets();
@@ -128,7 +132,7 @@ public class CustomerController {
 
 
 	@PostMapping("{customer}/screenings/{screening}")
-	public ResponseEntity<ResponseObject<Ticket>> postTicket(@PathVariable int customer, @PathVariable int screening, @Validated @RequestBody TicketNumber numSeats){
+	public ResponseEntity<ResponseObject<?>> postTicket(@PathVariable int customer, @PathVariable int screening, @Validated @RequestBody TicketNumber numSeats){
 		Customer c;
 		Screening s;
 		try {
@@ -140,7 +144,7 @@ public class CustomerController {
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not a valid screening"));
 
 		} catch (Exception e){
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 
 		}
 
