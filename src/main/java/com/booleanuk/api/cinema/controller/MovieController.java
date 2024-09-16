@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -21,9 +22,13 @@ public class MovieController {
 	private MovieRepository movieRepo;
 	private ScreeningRepository screeningRepo;
 
+	private HashMap<String, String> errorMessage;
+
 	public MovieController(MovieRepository movieRepository, ScreeningRepository screeningRepo){
 		this.movieRepo = movieRepository;
 		this.screeningRepo = screeningRepo;
+		this.errorMessage= new HashMap<>();
+		errorMessage.put("message", "Failed");
 	}
 
 	@GetMapping //all
@@ -33,12 +38,12 @@ public class MovieController {
 
 
 	@PostMapping
-	public ResponseEntity<ResponseObject<Movie>> postOne(@RequestBody Movie movie){
+	public ResponseEntity<ResponseObject<?>> postOne(@RequestBody Movie movie){
 		try {
 			checkIfValidMovie(movie);
 			// throws error if invalid.
 		} catch (Exception e) {
-			return new ResponseEntity<>(new ResponseObject<>("Failed."), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseObject<>("Failed.", errorMessage), HttpStatus.BAD_REQUEST);
 		}
 		movie.createdNow();
 
@@ -47,7 +52,7 @@ public class MovieController {
 
 
 	@PutMapping("{id}")
-	public ResponseEntity<ResponseObject<Movie>> updateMovie(@PathVariable int id, @RequestBody Movie movie){
+	public ResponseEntity<ResponseObject<?>> updateMovie(@PathVariable int id, @RequestBody Movie movie){
 		// check if valid id
 		Movie movieToUpdate;
 		try {
@@ -55,7 +60,7 @@ public class MovieController {
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
 
 		} catch (ResponseStatusException e) {
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 		}
 
 
@@ -92,10 +97,10 @@ public class MovieController {
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<ResponseObject<Movie>> deleteMovie(@PathVariable int id){
+	public ResponseEntity<ResponseObject<?>> deleteMovie(@PathVariable int id){
 		boolean isFound = movieRepo.existsById(id);
 		if (! isFound){
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 		}
 
 		Movie delMovie = movieRepo.findById(id).get();
@@ -104,25 +109,25 @@ public class MovieController {
 	}
 
 	@GetMapping("{id}/screenings")
-	public ResponseEntity<ResponseObject<List<Screening>>> getAllScreenings(@PathVariable int id){
+	public ResponseEntity<ResponseObject<?>> getAllScreenings(@PathVariable int id){
 		try {
 			Movie m = movieRepo.findById(id)
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
 			return new ResponseEntity<>(new ResponseObject<>("Success", m.getScreenings()), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PostMapping("{id}/screenings")
-	public ResponseEntity<ResponseObject<Screening>> postScreening(@PathVariable int id, @Validated @RequestBody Screening screening){
+	public ResponseEntity<ResponseObject<?>> postScreening(@PathVariable int id, @Validated @RequestBody Screening screening){
 		Movie m;
 		try {
 			// check if movie exists
 			m = movieRepo.findById(id)
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "couldn't find by id"));
 		} catch (ResponseStatusException e){
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.NOT_FOUND);
 		}
 		// check if valid screening
 		try{
@@ -133,7 +138,7 @@ public class MovieController {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body");
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>(new ResponseObject<>("Failed"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseObject<>("Failed", errorMessage), HttpStatus.BAD_REQUEST);
 
 		}
 
