@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +25,10 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int movieId;
+    @JoinColumn     //TODO: Should this be here ?
+    @ManyToOne
+    @JsonIncludeProperties(value = {"id", "title"})
+    private Movie movie;
 
     @Column
     private int screenNumber;
