@@ -2,7 +2,11 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.models.Movie;
+import com.booleanuk.api.cinema.models.Screening;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
+import com.booleanuk.api.cinema.repositories.ScreeningRepository;
+import com.booleanuk.api.cinema.responses.MovieResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +21,32 @@ public class MovieController {
     @Autowired
     private MovieRepository repository;
 
+    @Autowired
+    private ScreeningRepository associatedScreeningRepository;
+
+    // TODO: Handle case when the payload is a screening object instead of Id's
     @PostMapping
-    public ResponseEntity<Movie> create(@RequestBody Movie movie) {
-        return new ResponseEntity<>(this.repository.save(movie), HttpStatus.CREATED);
+    public ResponseEntity<Response<?>> create(@RequestBody Movie movie) {
+        Movie newMovie = this.repository.save(movie);
+
+        // Create corresponding screenings
+        List<Screening> screenings = movie.getScreenings();
+        for (Screening s : screenings) {
+            Screening existingScreening = this.associatedScreeningRepository.findById(s.getId()).orElse(null);
+            if (existingScreening == null) {
+                s.setMovie(newMovie);
+                this.associatedScreeningRepository.save(s);
+            } else {
+                existingScreening.setMovie(newMovie);
+            }
+        }
+        // Save to database
+        this.repository.save(newMovie);
+
+        // Update response
+        MovieResponse response = new MovieResponse();
+        response.set(newMovie);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -35,6 +62,7 @@ public class MovieController {
         Movie originalMovie = getObjectById(id);
         movie.setId(id);
         movie.setCreatedAt(originalMovie.getCreatedAt());
+        movie.setScreenings(originalMovie.getScreenings());
         return new ResponseEntity<>(this.repository.save(movie), HttpStatus.CREATED);
     }
 
