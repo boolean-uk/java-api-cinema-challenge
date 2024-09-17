@@ -7,12 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 
-// TODO: Check if all annotations below is needed
 @Getter
 @Setter
 @AllArgsConstructor

@@ -2,6 +2,10 @@ package com.booleanuk.api.cinema.controllers;
 
 import com.booleanuk.api.cinema.models.Customer;
 import com.booleanuk.api.cinema.repositories.CustomerRepository;
+import com.booleanuk.api.cinema.responses.CustomerListResponse;
+import com.booleanuk.api.cinema.responses.CustomerResponse;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,38 +21,73 @@ public class CustomerController {
     CustomerRepository repository;
 
     @PostMapping
-    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
-        return new ResponseEntity<>(this.repository.save(customer), HttpStatus.CREATED);
+    public ResponseEntity<Response<?>> create(@RequestBody Customer customer) {
+        CustomerResponse response = new CustomerResponse();
+        response.set(customer);
+        try {
+            this.repository.save(customer);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Could not create a new customer, please check all fields are correct.");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAll() {
-        return ResponseEntity.ok(this.repository.findAll());
+    public ResponseEntity<Response<?>> getAll() {
+        CustomerListResponse response = new CustomerListResponse();
+        List<Customer> customers = this.repository.findAll();
+        if (customers.isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set("No customers found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        response.set(this.repository.findAll());
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Customer> update(
+    public ResponseEntity<Response<?>> update(
             @PathVariable int id,
             @RequestBody Customer customer)
     {
-        Customer originalCustomer = this.getObjectById(id);
-        customer.setId(id);
-        customer.setCreatedAt(originalCustomer.getCreatedAt());
-        return new ResponseEntity<>(this.repository.save(customer), HttpStatus.CREATED);
+        CustomerResponse response = new CustomerResponse();
+        try {
+            Customer originalCustomer = this.getObjectById(id);
+            customer.setId(id);
+            customer.setCreatedAt(originalCustomer.getCreatedAt());
+            this.repository.save(customer);
+
+            // TODO: inefficient to call getObjectById again, refactor?
+            // Get the updated value, added on table update
+            customer.setUpdatedAt(getObjectById(id).getUpdatedAt());
+            response.set(customer);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set(e.getMessage());
+
+            // TODO: Duplicate code for HttpStatus.NOT_FOUND, both in exception and again here. Refactor?
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Customer> delete(@PathVariable int id) {
-        Customer customer = getObjectById(id);
+    public ResponseEntity<Response<?>> delete(@PathVariable int id) {
+        CustomerResponse response = new CustomerResponse();
         try {
+            Customer customer = getObjectById(id);
             this.repository.deleteById(id);
+            response.set(customer);
         } catch (Exception e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Could not delete customer. Detailed information: "+e.getMessage()
-            );
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.set(e.getMessage());
+
+            // TODO: Duplicate code for HttpStatus.NOT_FOUND, both in exception and again here. Refactor?
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(response);
     }
 
     /**
