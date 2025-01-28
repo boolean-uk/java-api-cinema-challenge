@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
@@ -23,11 +24,20 @@ public class MovieController {
         this.screeningRepository = screeningRepository;
     }
 
+    private record MovieWithScreenings(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {};
+
     @PostMapping
-    public ResponseEntity<Response<?>> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<Response<?>> createMovie(@RequestBody MovieWithScreenings movieWithScreenings) {
+        Movie movie = new Movie(movieWithScreenings.title, movieWithScreenings.rating, movieWithScreenings.description, movieWithScreenings.runtimeMins);
         Movie createdMovie = movieRepository.save(movie);
         if (createdMovie == null) {
             return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+        }
+        if (movieWithScreenings.screenings != null) {
+            for (Screening s : movieWithScreenings.screenings) {
+                s.setMovie(createdMovie);
+                screeningRepository.save(s);
+            }
         }
         return new ResponseEntity<>(new Response<>("success", createdMovie), HttpStatus.CREATED);
     }
