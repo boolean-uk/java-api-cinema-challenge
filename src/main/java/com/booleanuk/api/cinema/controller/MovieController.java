@@ -36,7 +36,7 @@ public class MovieController {
     }
 
     @PostMapping("{id}/screenings")
-    public ResponseEntity<Screening> create(@PathVariable int movieId, @RequestBody Screening screening) {
+    public ResponseEntity<Screening> create(@PathVariable(name="id") int movieId, @RequestBody Screening screening) {
         Movie movie = movieRepository.findById(movieId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
         );

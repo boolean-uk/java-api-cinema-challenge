@@ -1,5 +1,10 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -16,6 +21,10 @@ public class Screening {
 
     @Column private int screenNumber;
     @Column private int capacity;
+
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss[+SS][:SS]")
     @Column private LocalDateTime startsAt;
     @Column private LocalDateTime createdAt;
     @Column private LocalDateTime updatedAt;
@@ -56,6 +65,15 @@ public class Screening {
         this.startsAt = startsAt;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public Screening(int id, int screenNumber, int capacity, LocalDateTime startsAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Screening(int id) {
