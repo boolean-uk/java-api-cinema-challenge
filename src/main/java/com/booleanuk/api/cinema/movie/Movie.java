@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.movie;
 
 import com.booleanuk.api.cinema.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,8 +41,8 @@ public class Movie {
     @Column
     private String updated_at;
 
-    @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties({"movie","id"})
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
+    @JsonIgnore
     private List<Screening> screenings;
 
     public Movie(int id) {

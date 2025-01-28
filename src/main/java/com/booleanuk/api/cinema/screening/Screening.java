@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.screening;
 
 import com.booleanuk.api.cinema.movie.Movie;
+import com.booleanuk.api.cinema.ticket.Ticket;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
@@ -9,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,4 +44,8 @@ public class Screening {
     @JoinColumn(name = "movie_id")
     @JsonIgnore
     private Movie movie;
+
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Ticket> tickets;
 }
