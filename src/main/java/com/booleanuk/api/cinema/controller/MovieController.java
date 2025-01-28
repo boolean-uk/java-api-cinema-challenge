@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.controller;
 
+import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
@@ -24,7 +25,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Movie> create(@RequestBody Movie movie) {
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
     }
 
@@ -41,7 +42,7 @@ public class MovieController {
     }
 
     @PostMapping("{id}/screenings")
-    public ResponseEntity<Screening> create(@PathVariable(name="id") int movieId, @RequestBody Screening screening) {
+    public ResponseEntity<Screening> createScreening(@PathVariable(name="id") int movieId, @RequestBody Screening screening) {
         Movie movie = movieRepository.findById(movieId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
         );
@@ -61,5 +62,27 @@ public class MovieController {
         return ResponseEntity.ok(screeningRepository.findAll().stream().filter(
                 s -> s.getMovieId() == movie.getId()
         ).toList());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+        Movie movieToUpdate = movieRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
+        );
+        movieToUpdate.setTitle(movie.getTitle());
+        movieToUpdate.setRating(movie.getRating());
+        movieToUpdate.setDescription(movie.getDescription());
+        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        movieToUpdate.setUpdatedAt(LocalDateTime.now());
+        return new ResponseEntity<>(movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
+        Movie movie = movieRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
+        );
+        movieRepository.deleteById(id);
+        return ResponseEntity.ok(movie);
     }
 }
