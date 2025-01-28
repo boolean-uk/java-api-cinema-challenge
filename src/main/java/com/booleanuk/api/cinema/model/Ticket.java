@@ -2,6 +2,8 @@ package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +20,7 @@ public class Ticket {
 
     @ManyToOne
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Screening screening;
 
     @Column int numSeats;
