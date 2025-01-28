@@ -23,6 +23,11 @@ public class MovieController {
         this.screeningRepository = screeningRepository;
     }
 
+    @PostMapping
+    public ResponseEntity<Movie> create(@RequestBody Movie movie) {
+        return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getOne(@PathVariable int id) {
         return ResponseEntity.ok(movieRepository.findById(id).orElseThrow(

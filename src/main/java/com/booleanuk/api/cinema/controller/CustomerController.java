@@ -4,10 +4,7 @@ import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -19,6 +16,11 @@ public class CustomerController {
 
     public CustomerController(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
+    }
+
+    @PostMapping
+    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
+        return new ResponseEntity<>(customerRepository.save(customer), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
