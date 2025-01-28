@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
 
     @ManyToOne
     private Movie movie;
@@ -20,7 +20,7 @@ public class Screening {
     @Column private LocalDateTime createdAt;
     @Column private LocalDateTime updatedAt;
 
-    public Screening(String id, Movie movie, int screenNumber, int capacity, LocalDateTime startsAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Screening(int id, Movie movie, int screenNumber, int capacity, LocalDateTime startsAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.movie = movie;
         this.screenNumber = screenNumber;
@@ -39,7 +39,7 @@ public class Screening {
         this.updatedAt = updatedAt;
     }
 
-    public Screening(String id, Movie movie, int screenNumber, int capacity, LocalDateTime startsAt) {
+    public Screening(int id, Movie movie, int screenNumber, int capacity, LocalDateTime startsAt) {
         this.id = id;
         this.movie = movie;
         this.screenNumber = screenNumber;
@@ -58,18 +58,22 @@ public class Screening {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Screening(String id) {
+    public Screening(int id) {
         this.id = id;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Screening() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
