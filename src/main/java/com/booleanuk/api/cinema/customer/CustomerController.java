@@ -76,8 +76,8 @@ public class CustomerController {
 
         if (deletedCustomer == null) {
             ErrorResponse error = new ErrorResponse();
-            error.set("bad request");
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            error.set("Not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
 
         this.customerRepository.delete(deletedCustomer);
