@@ -98,4 +98,12 @@ public class Ticket {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public int getCustomerId() {
+        return this.customer.getId();
+    }
+
+    public int getScreeningId() {
+        return this.screening.getId();
+    }
 }

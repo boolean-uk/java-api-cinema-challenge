@@ -1,6 +1,5 @@
 package com.booleanuk.api.cinema.controller;
 
-import com.booleanuk.api.cinema.model.Customer;
 import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;

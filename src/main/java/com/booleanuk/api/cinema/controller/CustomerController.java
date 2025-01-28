@@ -1,7 +1,12 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
+import com.booleanuk.api.cinema.model.Movie;
+import com.booleanuk.api.cinema.model.Screening;
+import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
+import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.repository.TicketRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +19,13 @@ import java.util.List;
 @RequestMapping("/customers")
 public class CustomerController {
     private CustomerRepository customerRepository;
+    private TicketRepository ticketRepository;
+    private ScreeningRepository screeningRepository;
 
-    public CustomerController(CustomerRepository customerRepository) {
+    public CustomerController(CustomerRepository customerRepository, TicketRepository ticketRepository, ScreeningRepository screeningRepository) {
         this.customerRepository = customerRepository;
+        this.ticketRepository = ticketRepository;
+        this.screeningRepository = screeningRepository;
     }
 
     @PostMapping
@@ -55,5 +64,20 @@ public class CustomerController {
         );
         customerRepository.deleteById(id);
         return ResponseEntity.ok(customer);
+    }
+
+    @GetMapping("/{c_id}/screenings/{s_id}")
+    public ResponseEntity<List<Ticket>> getAllTickets(@PathVariable(name="c_id") int customerId, @PathVariable(name="s_id") int screeningId) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
+        );
+
+        Screening screening = screeningRepository.findById(screeningId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that ID was found.")
+        );
+
+        return ResponseEntity.ok(ticketRepository.findAll().stream().filter(
+                t -> t.getCustomerId() == customer.getId() && t.getScreeningId() == screening.getId()
+        ).toList());
     }
 }
