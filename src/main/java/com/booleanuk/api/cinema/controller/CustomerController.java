@@ -66,6 +66,21 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
 
+    @PostMapping("/{c_id}/screenings/{s_id}")
+    public ResponseEntity<Ticket> bookTicket(@PathVariable(name="c_id") int customerId, @PathVariable(name="s_id") int screeningId, @RequestBody Ticket ticket) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
+        );
+
+        Screening screening = screeningRepository.findById(screeningId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that ID was found.")
+        );
+
+        ticket.setCustomer(customer);
+        ticket.setScreening(screening);
+        return new ResponseEntity<>(ticketRepository.save(ticket), HttpStatus.CREATED);
+    }
+
     @GetMapping("/{c_id}/screenings/{s_id}")
     public ResponseEntity<List<Ticket>> getAllTickets(@PathVariable(name="c_id") int customerId, @PathVariable(name="s_id") int screeningId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
