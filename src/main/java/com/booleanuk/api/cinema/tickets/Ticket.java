@@ -38,7 +38,7 @@ public class Ticket {
     @JsonIncludeProperties({"screen_number", "starts_at"})
     private Screening screening;
 
-    public Ticket(int numSeats) {
+    public Ticket(int id, int numSeats) {
         this.numSeats = numSeats;
     }
 
