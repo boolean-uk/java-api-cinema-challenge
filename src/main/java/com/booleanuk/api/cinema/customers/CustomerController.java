@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.customers;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,15 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        /*try {
+            customer.setCreatedAt(LocalDateTime.now());
+            customer.setUpdatedAt(LocalDateTime.now());
+            Customer customerToCreate = this.customerRepository.save(customer);
+            return new ResponseEntity<>(customerToCreate, HttpStatus.CREATED);
+        } catch (Exception e) {
+            throw new BadRequestException("Could not create a new customer, please check all fields are correct");
+            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }*/
         customer.setCreatedAt(LocalDateTime.now());
         customer.setUpdatedAt(LocalDateTime.now());
         return new ResponseEntity<Customer>(this.customerRepository.save(customer), HttpStatus.CREATED);

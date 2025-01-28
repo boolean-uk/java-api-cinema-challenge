@@ -1,5 +1,7 @@
 package com.booleanuk.api.cinema.customers;
 
+import com.booleanuk.api.cinema.tickets.Ticket;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -29,6 +32,10 @@ public class Customer {
     private LocalDateTime createdAt;
     @Column
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
+    @JsonIncludeProperties({"customer_id", "screening_id", "num_seats"})
+    private List<Ticket> tickets;
 
     public Customer(String name, String email, String phone) {
         this.name = name;
