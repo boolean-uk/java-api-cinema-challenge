@@ -39,6 +39,25 @@ public class Screening {
         this.updatedAt = updatedAt;
     }
 
+    public Screening(String id, Movie movie, int screenNumber, int capacity, LocalDateTime startsAt) {
+        this.id = id;
+        this.movie = movie;
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public Screening(Movie movie, int screenNumber, int capacity, LocalDateTime startsAt) {
+        this.movie = movie;
+        this.screenNumber = screenNumber;
+        this.capacity = capacity;
+        this.startsAt = startsAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Screening(String id) {
         this.id = id;
     }
@@ -100,5 +119,9 @@ public class Screening {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getMovieId() {
+        return this.movie.getId();
     }
 }

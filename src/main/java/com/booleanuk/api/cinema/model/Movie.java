@@ -37,6 +37,25 @@ public class Movie {
         this.updatedAt = updatedAt;
     }
 
+    public Movie(int id, String title, String rating, String description, int runtimeMins) {
+        this.id = id;
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public Movie(String title, String rating, String description, int runtimeMins) {
+        this.title = title;
+        this.rating = rating;
+        this.description = description;
+        this.runtimeMins = runtimeMins;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Movie(int id) {
         this.id = id;
     }
