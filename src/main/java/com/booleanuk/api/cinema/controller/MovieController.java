@@ -4,13 +4,13 @@ import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
@@ -24,64 +24,81 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
+    public ResponseEntity<Response<?>> createMovie(@RequestBody Movie movie) {
+        Movie createdMovie = movieRepository.save(movie);
+        if (createdMovie == null) {
+            return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new Response<>("success", createdMovie), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getOne(@PathVariable int id) {
-        return ResponseEntity.ok(movieRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
-        ));
+    public ResponseEntity<Response<?>> getOne(@PathVariable int id) {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new Response<>("success", movie), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<Movie>> getAll() {
-        return ResponseEntity.ok(movieRepository.findAll());
+    public ResponseEntity<Response<?>> getAll() {
+        return new ResponseEntity<>(new Response<>("success", movieRepository.findAll()), HttpStatus.OK);
     }
 
     @PostMapping("{id}/screenings")
-    public ResponseEntity<Screening> createScreening(@PathVariable(name="id") int movieId, @RequestBody Screening screening) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> createScreening(@PathVariable(name = "id") int movieId, @RequestBody Screening screening) {
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
+
         screening.setMovie(movie);
         screening.setCreatedAt(LocalDateTime.now());
         screening.setUpdatedAt(LocalDateTime.now());
-        return new ResponseEntity<>(screeningRepository.save(screening), HttpStatus.CREATED);
+        Screening createdScreening = screeningRepository.save(screening);
+
+        if (createdScreening == null) {
+            return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new Response<>("success", createdScreening), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}/screenings")
-    public ResponseEntity<List<Screening>> getAll(@PathVariable(name="id") int movieId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> getAllScreenings(@PathVariable(name = "id") int movieId) {
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie == null)
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
 
-        // maybe findAll(...) can also filter
-        return ResponseEntity.ok(screeningRepository.findAll().stream().filter(
-                s -> s.getMovieId() == movie.getId()
-        ).toList());
+        return new ResponseEntity<>(new Response<>("success", screeningRepository.findAll().stream().filter(
+                s -> s.getMovieId() == movie.getId()).toList()), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
-        Movie movieToUpdate = movieRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> updateMovie(@PathVariable int id, @RequestBody Movie movie) {
+        Movie movieToUpdate = movieRepository.findById(id).orElse(null);
+        if (movieToUpdate == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
+
         movieToUpdate.setTitle(movie.getTitle());
         movieToUpdate.setRating(movie.getRating());
         movieToUpdate.setDescription(movie.getDescription());
         movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         movieToUpdate.setUpdatedAt(LocalDateTime.now());
-        return new ResponseEntity<>(movieRepository.save(movieToUpdate), HttpStatus.CREATED);
+
+        if (movieRepository.save(movieToUpdate) == null) {
+            return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new Response<>("success", movieToUpdate), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Movie> deleteMovie(@PathVariable int id) {
-        Movie movie = movieRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> deleteMovie(@PathVariable int id) {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie == null)
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
         movieRepository.deleteById(id);
-        return ResponseEntity.ok(movie);
+        return ResponseEntity.ok(new Response<>("success", movie));
     }
 }

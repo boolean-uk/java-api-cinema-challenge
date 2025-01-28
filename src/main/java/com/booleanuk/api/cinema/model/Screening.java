@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,15 +14,15 @@ public class Screening {
     private int id;
 
     @ManyToOne
+    @JsonIgnore
     private Movie movie;
 
     @Column private int screenNumber;
     @Column private int capacity;
 
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss[+SS][:SS]")
     @Column private LocalDateTime startsAt;
+
     @Column private LocalDateTime createdAt;
     @Column private LocalDateTime updatedAt;
 
@@ -139,6 +140,7 @@ public class Screening {
         this.updatedAt = updatedAt;
     }
 
+    @JsonIgnore
     public int getMovieId() {
         return this.movie.getId();
     }

@@ -1,12 +1,13 @@
 package com.booleanuk.api.cinema.controller;
 
 import com.booleanuk.api.cinema.model.Customer;
-import com.booleanuk.api.cinema.model.Movie;
 import com.booleanuk.api.cinema.model.Screening;
 import com.booleanuk.api.cinema.model.Ticket;
 import com.booleanuk.api.cinema.repository.CustomerRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.repository.TicketRepository;
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,70 +30,87 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
-        return new ResponseEntity<>(customerRepository.save(customer), HttpStatus.CREATED);
+    public ResponseEntity<Response<?>> create(@RequestBody Customer customer) {
+        Customer addedCustomer = customerRepository.save(customer);
+        if (addedCustomer == null) {
+            return new ResponseEntity<>(new ErrorResponse("bad request"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new Response<>("success", addedCustomer), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getOne(@PathVariable int id) {
-        return ResponseEntity.ok(customerRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
-        ));
+    public ResponseEntity<Response<?>> getOne(@PathVariable int id) {
+//        return ResponseEntity.ok(customerRepository.findById(id).orElseThrow(
+//                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
+//        ));
+        Customer customer = customerRepository.findById(id).orElse(null);
+        if (customer == null) {
+            ErrorResponse error = new ErrorResponse("not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        Response<Customer> response = new Response<>();
+        response.set(customer);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAll() {
-        return ResponseEntity.ok(customerRepository.findAll());
+    public ResponseEntity<Response<?>> getAll() {
+        return ResponseEntity.ok(new Response<>("success", customerRepository.findAll()));
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> update(@PathVariable int id, @RequestBody Customer customer) {
-        Customer customerToUpdate = customerRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody Customer customer) {
+        Customer customerToUpdate = customerRepository.findById(id).orElse(null);
+        if (customerToUpdate == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
         customerToUpdate.setName(customer.getName());
         customerToUpdate.setEmail(customer.getEmail());
         customerToUpdate.setPhone(customer.getPhone());
         customerToUpdate.setUpdatedAt(LocalDateTime.now());
-        return new ResponseEntity<>(customerRepository.save(customerToUpdate), HttpStatus.CREATED);
+        // todo error 400
+        return new ResponseEntity<>(new Response<>(customerRepository.save(customerToUpdate)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable int id) {
-        Customer customer = customerRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> deleteCustomer(@PathVariable int id) {
+        Customer customer = customerRepository.findById(id).orElse(null);
+        if (customer == null) {
+            return new ResponseEntity(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
+
         customerRepository.deleteById(id);
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(new Response<>("success", customer));
     }
 
     @PostMapping("/{c_id}/screenings/{s_id}")
-    public ResponseEntity<Ticket> bookTicket(@PathVariable(name="c_id") int customerId, @PathVariable(name="s_id") int screeningId, @RequestBody Ticket ticket) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> bookTicket(@PathVariable(name = "c_id") int customerId, @PathVariable(name = "s_id") int screeningId, @RequestBody Ticket ticket) {
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        Screening screening = screeningRepository.findById(screeningId).orElse(null);
 
-        Screening screening = screeningRepository.findById(screeningId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that ID was found.")
-        );
+        if (customer == null || screening == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
 
         ticket.setCustomer(customer);
         ticket.setScreening(screening);
-        return new ResponseEntity<>(ticketRepository.save(ticket), HttpStatus.CREATED);
+        ticket.setCreatedAt(LocalDateTime.now());
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return new ResponseEntity<>(new Response<>("success", ticketRepository.save(ticket)), HttpStatus.CREATED);
     }
 
     @GetMapping("/{c_id}/screenings/{s_id}")
-    public ResponseEntity<List<Ticket>> getAllTickets(@PathVariable(name="c_id") int customerId, @PathVariable(name="s_id") int screeningId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No customer with that ID was found.")
-        );
+    public ResponseEntity<Response<?>> getAllTickets(@PathVariable(name = "c_id") int customerId, @PathVariable(name = "s_id") int screeningId) {
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        Screening screening = screeningRepository.findById(screeningId).orElse(null);
 
-        Screening screening = screeningRepository.findById(screeningId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No screening with that ID was found.")
-        );
+        if (customer == null || screening == null) {
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+        }
 
-        return ResponseEntity.ok(ticketRepository.findAll().stream().filter(
+        return new ResponseEntity<>(new Response<>("success", ticketRepository.findAll().stream().filter(
                 t -> t.getCustomerId() == customer.getId() && t.getScreeningId() == screening.getId()
-        ).toList());
+        ).toList()), HttpStatus.OK);
     }
 }

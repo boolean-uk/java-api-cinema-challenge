@@ -1,5 +1,6 @@
 package com.booleanuk.api.cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,9 +13,11 @@ public class Ticket {
     private int id;
 
     @ManyToOne
+    @JsonIgnore
     private Customer customer;
 
     @ManyToOne
+    @JsonIgnore
     private Screening screening;
 
     @Column int numSeats;
@@ -59,6 +62,7 @@ public class Ticket {
         this.id = id;
     }
 
+    @JsonIgnore
     public Customer getCustomer() {
         return customer;
     }
@@ -67,6 +71,7 @@ public class Ticket {
         this.customer = customer;
     }
 
+    @JsonIgnore
     public Screening getScreening() {
         return screening;
     }
@@ -99,10 +104,12 @@ public class Ticket {
         this.updatedAt = updatedAt;
     }
 
+    @JsonIgnore
     public int getCustomerId() {
         return this.customer.getId();
     }
 
+    @JsonIgnore
     public int getScreeningId() {
         return this.screening.getId();
     }
