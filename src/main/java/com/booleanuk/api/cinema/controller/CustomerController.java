@@ -65,9 +65,12 @@ public class CustomerController {
         if (customerToUpdate == null) {
             return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
         }
-        customerToUpdate.setName(customer.getName());
-        customerToUpdate.setEmail(customer.getEmail());
-        customerToUpdate.setPhone(customer.getPhone());
+        if (customer.getName() != null)
+            customerToUpdate.setName(customer.getName());
+        if (customer.getEmail() != null)
+            customerToUpdate.setEmail(customer.getEmail());
+        if (customer.getPhone() != null)
+            customerToUpdate.setPhone(customer.getPhone());
         customerToUpdate.setUpdatedAt(LocalDateTime.now());
         // todo error 400
         return new ResponseEntity<>(new Response<>(customerRepository.save(customerToUpdate)), HttpStatus.CREATED);
@@ -77,7 +80,7 @@ public class CustomerController {
     public ResponseEntity<Response<?>> deleteCustomer(@PathVariable int id) {
         Customer customer = customerRepository.findById(id).orElse(null);
         if (customer == null) {
-            return new ResponseEntity(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
         }
 
         customerRepository.deleteById(id);
