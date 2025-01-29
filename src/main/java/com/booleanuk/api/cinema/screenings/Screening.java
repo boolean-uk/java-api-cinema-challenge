@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.screenings;
 
 import com.booleanuk.api.cinema.movies.Movie;
 import com.booleanuk.api.cinema.tickets.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "screenings")
+@JsonIgnoreProperties({"tickets"})
 public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +43,13 @@ public class Screening {
     @OneToMany(mappedBy = "screening", cascade = CascadeType.REMOVE)
     @JsonIncludeProperties({"customer_id", "screening_id", "num_seats"})
     private List<Ticket> tickets;
+
+    public Screening(Movie movie, int screenNumber, LocalDateTime startsAt, int capacity) {
+        this.movie = movie;
+        this.screenNumber = screenNumber;
+        this.startsAt = startsAt;
+        this.capacity = capacity;
+    }
 
     public Screening(int screenNumber, LocalDateTime startsAt, int capacity) {
         this.screenNumber = screenNumber;

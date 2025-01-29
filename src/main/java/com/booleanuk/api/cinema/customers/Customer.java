@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.customers;
 
 import com.booleanuk.api.cinema.tickets.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "customers")
+@JsonIgnoreProperties({"tickets"})
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
