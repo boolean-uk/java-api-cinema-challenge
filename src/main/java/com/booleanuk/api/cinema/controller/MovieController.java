@@ -91,10 +91,14 @@ public class MovieController {
             return new ResponseEntity<>(new ErrorResponse("not found"), HttpStatus.NOT_FOUND);
         }
 
-        movieToUpdate.setTitle(movie.getTitle());
-        movieToUpdate.setRating(movie.getRating());
-        movieToUpdate.setDescription(movie.getDescription());
-        movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
+        if (movie.getTitle() != null)
+            movieToUpdate.setTitle(movie.getTitle());
+        if (movie.getRating() != null)
+            movieToUpdate.setRating(movie.getRating());
+        if (movie.getDescription() != null)
+            movieToUpdate.setDescription(movie.getDescription());
+        if (movie.getRuntimeMins() > 0)
+            movieToUpdate.setRuntimeMins(movie.getRuntimeMins());
         movieToUpdate.setUpdatedAt(LocalDateTime.now());
 
         if (movieRepository.save(movieToUpdate) == null) {
