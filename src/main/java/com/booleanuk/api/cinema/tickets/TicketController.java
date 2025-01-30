@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class TicketController {
 
         Customer customer = this.customerRepository.findById(customerId).orElse(null);
         if (customer == null) {
-            ErrorResponse error = new ErrorResponse("No such customer found");
+            ErrorResponse error = new ErrorResponse(Map.of("message","No such customer found"));
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         // Check if the tickets belonging to the customer ID match the screenID
@@ -48,7 +47,7 @@ public class TicketController {
         }
 
         if (tickets.isEmpty()) {
-            ErrorResponse noMatchingTicketsError = new ErrorResponse("The customer exists but does not have any tickets with that screening ID");
+            ErrorResponse noMatchingTicketsError = new ErrorResponse(Map.of("message","The customer exists but does not have any tickets with that screening ID"));
             return new ResponseEntity<>(noMatchingTicketsError, HttpStatus.NOT_FOUND);
         }
 
@@ -64,12 +63,12 @@ public class TicketController {
 
         Customer customer = this.customerRepository.findById(customerId).orElse(null);
         if (customer == null) {
-            ErrorResponse error = new ErrorResponse("No such customer found");
+            ErrorResponse error = new ErrorResponse(Map.of("message","No such customer found"));
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         Screen screen = this.screenRepository.findById(screeningId).orElse(null);
         if (screen == null) {
-            ErrorResponse error = new ErrorResponse("Customer exists but no such screen found.");
+            ErrorResponse error = new ErrorResponse(Map.of("message","Customer exists but no such screen found."));
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         ticket.setCustomer(customer);

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("customers")
@@ -26,7 +27,7 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Response<?>> createCustomer(@RequestBody Customer customer) {
         if (customer == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Failed to create customer");
+            ErrorResponse errorResponse = new ErrorResponse(Map.of("message","Failed to create customer"));
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
         }
         customer.setDate_created(String.valueOf(LocalDateTime.now()));

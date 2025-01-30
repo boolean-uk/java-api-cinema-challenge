@@ -8,9 +8,9 @@ import java.util.Map;
 
 @Getter
 
-public class ErrorResponse extends Response<String>{
+public class ErrorResponse extends Response<Map<String, String>>{
 
-    public ErrorResponse(String data) {
+    public ErrorResponse(Map<String, String> data) {
         super(data);
         this.status = "Error";
 
