@@ -2,6 +2,7 @@ package com.booleanuk.api.cinema.tickets;
 
 import com.booleanuk.api.cinema.customers.Customer;
 import com.booleanuk.api.cinema.screens.Screen;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,12 +28,12 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnoreProperties("tickets")
+    @JsonIgnore
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "screening_id")
-    @JsonIgnoreProperties("tickets")
+    @JsonIgnore
     private Screen screen;
 
     @Column(name = "created_at")
