@@ -8,16 +8,11 @@ import java.util.Map;
 
 @Getter
 
-public class ErrorResponse extends Response<Map<String, String>>{
+public class ErrorResponse extends Response<String>{
 
-    public ErrorResponse(String status, Map<String, String> data) {
-        super(status, data);
+    public ErrorResponse(String data) {
+        super(data);
+        this.status = "Error";
 
-    }
-
-    public void set(String message) {
-        Map<String, String> reply = new HashMap<>();
-        reply.put("message", message);
-        this.data = reply;
     }
 }

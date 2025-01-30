@@ -1,6 +1,8 @@
 package com.booleanuk.api.cinema.customers;
 
 
+import com.booleanuk.api.cinema.responses.ErrorResponse;
+import com.booleanuk.api.cinema.responses.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +19,18 @@ public class CustomerController {
     CustomerRepository customerRepository;
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(customerRepository.findAll());
+    public ResponseEntity<Response<?>> getAllCustomers() {
+        return new ResponseEntity<>(new Response<>(customerRepository.findAll()), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Response<?>> createCustomer(@RequestBody Customer customer) {
+        if (customer == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Failed to create customer");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
+        }
         customer.setDate_created(String.valueOf(LocalDateTime.now()));
-        return new ResponseEntity<>(this.customerRepository.save(customer), HttpStatus.CREATED);
+        return new ResponseEntity<>(new Response<>(this.customerRepository.save(customer)), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

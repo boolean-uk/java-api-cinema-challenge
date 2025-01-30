@@ -36,8 +36,7 @@ public class TicketController {
 
         Customer customer = this.customerRepository.findById(customerId).orElse(null);
         if (customer == null) {
-            ErrorResponse error = new ErrorResponse("Error", null);
-            error.set("No such customer found");
+            ErrorResponse error = new ErrorResponse("No such customer found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         // Check if the tickets belonging to the customer ID match the screenID
@@ -49,12 +48,11 @@ public class TicketController {
         }
 
         if (tickets.isEmpty()) {
-            ErrorResponse noMatchingTicketsError = new ErrorResponse("Error", null);
-            noMatchingTicketsError.set("The customer exists but does not have any tickets with that screening ID");
+            ErrorResponse noMatchingTicketsError = new ErrorResponse("The customer exists but does not have any tickets with that screening ID");
             return new ResponseEntity<>(noMatchingTicketsError, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new Response<>("Success", tickets), HttpStatus.OK);
+        return new ResponseEntity<>(new Response<>(tickets), HttpStatus.OK);
 
     }
 
@@ -66,23 +64,18 @@ public class TicketController {
 
         Customer customer = this.customerRepository.findById(customerId).orElse(null);
         if (customer == null) {
-            ErrorResponse error = new ErrorResponse("Error", null);
-            error.set("No such customer found");
+            ErrorResponse error = new ErrorResponse("No such customer found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-        Screen screen = this.screenRepository.findById(customerId).orElse(null);
+        Screen screen = this.screenRepository.findById(screeningId).orElse(null);
         if (screen == null) {
-            ErrorResponse error = new ErrorResponse("Error", null);
-            error.set("Customer exists but no such screen found.");
+            ErrorResponse error = new ErrorResponse("Customer exists but no such screen found.");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         ticket.setCustomer(customer);
         ticket.setScreen(screen);
         ticket.setCreated_at(String.valueOf(LocalDateTime.now()));
-        return new ResponseEntity<>(new Response<>("Success", this.ticketRepository.save(ticket)), HttpStatus.CREATED);
-
-
-
+        return new ResponseEntity<>(new Response<>(this.ticketRepository.save(ticket)), HttpStatus.CREATED);
 
     }
 }

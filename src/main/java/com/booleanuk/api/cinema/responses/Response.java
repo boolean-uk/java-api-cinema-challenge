@@ -7,8 +7,9 @@ public class Response<T> {
     protected String status;
     protected T data;
 
-    public Response(String status, T data) {
-        this.status = status;
+    public Response(T data) {
+        this.status = "Success";
         this.data = data;
     }
+
 }
