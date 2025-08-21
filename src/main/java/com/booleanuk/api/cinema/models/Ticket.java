@@ -18,7 +18,7 @@ public class Ticket {
     private int customer_id;
 
     @Column(insertable = false, updatable = false)
-    private int publisher_id;
+    private int screening_id;
 
     @Column
     private int numSeats;

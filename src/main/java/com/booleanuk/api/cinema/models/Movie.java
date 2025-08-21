@@ -28,9 +28,10 @@ public class Movie {
     @Column
     private int runtimeMins;
 
-    @OneToMany(mappedBy = "screening")
-    @JsonIgnoreProperties({"screening"})
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnoreProperties({"movie"})
     private List<Screening> screenings;
+
 
     public Movie(String title, String rating, String description, int runtimeMins){
         this.title = title;
