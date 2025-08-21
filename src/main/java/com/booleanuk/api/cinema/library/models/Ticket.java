@@ -15,6 +15,11 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private Integer numSeats;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
@@ -23,8 +28,14 @@ public class Ticket {
     @JoinColumn(name = "screening_id")
     private Screening screening;
 
-    private Integer numSeats;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
