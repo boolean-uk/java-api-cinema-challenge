@@ -3,6 +3,7 @@ package com.booleanuk.api.cinema.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Data
@@ -46,6 +48,10 @@ public class Screening {
     @JsonIgnore
     private Movie movie;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "screening", fetch = FetchType.LAZY)
+    private List<Ticket> tickets;
+
     public Screening(int screenNumber, int capacity, String startsAt) {
         this.screenNumber = screenNumber;
         this.capacity = capacity;
@@ -62,5 +68,9 @@ public class Screening {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void addTicket(Ticket ticket) {
+        this.tickets.add(ticket);
     }
 }

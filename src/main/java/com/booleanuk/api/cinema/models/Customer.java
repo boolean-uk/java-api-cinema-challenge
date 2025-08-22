@@ -1,6 +1,7 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 
 @NoArgsConstructor
@@ -44,6 +46,10 @@ public class Customer {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
     private OffsetDateTime updatedAt;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Ticket> tickets;
+
     public Customer(String name, String email, String phone) {
         this.name = name;
         this.email = email;
@@ -59,5 +65,9 @@ public class Customer {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void addTicket(Ticket ticket) {
+        this.tickets.add(ticket);
     }
 }

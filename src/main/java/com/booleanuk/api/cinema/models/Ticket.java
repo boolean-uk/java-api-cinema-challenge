@@ -9,30 +9,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @Data
 @Getter
 @Setter
 @Entity
-@Table(name = "movies")
-public class Movie {
+@Table(name = "tickets")
+public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private String title;
-
     @Column
-    private String rating;
-
-    @Column
-    private String description;
-
-    @Column
-    private int runtimeMins;
+    private int numSeats;
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
@@ -42,17 +33,18 @@ public class Movie {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ssXXX")
     private OffsetDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore
-    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
-    //@JsonIncludeProperties (value = {"screenNumber", "capacity", "startsAt"})
-    private List<Screening> screenings;
+    private Customer customer;
 
-    public Movie(String title, String rating, String description, int runtimeMins, List<Screening> screenings) {
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMins = runtimeMins;
-        this.screenings = screenings;
+    @ManyToOne
+    @JoinColumn(name = "screening_id", nullable = false)
+    @JsonIgnore
+    private Screening screening;
+
+    public Ticket(int numSeats) {
+        this.numSeats = numSeats;
     }
 
     @PrePersist
@@ -65,11 +57,4 @@ public class Movie {
     protected void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
     }
-
-    public void addScreening(Screening screening){
-        this.screenings.add(screening);
-    }
-
-
-
 }

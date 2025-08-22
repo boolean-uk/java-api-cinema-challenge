@@ -34,14 +34,14 @@ public class ScreeningController {
 
     @PostMapping
     public ResponseEntity<Response<?>> createScreening(@PathVariable int id, @RequestBody Screening screening) {
-        ScreeningResponse screeningResponse = new ScreeningResponse();
         Movie movie = this.movieRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No movie with that id were found"));
         screening.setMovie(movie);
+
+        ScreeningResponse screeningResponse = new ScreeningResponse();
         try {
             screeningResponse.set(this.screeningRepository.save(screening));
             movie.addScreening(screening);
-            screening.setMovie(movie);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.set("Bad request");
