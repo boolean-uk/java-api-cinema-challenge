@@ -55,18 +55,17 @@ public class WebSecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/books", "/books/**").authenticated() // need to add hasRole to be role specific
-                        .requestMatchers("/customers", "/customers/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/movies", "/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/movies", "/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/movies", "/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/movies", "/movies/**").authenticated()
+                        .requestMatchers("/customers", "/customers/**").hasAnyRole("ADMIN","MODERATOR")
 
-                        .requestMatchers(HttpMethod.DELETE, "/screenings", "/screenings/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/screenings", "/screenings/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/screenings", "/screenings/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/screenings", "/screenings/**").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/movies").hasAnyRole("CUSTOMER", "ADMIN", "MODERATOR")
+                        .requestMatchers(HttpMethod.POST,"/movies").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/movies").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/movies").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET,"movies/{id}/screenings").hasAnyRole("USER", "ADMIN", "MODERATOR")
+                        .requestMatchers(HttpMethod.POST,"movies/{id}/screenings").hasRole("ADMIN")
+
+                        .requestMatchers("/tickets", "/tickets/**").hasRole("USER")
                 );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

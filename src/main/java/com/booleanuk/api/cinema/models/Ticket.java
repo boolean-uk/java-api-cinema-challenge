@@ -1,32 +1,24 @@
 package com.booleanuk.api.cinema.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "customers")
-public class Customer {
-
+@Table(name = "tickets")
+public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
     @Column
-    private String name;
-
-    @Column
-    private String email;
-
-    @Column
-    private String phone;
+    private int numSeats;
 
     @Column
     private String createdAt;
@@ -34,16 +26,19 @@ public class Customer {
     @Column
     private String updatedAt;
 
-    private ERole role = ERole.ROLE_USER; // change to customer
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIncludeProperties(value = {"name"})
+    private Customer customer;
 
-    @OneToMany(mappedBy = "customer")
-    @JsonIgnoreProperties({"customer"})
-    private List<Ticket> tickets;
+    @ManyToOne
+    @JoinColumn(name = "screening_id", nullable = false)
+    @JsonIncludeProperties(value = {"screen_number"}) // might need to be screenNumber
+    private Screening screening;
 
-    public Customer(String name, String email, String phone) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
+
+    public Ticket(int numSeats) {
+        this.numSeats = numSeats;
     }
 
     @PrePersist
@@ -55,11 +50,5 @@ public class Customer {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = String.valueOf(LocalDateTime.now());
-    }
-
-    public Customer(int id) {this.id = id;}
-
-    public void addTicket(Ticket ticket) {
-        this.tickets.add(ticket);
     }
 }
