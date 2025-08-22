@@ -1,6 +1,9 @@
 package com.booleanuk.api.cinema.controllers;
 
+import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.models.Screening;
+import com.booleanuk.api.cinema.models.ScreeningRequestDTO;
+import com.booleanuk.api.cinema.repository.MovieRepository;
 import com.booleanuk.api.cinema.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.payload.response.ScreeningListResponse;
 import com.booleanuk.api.cinema.payload.response.ScreeningResponse;
@@ -11,11 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
+
 @RestController
-@RequestMapping("screenings")
+@RequestMapping("movies/{id}/screenings")
 public class ScreeningController {
     @Autowired
     private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
 
     @GetMapping
     public ResponseEntity<ScreeningListResponse> getAllScreenings() {
@@ -25,28 +33,24 @@ public class ScreeningController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<?>> createScreening(@RequestBody Screening screening) {
+    public ResponseEntity<Response<?>> createScreening(@PathVariable int id, @RequestBody ScreeningRequestDTO dto) {
         ScreeningResponse screeningResponse = new ScreeningResponse();
         try {
-            screeningResponse.set(this.screeningRepository.save(screening));
+            Movie movie = movieRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+            Screening screening = new Screening();
+            screening.setScreenNumber(dto.screenNumber());
+            screening.setCapacity(dto.capacity());
+            screening.setMovie(movie);
+
+            screeningResponse.set(screeningRepository.save(screening));
+            return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
+
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.set("Bad request");
+            error.set("Bad request: " + e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<?>> getScreeningById(@PathVariable int id) {
-        Screening screening = this.screeningRepository.findById(id).orElse(null);
-        if (screening == null) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("not found");
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-        }
-        ScreeningResponse screeningResponse = new ScreeningResponse();
-        screeningResponse.set(screening);
-        return ResponseEntity.ok(screeningResponse);
     }
 }
