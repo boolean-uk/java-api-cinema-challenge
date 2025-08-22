@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "app_user")
 public class User {
 
     @Id
@@ -19,7 +20,7 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String password; // hashed password
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
