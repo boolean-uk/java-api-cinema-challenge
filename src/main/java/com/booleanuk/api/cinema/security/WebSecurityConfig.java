@@ -66,7 +66,10 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"movies/{id}/screenings").hasAnyRole("CUSTOMER", "ADMIN", "TICKETSELLER")
                         .requestMatchers(HttpMethod.POST,"movies/{id}/screenings").hasRole("ADMIN")
 
-                        .requestMatchers("/tickets", "/tickets/**").hasRole("TICKETSELLER")
+                        .requestMatchers(HttpMethod.GET,"customers/{customerId}/screenings/{screeningId}").hasAnyRole("CUSTOMER", "ADMIN", "TICKETSELLER")
+                        .requestMatchers(HttpMethod.POST,"customers/{customerId}/screenings/{screeningId}").hasAnyRole( "TICKETSELLER")
+
+
                 );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
