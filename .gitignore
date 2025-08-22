@@ -36,3 +36,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+### properties ###
+
+*.properties
+report.html.html
+report.html.json
+application.yml
+
+
