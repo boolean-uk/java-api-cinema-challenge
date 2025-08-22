@@ -34,7 +34,7 @@ public class ScreeningController {
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
 
-        screeningListResponse.set(this.screeningRepository.findAll());
+        screeningListResponse.set(this.screeningRepository.getScreeningByMovie(movie));
         return ResponseEntity.ok(screeningListResponse);
     }
 
