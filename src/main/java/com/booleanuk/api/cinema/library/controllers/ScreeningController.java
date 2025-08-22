@@ -2,14 +2,16 @@ package com.booleanuk.api.cinema.library.controllers;
 
 import com.booleanuk.api.cinema.library.models.Movie;
 import com.booleanuk.api.cinema.library.models.Screening;
+import com.booleanuk.api.cinema.library.payload.request.ScreeningRequest;
+import com.booleanuk.api.cinema.library.payload.response.ScreeningResponse;
 import com.booleanuk.api.cinema.library.repository.MovieRepository;
 import com.booleanuk.api.cinema.library.repository.ScreeningRepository;
-import com.booleanuk.api.cinema.library.payload.request.ScreeningRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies/{movieId}/screenings")
@@ -22,14 +24,19 @@ public class ScreeningController {
     private MovieRepository movieRepository;
 
     @GetMapping
-    public ResponseEntity<List<Screening>> getScreeningsByMovie(@PathVariable Integer movieId) {
+    public ResponseEntity<List<ScreeningResponse>> getScreeningsByMovie(@PathVariable Integer movieId) {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
-        return ResponseEntity.ok(movie.getScreenings());
+
+        List<ScreeningResponse> responses = movie.getScreenings().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping
-    public ResponseEntity<Screening> createScreening(
+    public ResponseEntity<ScreeningResponse> createScreening(
             @PathVariable Integer movieId,
             @RequestBody ScreeningRequest request) {
 
@@ -43,8 +50,19 @@ public class ScreeningController {
                 .startsAt(request.getStartsAt())
                 .build();
 
-        Screening savedScreening = screeningRepository.save(screening);
+        Screening saved = screeningRepository.save(screening);
 
-        return ResponseEntity.status(201).body(savedScreening);
+        return ResponseEntity.status(201).body(toResponse(saved));
+    }
+
+    private ScreeningResponse toResponse(Screening screening) {
+        return ScreeningResponse.builder()
+                .id(screening.getId())
+                .screenNumber(screening.getScreenNumber())
+                .capacity(screening.getCapacity())
+                .startsAt(screening.getStartsAt())
+                .createdAt(screening.getCreatedAt())
+                .updatedAt(screening.getUpdatedAt())
+                .build();
     }
 }

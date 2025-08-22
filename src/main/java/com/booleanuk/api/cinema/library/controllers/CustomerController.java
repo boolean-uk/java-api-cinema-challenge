@@ -3,14 +3,17 @@ package com.booleanuk.api.cinema.library.controllers;
 import com.booleanuk.api.cinema.library.models.Customer;
 import com.booleanuk.api.cinema.library.models.Screening;
 import com.booleanuk.api.cinema.library.models.Ticket;
+import com.booleanuk.api.cinema.library.payload.request.CustomerRequest;
+import com.booleanuk.api.cinema.library.payload.response.CustomerResponse;
 import com.booleanuk.api.cinema.library.repository.CustomerRepository;
 import com.booleanuk.api.cinema.library.repository.ScreeningRepository;
 import com.booleanuk.api.cinema.library.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customers")
@@ -26,53 +29,60 @@ public class CustomerController {
     private TicketRepository ticketRepository;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<CustomerResponse> getAllCustomers() {
+        return customerRepository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable int id) {
-        return customerRepository.findById(id);
+    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable int id) {
+        return customerRepository.findById(id)
+                .map(customer -> ResponseEntity.ok(toResponse(customer)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CustomerRequest request) {
+        Customer customer = new Customer();
+        customer.setName(request.getName());
+        customer.setEmail(request.getEmail());
+        customer.setPhone(request.getPhone());
+
+        Customer saved = customerRepository.save(customer);
+        return ResponseEntity.status(201).body(toResponse(saved));
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable int id, @RequestBody Customer updatedCustomer) {
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable int id, @RequestBody CustomerRequest request) {
         return customerRepository.findById(id).map(customer -> {
-            customer.setName(updatedCustomer.getName());
-            customer.setEmail(updatedCustomer.getEmail());
-            customer.setPhone(updatedCustomer.getPhone());
-            return customerRepository.save(customer);
-        }).orElseGet(() -> {
-            updatedCustomer.setId(id);
-            return customerRepository.save(updatedCustomer);
-        });
+            customer.setName(request.getName());
+            customer.setEmail(request.getEmail());
+            customer.setPhone(request.getPhone());
+
+            Customer updated = customerRepository.save(customer);
+            return ResponseEntity.ok(toResponse(updated));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable int id) {
+        if (!customerRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         customerRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{customerId}/tickets")
-    public Ticket createTicket(@PathVariable int customerId,
-                               @RequestParam int screeningId,
-                               @RequestParam int numSeats) {
-
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        Screening screening = screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
-
-        Ticket ticket = new Ticket();
-        ticket.setCustomer(customer);
-        ticket.setScreening(screening);
-        ticket.setNumSeats(numSeats);
-
-        return ticketRepository.save(ticket);
+    private CustomerResponse toResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
+                .createdAt(customer.getCreatedAt())
+                .updatedAt(customer.getUpdatedAt())
+                .build();
     }
+
 }
