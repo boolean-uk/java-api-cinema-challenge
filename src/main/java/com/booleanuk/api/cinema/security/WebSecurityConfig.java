@@ -7,6 +7,7 @@ import com.booleanuk.api.cinema.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -55,10 +56,17 @@ public class WebSecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/customers", "/customers/**").authenticated()
-                        .requestMatchers("/movies", "/movies/**").authenticated()
-                        .requestMatchers("/screenings", "/screenings/**").authenticated()
-                        .requestMatchers("/tickets", "/tickets/**").authenticated()
+                        .requestMatchers("/customers", "/customers/**").hasAnyRole("ADMIN","TICKETSELLER")
+
+                        .requestMatchers(HttpMethod.GET,"/movies").hasAnyRole("CUSTOMER", "ADMIN", "TICKETSELLER")
+                        .requestMatchers(HttpMethod.POST,"/movies").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/movies").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/movies").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET,"movies/{id}/screenings").hasAnyRole("CUSTOMER", "ADMIN", "TICKETSELLER")
+                        .requestMatchers(HttpMethod.POST,"movies/{id}/screenings").hasRole("ADMIN")
+
+                        .requestMatchers("/tickets", "/tickets/**").hasRole("TICKETSELLER")
                 );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
