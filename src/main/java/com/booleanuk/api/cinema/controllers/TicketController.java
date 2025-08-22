@@ -60,48 +60,4 @@ public class TicketController {
         ticketResponse.set(ticket);
         return ResponseEntity.ok(ticketResponse);
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Response<?>> updateTicket(@PathVariable int id, @RequestBody Ticket ticket) {
-        Screening screening = screeningRepository.findById(ticket.getScreening_id()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-        Customer customer = customerRepository.findById(ticket.getCustomer_id()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
-
-        Ticket ticketToUpdate = this.ticketRepository.findById(id).orElse(null);
-
-        if (ticketToUpdate == null) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("not found");
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-        }
-        ticketToUpdate.setCustomer(customer);
-        ticketToUpdate.setScreening(screening);
-        ticketToUpdate.setNumSeats(ticket.getNumSeats());
-
-        try {
-            ticketToUpdate = this.ticketRepository.save(ticketToUpdate);
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("Bad request");
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-        TicketResponse ticketResponse = new TicketResponse();
-        ticketResponse.set(ticketToUpdate);
-        return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Response<?>> deleteTicket(@PathVariable int id) {
-        Ticket ticketToDelete = this.ticketRepository.findById(id).orElse(null);
-        if (ticketToDelete == null) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("not found");
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-        }
-        this.ticketRepository.delete(ticketToDelete);
-        TicketResponse ticketResponse = new TicketResponse();
-        ticketResponse.set(ticketToDelete);
-        return ResponseEntity.ok(ticketResponse);
-    }
 }

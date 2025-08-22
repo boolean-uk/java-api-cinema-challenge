@@ -49,42 +49,4 @@ public class ScreeningController {
         screeningResponse.set(screening);
         return ResponseEntity.ok(screeningResponse);
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Response<?>> updateScreening(@PathVariable int id, @RequestBody Screening screening) {
-        Screening screeningToUpdate = this.screeningRepository.findById(id).orElse(null);
-        if (screeningToUpdate == null) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("not found");
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-        }
-        screeningToUpdate.setScreenNumber(screening.getScreenNumber());
-        screeningToUpdate.setCapacity(screening.getCapacity());
-        screeningToUpdate.setStartsAt(screening.getStartsAt());
-
-        try {
-            screeningToUpdate = this.screeningRepository.save(screeningToUpdate);
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("Bad request");
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-        ScreeningResponse screeningResponse = new ScreeningResponse();
-        screeningResponse.set(screeningToUpdate);
-        return new ResponseEntity<>(screeningResponse, HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Response<?>> deleteScreening(@PathVariable int id) {
-        Screening screeningToDelete = this.screeningRepository.findById(id).orElse(null);
-        if (screeningToDelete == null) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("not found");
-            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-        }
-        this.screeningRepository.delete(screeningToDelete);
-        ScreeningResponse screeningResponse = new ScreeningResponse();
-        screeningResponse.set(screeningToDelete);
-        return ResponseEntity.ok(screeningResponse);
-    }
 }

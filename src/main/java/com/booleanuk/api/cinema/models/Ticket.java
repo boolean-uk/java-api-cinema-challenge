@@ -21,7 +21,7 @@ public class Ticket {
     private int screening_id;
 
     @Column
-    private int numSeats;
+    private int num_seats;
 
     @ManyToOne
     @JoinColumn(name = "screening_id", nullable = false)

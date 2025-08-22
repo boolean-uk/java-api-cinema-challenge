@@ -19,15 +19,15 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (this.roleRepository.existsByName(ERole.ROLE_CUSTOMER)) {
+        if (this.roleRepository.findByName(ERole.ROLE_CUSTOMER).isEmpty()) {
             this.roleRepository.save(new Role(ERole.ROLE_CUSTOMER));
         }
 
-        if (this.roleRepository.existsByName(ERole.ROLE_ADMIN)) {
+        if (this.roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             this.roleRepository.save(new Role(ERole.ROLE_ADMIN));
         }
 
-        if (this.roleRepository.existsByName(ERole.ROLE_TICKETMASTER)) {
+        if (this.roleRepository.findByName(ERole.ROLE_TICKETMASTER).isEmpty()) {
             this.roleRepository.save(new Role(ERole.ROLE_TICKETMASTER));
         }
     }

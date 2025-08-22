@@ -28,14 +28,15 @@ public class Screening {
     @Column
     private String startsAt;
 
+    @Column(insertable = false, updatable = false)
+    private int movie_id;
+
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties({"screening"})
+    private List<Ticket> tickets;
+
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIncludeProperties(value = {"title", "runtimeMins"})
     private Movie movie;
-
-    public Screening(int screenNumber, int capacity, String startsAt){
-        this.screenNumber = screenNumber;
-        this.capacity = capacity;
-        this.startsAt = startsAt;
-    }
 }

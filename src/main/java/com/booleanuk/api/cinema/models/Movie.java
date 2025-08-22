@@ -28,15 +28,7 @@ public class Movie {
     @Column
     private int runtimeMins;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
     @JsonIgnoreProperties({"movie"})
     private List<Screening> screenings;
-
-
-    public Movie(String title, String rating, String description, int runtimeMins){
-        this.title = title;
-        this.rating = rating;
-        this.description = description;
-        this.runtimeMins = runtimeMins;
-    }
 }

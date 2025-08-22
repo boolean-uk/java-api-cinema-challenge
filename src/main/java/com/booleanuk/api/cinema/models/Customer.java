@@ -25,9 +25,7 @@ public class Customer {
     @Column
     private String phone;
 
-    public Customer(String name, String email, String phone){
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-    }
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties({"customer"})
+    private List<Ticket> tickets;
 }
