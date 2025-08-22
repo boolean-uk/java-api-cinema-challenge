@@ -36,3 +36,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore application.yml file ###
+src/main/resources/application.yml
+report.html
+report.json
