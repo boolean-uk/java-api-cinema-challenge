@@ -3,6 +3,7 @@ package com.booleanuk.api.cinema.controllers;
 import com.booleanuk.api.cinema.models.Movie;
 import com.booleanuk.api.cinema.payload.response.*;
 import com.booleanuk.api.cinema.repositories.MovieRepository;
+import com.booleanuk.api.cinema.repositories.ScreeningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ public class MovieController {
 
     @Autowired
     private MovieRepository movieRepository;
-
 
     @GetMapping
     public ResponseEntity<MovieListResponse> getAllMovies() {
