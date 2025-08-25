@@ -60,7 +60,10 @@ public class WebSecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/books", "/books/**").authenticated()
+                        .requestMatchers("/movies", "/movies/**").authenticated()
+                        .requestMatchers("/customers", "/customers/**").authenticated()
+                        .requestMatchers("/customers/**/**", "/movies/**/**").authenticated()
+
                 );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
